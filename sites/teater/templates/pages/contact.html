@@ -4,30 +4,31 @@
 
 {% block content %}
 
-<div class="page-content">
-    <p>Aarhus Teaters Arkiv bestyres af arkivar &amp; historiker Marianne Ninna Philipsen.</p>
-    <p>Forespørgsler vedr. specifikke arkivalier eller historiske oplysninger modtages via e-mail og behandles
-        løbende.</p>
-    <p>Der er ingen faste åbningstider, men har man specifikke forespørgsler vedr. ikke- digitaliserede arkivalier,
-        kan arkivet besøges efter aftale.</p>
-    <h4 class="pad-top_large">KONTAKT</h4>
-    <dl>
-        <dt>ARKIVAR</dt>
-        <dd>Marianne Ninna Philipsen</dd>
-        <dt>ADRESSE</dt>
-        <dd>Aarhus Teaters Arkiv &amp; Historie, Skolegade 9, 8000 Aarhus C</dd>
-        <dt>TLF. NUMMER</dt>
-        <dd>+45 89 33 23 59 / 28772252</dd>
-        <dt>EMAIL</dt>
-        <dd><a href="mailto:marianne.philipsen@aarhusteater.dk">marianne.philipsen@aarhusteater.dk</a></dd>
-        <dt>HJEMMESIDE</dt>
-        <dd><a
-                href="https://www.aarhusteater.dk/om-teatret/om-huset/">http://www.aarhusteater.dk/om-teatret/om-huset/</a>
-        </dd>
-    </dl>
+{% set markdown_content %}
 
-</div>
+Aarhus Teaters Arkiv bestyres af historiker og arkivar Marianne Ninna
+Philipsen.
 
+Forespørgsler vedr. specifikke arkivalier eller historiske oplysninger
+modtages via e-mail og behandles løbende.
+
+Der er ingen faste åbningstider, men har man specifikke forespørgsler
+vedr. ikke- digitaliserede arkivalier, kan arkivet besøges efter aftale.
+
+**KONTAKT**
+
+ARKIVAR: Marianne Ninna Philipsen
+
+ADRESSE: Aarhus Teaters Arkiv & Historie, Skolegade 9, 8000 Aarhus C
+
+TLF. NUMMER: 89 33 23 00/ 28 77 22 52
+
+EMAIL: <marianne.philipsen@aarhusteater.dk>
+
+HJEMMESIDE: [aarhusteater.dk](https://aarhusteater.dk)
+{% endset %}
+
+{{ markdown(markdown_content)|safe }}
 
 
 {% endblock content %}
