@@ -1,0 +1,20 @@
+Aarhus Teaters Arkiv bestyres af historiker og arkivar Marianne Ninna
+Philipsen.
+
+Forespørgsler vedr. specifikke arkivalier eller historiske oplysninger
+modtages via e-mail og behandles løbende.
+
+Der er ingen faste åbningstider, men har man specifikke forespørgsler
+vedr. ikke- digitaliserede arkivalier, kan arkivet besøges efter aftale.
+
+**KONTAKT**
+
+ARKIVAR Marianne Ninna Philipsen
+
+ADRESSE Aarhus Teaters Arkiv & Historie, Skolegade 9, 8000 Aarhus C
+
+TLF. NUMMER 89 33 23 00/ 28 77 22 52
+
+EMAIL <marianne.philipsen@aarhusteater.dk>
+
+HJEMMESIDE aarhusteater.dk

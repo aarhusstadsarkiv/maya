@@ -1,0 +1,44 @@
+**OM AARHUS TEATERS ARKIV**
+
+Teater er en flygtig kunstart. Når tæppet falder den sidste aften efter
+en forestilling, eksisterer den ikke længere som noget konkret sanseligt
+og visuelt. Teatret er og har altid været en oplevelse i nuet. Det er
+teatrets "nu", som Aarhus Teaters Arkiv bevarer og dokumenterer for
+fremtiden.
+
+Aarhus Teaters arkivalier er dateret fra 1898 og frem. Aarhus Teaters
+arkiv rummer over 300 hyldemeter analoge arkivalier af stor
+kulturhistorisk værdi. Der er tale om historie og kulturarv, som dækker
+det nære lokale, det nationale samt det internationale udsyn indenfor
+dansk scenekunst og kultur.
+
+**SAMLINGERNE**
+
+Aarhus Teaters Arkiv er delt i to samlinger: Aarhus Teaters Kunstneriske
+Samling og Aarhus Teaters Administrative Samling.
+
+Arkivets kunstneriske samling befinder sig fysisk på Aarhus Teaters
+Arkiv, mens den administrative samling gennem de seneste par år blevet
+overdraget til Aarhus Stadsarkiv, hvor det registreres på
+www.aarhusarkivet.dk
+
+Blandt de tusindvis af arkivalier i Aarhus Teaters Kunstneriske Samling
+er manuskripter, fotografier, programmer, plakater, scene- og
+kostumetegninger, breve, dagbøger, forhandlings-, rekvisit- og
+kostumeprotokoller, noder og meget mere.
+
+**AARHUS TEATERS DIGITALE ARKIV**
+
+I Aarhus Teaters digitale arkiv kan man søge på forestillinger, personer
+eller sæsoner og via disse komme på en rundtur i hele teatrets historie
+eller få specifikke oplysninger om enkelte forestillinger, skuespillere
+og øvrige ansatte.
+
+Der ligger mere end 26.000 digitale filer tilgængelige på Aarhus Teaters
+online-arkiv. Der er primært tale om forestillingsbilleder og
+programmer, som kan søges frem gennem personnavne eller
+forestillingstitler. Der ligger også en del breve til og fra nogen af
+teatrets første direktører.
+
+Det digitale arkiv løbende med oplysninger med arkivalier og
+oplysninger.
