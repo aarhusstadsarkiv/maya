@@ -1,12 +1,1 @@
--rw-r--r-- 1 dennis dennis 1545044 apr 22 09:21 '01 000144340 Salling gennem tiden.jpg'
--rw-r--r-- 1 dennis dennis  767416 apr 22 09:21 '02 000144033 Ferdinand Salling.jpg'
--rw-r--r-- 1 dennis dennis 2548803 apr 22 09:21 '03 000144327 Herman Salling.jpg'
--rw-r--r-- 1 dennis dennis 2024786 apr 22 09:21 '04 000144236 Sallings 50-års jubilæum.jpg'
--rw-r--r-- 1 dennis dennis 1081718 apr 22 09:21 '05 000141117 Ansatte i Salling.jpg'
--rw-r--r-- 1 dennis dennis 1821678 apr 22 09:21 '05 000511996 Vinduesudstillinger.jpg'
--rw-r--r-- 1 dennis dennis 1792245 apr 22 09:21 '06 000144145 Sallings tagrestaurant.jpg'
--rw-r--r-- 1 dennis dennis 3576330 apr 22 09:21 '07 000511836 Jul i Salling.jpg'
--rw-r--r-- 1 dennis dennis 1291988 apr 22 09:21 '08 000511854 Sallings salgsfremstød.jpg'
--rw-r--r-- 1 dennis dennis 1890014 apr 22 09:21 '09 000481954 Salling på banen.jpg'
--rw-r--r-- 1 dennis dennis  653444 apr 22 09:21 '10 000144093 Salling Group gennem tiden.jpg'
--rw-r--r-- 1 dennis dennis 1570329 apr 22 09:21 '11 000139276 Strøget i Aarhus.jpg'
+# Salling arkivet
