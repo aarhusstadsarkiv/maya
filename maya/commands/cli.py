@@ -129,6 +129,7 @@ def server_dev(port: int, workers: int, host: str, base_dir: str, reload=True):
         # reload when yml and py files change
         cmd.append("--reload")
         cmd.append("--reload-include=*.yml")
+        cmd.append("--reload-include=*.json")
 
         for dir in reload_dirs:
             cmd.append(f"--reload-dir={dir}")
