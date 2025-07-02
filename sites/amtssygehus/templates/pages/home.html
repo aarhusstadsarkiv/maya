@@ -1,0 +1,173 @@
+{% extends "base.html" %}
+
+{% import "macros/salling_macros.html" as salling_macros %}
+
+{% block body_class %}page-home{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', path='/css/memories.css') }}?v={{ get_setting('version') }}">
+<link rel="stylesheet" href="{{ url_for('static', path='/css/stories.css') }}?v={{ get_setting('version') }}">
+
+<link rel="stylesheet"
+    href="{{ url_for('static', path='/css/search_suggestions.css') }}?v={{ get_setting('version') }}">
+<script type="module">
+
+    import { initializeSlider } from '/static/js/search-suggestions.js?v={{ get_setting("version") }}';
+    initializeSlider("home");
+
+    import { Slider } from '/static/js/simple-slider.js?v={{ get_setting("version") }}';
+    const slider = new Slider('.slideshow', '.stories-first')
+
+
+</script>
+
+<style>
+
+    .stories-first-portrait img {
+        max-height: 300px;
+        width: auto;
+    }
+
+
+    .slider-left,
+    .slider-right {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 40px;
+        width: 40px;
+        background-color: var(--background-disabled);
+    }
+
+    .slideshow {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .slider-controls {
+        position: absolute;
+        bottom: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+    }
+
+
+    .slider-left,
+    .slider-right {
+        cursor: pointer;
+    }
+
+    .stories-first.active {
+        display: flex;
+    }
+
+    .stories-first {
+        background: var(--search-result-background);
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        padding: 0.7em;
+        display: none;
+        flex-direction: row;
+        align-items: flex-start;
+        min-width: 100%;
+        min-height: 335px;
+    }
+
+    .container-main>.section-title:first-of-type {
+        margin-top: 20px;
+    }
+
+
+    @media (max-width: 768px) {
+        .stories-first {
+            box-shadow: unset;
+            padding: unset;
+            flex-direction: column;
+        }
+
+        .stories-first-content {
+            height: 275px;
+        }
+    }
+
+
+    .stories-first-portrait {
+        align-items: center;
+        width: unset;
+        position: relative;
+        margin: 0 auto;
+    }
+
+    @media (max-width: 992px) {
+
+        .stories-first-portrait {
+            text-align: center;
+            display: unset;
+        }
+
+
+        .stories-first-content>p {
+            width: 100%;
+        }
+    }
+
+    /* max width of 768px; */
+    @media (max-width: 768px) {
+        .stories-first-portrait {
+            width: 100%;
+            margin: 0 auto;
+        }
+    }
+
+    h3 {
+        text-transform: uppercase;
+        margin: 20px 0;
+    }
+
+    .stories-first-portrait .arrow-left-container,
+    .stories-first-portrait .arrow-right-container {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+    .stories-first-portrait .arrow-left-container {
+        left: 0;
+    }
+
+    .stories-first-portrait .arrow-right-container {
+        right: 0;
+    }
+
+    .stories-first-portrait .arrow-left-container,
+    .stories-first-portrait .arrow-right-container {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background-color: var(--search-result-background);
+        z-index: 10;
+        cursor: pointer;
+        height: 40px;
+        width: 40px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+</style>
+
+{% endblock head %}
+
+{% block content %}
+
+{{ salling_macros.story_slider(stories) }}
+
+<h4 class="section-title">Udvalgte Salling Minder</h4>
+{{ salling_macros.memories(memories) }}
+
+{% include 'includes/search_suggestions_home.html' %}
+
+{% endblock content %}

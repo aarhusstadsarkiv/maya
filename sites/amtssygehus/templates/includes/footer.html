@@ -1,0 +1,49 @@
+
+
+
+<!-- new footer -->
+<div class="footer-content" id="item-1">
+    <div class="footer-logo-right">
+        <a href="https://stadsarkiv.aarhus.dk/"><img src="/static/assets/footer_stadsarkiv.png" alt="Besøg Aarhus Stadsarkiv"></a>
+    </div>
+</div>
+
+<div class="footer-content" id="item-2">
+    <ul class="contact-info">
+        <li class="heading">aarhus stadsarkiv</li>
+        <li>Hack Kampmanns Plads 2</li>
+        <li>DOKK1, niveau 2.2</li>
+        <li>8000 Aarhus C</li>
+        <li>Tlf.: 41856545</li>
+        <li>Mail: stadsarkiv@aarhus.dk</li>
+        <li>Web: aarhusstadsarkiv.dk</li>
+        <li>
+            &nbsp;
+        </li>
+
+        {% if get_setting('show_version') %}
+        {% set version = get_setting('version') %}
+            <li>
+                &nbsp;
+            </li>
+            <li class="version">{{ version }}</li>
+        {% endif %}
+    </ul>
+</div>
+
+<div class="footer-content" id="item-3">
+    <ul class="reading-room">
+        <li class="heading">Politik</li>
+        <li><a href="/privatlivspolitik">
+            Privatlivspolitik</a>
+        </li>
+        <li><a href="https://was.digst.dk/sallingarkivet-dk">Tilgængelighedserklæring</a></li>
+    </ul>
+</div>
+
+<div class="footer-content" id="item-4">
+    
+    <div class="footer-logo-right">
+        <a href="https://www.sallingfondene.dk/"><img src="/static/assets/footer_salling.png" alt="Besøg Aarhus Stadsarkiv"></a>
+    </div>
+</div>

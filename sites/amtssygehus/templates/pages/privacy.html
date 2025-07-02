@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block body_class %}page-cookies{% endblock %}
+
+{% block content %}
+{% include "includes/main_title.html" %}
+
+{% set markdown_content %}
+
+**1. Ejeroplysninger**  
+Aarhus Stadsarkiv  
+Dokk1  
+Hack Kampmanns Plads 2  
+8000 Aarhus C  
+Telefon: +45 89 40 48 00  
+Email: [stadsarkiv@aarhus.dk](mailto:stadsarkiv@aarhus.dk)  
+
+**2. Dette website anvender cookies**  
+En cookie er en lille tekstfil, der lagres på din computer el. tilsvarende for at kunne genkende dig. Der er ingen personlige oplysninger gemt i vores cookies, og de kan ikke indeholde virus.
+
+**3. Formål med cookies på vores website:**  
+- At gemme dine indstillinger.  
+- Trafikmåling og statistik.  
+
+**4. Tredjeparter med adgang til at sætte cookies**  
+Sitet anvender cookies fra en følgende tredjeparter:
+
+**5. Persondata**  
+Vi indsamler ikke personoplysninger.
+
+{% endset %}
+
+{{ markdown(markdown_content)|safe }}
+
+
+<div>
+    <p><strong>1. Ejeroplysninger</strong></p>
+    <p>Aarhus Stadsarkiv<br>Dokk1<br>Hack Kampmanns Plads 2 <br>8000 Aarhus C <br>Telefon: +45 89 40 48 00 <br>Email: <a
+            href="mailto:stadsarkiv@aarhus.dk">stadsarkiv@aarhus.dk</a></p>
+    <p><strong>2. Dette website anvender cookies</strong><br>En cookie er en lille tekstfil, der lagres på din
+        computer el. tilsvarende for at kunne genkende dig. Der er ingen personlige oplysninger gemt i vores cookies, og
+        de kan ikke indeholde virus.</p>
+    <p><strong>3. Formål med cookies på vores website:</strong></p>
+    <ul>
+        <li>At gemme dine&nbsp;indstillinger.</li>
+        <li>Trafikmåling og statistik.</li>
+    </ul>
+    <p><strong>4. Tredjeparter med adgang til at sætte cookies</strong></p>
+    <p>Sitet anvender cookies fra en følgende tredjeparter:</p>
+    <p><strong>5. Persondata<br></strong>Vi indsamler ikke&nbsp;personoplysninger.</p>
+    <p>&nbsp;</p>
+</div>
+</div>
+
+{% endblock content %}

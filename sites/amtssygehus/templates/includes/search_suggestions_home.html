@@ -1,0 +1,55 @@
+{% set image_items = [
+{
+"image_src": "https://acastorage.blob.core.windows.net/sam-access/000488227/000488227_m.jpg",
+"alt_text": "1890- 1950",
+"link_url": "/search?date_from=18900101&date_to=19491231",
+"link_text": "1890- 1950"
+},
+{
+"image_src": "https://storage.googleapis.com/openaws-access/000191312_m.jpg",
+"alt_text": "1950'erne",
+"link_url": "/search?date_from=19500101&date_to=19591231",
+"link_text": "1950'erne"
+},
+{
+"image_src": "https://storage.googleapis.com/openaws-access/000191300_m.jpg",
+"alt_text": "1960'erne",
+"link_url": "/search?date_from=19600101&date_to=19691231",
+"link_text": "1960'erne"
+},
+{
+"image_src": "https://storage.googleapis.com/openaws-access/000191308_m.jpg",
+"alt_text": "1970'erne",
+"link_url": "/search?date_from=19700101&date_to=19791231",
+"link_text": "1970'erne"
+},
+{
+"image_src": "https://storage.googleapis.com/openaws-access/000186061_m.jpg",
+"alt_text": "1980'erne",
+"link_url": "/search?date_from=19800101&date_to=19891231",
+"link_text": "1980'erne"
+},
+{
+"image_src": "https://storage.googleapis.com/openaws-access/000191310_m.jpg",
+"alt_text": "1990'erne",
+"link_url": "/search?date_from=19900101&date_to=19991231",
+"link_text": "1990'erne"
+},
+{
+"image_src": "https://storage.googleapis.com/openaws-access/000186539_m.jpg",
+"alt_text": "2000'erne",
+"link_url": "/search?date_from=20000101&date_to=20091231",
+"link_text": "2000'erne"
+},
+{
+"image_src": "https://storage.googleapis.com/openaws-access/000186506_m.jpg",
+"alt_text": "2010'erne",
+"link_url": "/search?date_from=20100101&date_to=20191231",
+"link_text": "2010'erne"
+}
+
+] %}
+
+<h4 class="section-title">Populære temaer fra arkivet</h4>
+
+{{ salling_macros.search_suggestions(image_items) }}

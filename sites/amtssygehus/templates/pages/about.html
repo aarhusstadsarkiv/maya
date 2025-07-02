@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block body_class %}page-about{% endblock %}
+
+{% block content %}
+
+
+
+{% include "includes/main_title.html" %}
+
+{% set markdown_content %}
+
+Aarhus Kommune overtager i 2018 Aarhus Amtssygehus i Tage-Hansens Gade. Området skal udvikles til en ny bydel, der bygger videre på det eksisterende, men fortolker det og giver plads til at dække moderne behov.
+
+Aarhus Stadsarkiv tager del i processen ved at samle vidnesbyrd om stedets historie og dets betydning for aarhusianerne og byens udvikling.  Denne hjemmeside skildrer historien ved hjælp af digitale arkivalier fra arkivets samling, suppleret af små fortællinger, der samler op på særlig vigtige træk. Arkivet og fortællingerne omfatter også hospitalets omgivelser med nabobygninger, park og veje.
+
+Aarhus Stadsarkiv har således valgt at fortælle hospitalets historie ved at sammensætte en række temaer, ”Hospitalshistorier”, der på forskellig vis kommer rundt om hospitalet, dets ansatte, patienter, byens og amtets beslutningstagere og de mange, der på anden vis har levet i og med denne ’by i byen’.
+
+Man kan også komme rundt i historien ved at udforske arkivalier såsom dokumenter og billeder. Alle dokumenter og billeder er påført et emne, "tag", som man kan følge rundt på hjemmesiden. Hjemmesiden er bygget op på den måde, at alle arkivalier - dvs. dokumenter i fuldtekst samt billeder - ved hjælp af en webservice trækkes ind fra Stadsarkivets arkivsystem på [https://www.aarhusarkivet.dk](https://www.aarhusarkivet.dk).
+
+Nogle steder vil man opleve, at der omtales arkivalier, der ikke må vises på internettet, men findes på Stadsarkivet (se nedenfor). Dette skyldes ophavsret.
+
+**Din hospitalshistorie**
+
+En række erindringer er gengivet på hjemmesiden. Stadsarkivet og Teknik & Miljø modtog ved en række indsamlingsarrangementer i august 2016 fortællinger, billeder og dokumenter fra ansatte og andre aarhusianere med deres bidrag til stedets historie.
+
+**Vil du vide mere**
+
+På Aarhus Stadsarkivs hjemmeside og f.eks. på [https://www.danskebilleder.dk](https://www.danskebilleder.dk) kan man finde flere dokumenter og fotografier om Aarhus Amtssygehus. Se også Rigsarkivets samlinger på [https://soeg.rigsarkivet.dk/](https://soeg.rigsarkivet.dk/).
+Stadsarkivets hjemmeside med arkivsøgning: [https://www.aarhusarkivet.dk](https://www.aarhusarkivet.dk).
+
+**Rettigheder**
+
+Alt fremlagt materiale fra arkiverne er clearet til offentliggørelse.
+
+{% endset %}
+
+{{ markdown(markdown_content)|safe }}
+
+{% endblock content %}

@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block body_class %}page-memory{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', path='/css/memory.css') }}?v={{ get_setting('version') }}">
+{% endblock head %}
+
+{% block content %}
+{% include "includes/main_title.html" %}
+
+{% macro first_memory_image (image) %}
+<div class="memory-result">
+    <a class="memory-link" href="/records/{{ image.record }}">
+        <div class="memory-portrait">
+            <img src="{{ image.url }}" alt="{{ image.text }}">
+        </div>
+        <div class="memory-summary">{{ image.text }}</div>
+    </a>
+</div>
+{% endmacro %}
+
+<div class="memory-container">
+    <div class="memory-first">
+        <div class="memory">     
+            {% for paragraph in memory.paragraphs %}
+            <p>{{ paragraph }}</p>
+            {% endfor %}
+        </div>
+        {% if first_image %}
+        {{ first_memory_image(first_image) }}
+        {% endif %}
+    </div>
+    
+    <div class="memory-rest">
+        {% for image in images %}
+        {{ first_memory_image(image) }}
+        {% endfor %}
+    </div>
+</div>
+
+{% endblock content %}

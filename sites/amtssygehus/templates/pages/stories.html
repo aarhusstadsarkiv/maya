@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% import "macros/salling_macros.html" as salling_macros %}
+
+{% block body_class %}page-stories{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', path='/css/stories.css') }}?v={{ get_setting('version') }}">
+{% endblock head %}
+
+{% block content %}
+{% include "includes/main_title.html" %}
+
+{{ salling_macros.story_first(story_first) }}
+
+<div class="stories-all-results">
+
+    {% for story in main_stories %}
+    <div class="stories-result">
+        <a class="stories-link" href="/historier/{{ story.path }}">
+            <div class="stories-portrait">
+                <img src="{{ story.urls[0] }}" alt="{{ story.heading }}">
+            </div>
+            <div class="stories-summary">
+                {{ story.heading }}
+            </div>
+        </a>
+    </div>
+    {% endfor %}
+</div>
+
+{% endblock content %}

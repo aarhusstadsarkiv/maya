@@ -1,0 +1,173 @@
+{% set truncate_summary_gallery = 160 %}
+
+{% macro parse_search_title_gallery(result) %}
+{% if result.label %}
+<div class="search-summary-gallery">{{ result.label|truncate(truncate_summary_gallery) }}</div>
+{% elif result.summary %}
+<div class="search-summary-gallery">{{ result.summary|truncate(truncate_summary_gallery) }}</div>
+{% endif %}
+{% endmacro %}
+
+{% macro parse_search_result_gallery(search_result, view) %}
+{% set start = search_result["start"]|int %}
+{% set size = search_result["size"]|int %}
+
+<div class="search-results-gallery">
+    {% for result in search_result.result %}
+    {% set serie = None %}
+    {% if result.series is iterable %}
+    {% set serie = result.series | last %}
+    {% endif %}
+    {% set current = loop.index + start %}
+
+    <div class="search-result-gallery">
+        <a class="search-link-gallery" href="/records/{{ result.id }}?search={{ current }}">
+            {% if result.show_image %}
+            {% if result.label %}
+            {% set label = result.label %}
+            {% else %}
+            {% set label = result.summary %}
+            {% endif %}
+
+            <div class="search-portrait-gallery">
+                <img src="{{ result.portrait }}" alt="{{ label }}">
+            </div>
+            {% else %}
+            {% if view == 'grid' %}
+            <div class="search-portrait-gallery">
+                <img src="{{ url_for('static', path='/assets/transparent_1px.png') }}" alt="{{ label }}">
+            </div>
+            {% endif %}
+            {% endif %}
+            {{ parse_search_title_gallery(result) }}
+            <div class="search-result-date-gallery">
+                {{ result.date_normalized }}
+            </div>
+        </a>
+    </div>
+    {% endfor %}
+</div>
+{% endmacro %}
+
+{% macro parse_pagination_total(pagination_data) %}
+
+{% set total = pagination_data["total"] %}
+{% set size = pagination_data["size"] %}
+{% set start = pagination_data["start"] %}
+{% set total_pages = pagination_data["total_pages"] %}
+{% set current_page = pagination_data["current_page"] %}
+{% set query_str = pagination_data["query_str"] %}
+
+<div class="pagination-total">
+    {% if total == 0 %}
+    {{ translate('No search results') }}
+    {% elif total == 1 %}
+    {{ total }} {{ translate('Search result') }}
+    {% elif total == 10000 %}
+
+    <span class="paginaton-total-results">{{ translate('More than 10.000 search results') }}</span>
+    <span class="pagination-showing-page">{{ translate('Showing page') }} {{ current_page }} {{ translate('of') }} {{
+        total_pages }}.</span>
+    {% else %}
+    <span class="paginaton-total-results">{{ total }} {{ translate('Search results') }}.</span>
+    <span class="pagination-showing-page">
+        {{ translate('Showing page') }} {{ current_page }} {{ translate('of') }} {{ total_pages }}.
+    </span>
+    {% endif %}
+</div>
+{% endmacro %}
+
+{% macro memories (memories) %}
+<div class="memories-all-results">
+    {% for memory in memories %}
+    <div class="memories-result">
+        <a class="memories-result-link" href="/erindringer/{{ memory.path }}">
+            <div class="memories-result-content">
+                <div class="memories-result-text">
+                    <div class="memories-result-summary">{{ memory.heading }}</div>
+                    <div>
+                        {{ memory.paragraphs[0] }}
+                    </div>
+                </div>
+
+                {% if memory.urls and memory.urls[0] %}
+                <div class="memories-result-image">
+                    <img src="{{ memory.urls[0]  }}" alt="{{ memory.heading }}">
+                </div>
+                {% endif %}
+            </div>
+        </a>
+    </div>
+    {% endfor %}
+</div>
+{% endmacro %}
+
+{% macro story_first (story_first, use_story_link=false) %}
+<div class="stories-first">
+    <div class="stories-first-content">
+
+        {% for paragraph in story_first.paragraphs %}
+        <p>{{ paragraph }}</p>
+        {% endfor %}
+    </div>
+
+    <div class="stories-first-portrait">
+        <img src="{{ story_first.urls[0] }}" alt="{{ story_first.heading }}">
+    </div>
+</div>
+{% endmacro %}
+
+{% macro story_slider (stories) %}
+<div class="slideshow no-select">
+
+    {% for story_first in stories %}
+    <div class="stories-first">
+        <div class="stories-first-content">
+            <h4 class="section-title">{{ story_first.heading }}</h4>
+            <p>{{ story_first.paragraphs[0] }}</p>
+            <p>
+                <a href="/historier/{{story_first.path}}">Læs hele historien</a>
+            </p>
+        </div>
+        
+        <div class="stories-first-portrait">
+            <a href="/historier/{{story_first.path}}">
+                <img src="{{ story_first.urls[0]  }}" alt="{{ story_first.heading }}">
+            </a>
+            
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% endmacro %}
+
+{% macro search_suggestions(image_items) %}
+<div class="horizontal-slider">
+    <div class="arrow-left-container no-select">
+        <svg class="arrow-left" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
+            fill="#1f1f1f">
+            <path d="M400-80 0-480l400-400 71 71-329 329 329 329-71 71Z" />
+        </svg>
+    </div>
+
+    <div class="image-container">
+        {% for item in image_items %}
+        <a href="{{ item.link_url }}">
+            <div class="image-item">
+                <img src="{{ item.image_src }}" alt="{{ item.alt_text }}">
+                <div class="overlay-text">
+                    {{ item.link_text }}
+                </div>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+    <div class="arrow-right-container no-select">
+        <svg class="arrow-right" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
+            fill="#1f1f1f">
+            <path d="m321-80-71-71 329-329-329-329 71-71 400 400L321-80Z" />
+        </svg>
+    </div>
+</div>
+{% endmacro %}

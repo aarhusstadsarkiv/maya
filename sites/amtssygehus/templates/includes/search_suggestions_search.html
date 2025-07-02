@@ -1,0 +1,49 @@
+{% set image_items = [
+{
+"image_src": "https://acastorage.blob.core.windows.net/sam-access/000452906/000452906_m.jpg",
+"alt_text": "Billeder",
+"link_url": "/search?content_types=61&availability=4",
+"link_text": "Billeder"
+},
+{
+"image_src": "https://storage.googleapis.com/openaws-access/000186477_m.jpg",
+"alt_text": " Manuskripter",
+"link_url": "/search?content_types=49",
+"link_text": "Manuskripter"
+},
+{
+"image_src": "https://storage.googleapis.com/openaws-access/000191275_m.jpg",
+"alt_text": "Dagligliv",
+"link_url": "/search?collection=125&collection_tags=Dagligliv&availability=4",
+"link_text": "Dagligliv"
+},
+{
+"image_src": "https://storage.googleapis.com/openaws-access/000148401_m.jpg",
+"alt_text": "Kultur og fritid",
+"link_url": "/search?subjects=37",
+"link_text": "Kultur og fritid"
+},
+{
+"image_src": "https://storage.googleapis.com/openaws-access/000191513_m.jpg",
+"alt_text": "Bygninger",
+"link_url": "/search?collection=125&collection_tags=Bygninger",
+"link_text": "Bygninger"
+},
+{
+"image_src": "https://storage.googleapis.com/openaws-access/000140706_m.jpg",
+"alt_text": "Medarbejdere",
+"link_url": "/search?collection=125&collection_tags=Medarbejdere&availability=4",
+"link_text": "Medarbejdere"
+},
+{
+"image_src": "https://acastorage.blob.core.windows.net/sam-access/000492127/000492127_m.jpg",
+"alt_text": "Arkitektur",
+"link_url": "/search?content_types=66",
+"link_text": "Arkitektur"
+}
+
+] %}
+
+<h3 class="main-title">Udforsk arkivet</h3>
+
+{{ salling_macros.search_suggestions(image_items) }}

@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% import "macros/salling_macros.html" as salling_macros %}
+
+{% block body_class %}page-memories{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', path='/css/memories.css') }}?v={{ get_setting('version') }}">
+{% endblock head %}
+
+{% block content %}
+{% include "includes/main_title.html" %}
+
+{{ salling_macros.memories(memories) }}
+
+{% endblock content %}

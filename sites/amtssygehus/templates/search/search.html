@@ -1,0 +1,54 @@
+{% extends "search.html" %}
+
+{% import "macros/common_macros.html" as common_macros %}
+{% import "macros/search_macros.html" as search_macros with context %}
+{% import "macros/salling_macros.html" as salling_macros %}
+
+{% block body_class %}page-records-search{% endblock %}
+
+{% block head %}
+{% endblock head %}
+
+{% block content %}
+<div class="container-main">
+
+    {% include 'includes/search_suggestions_search.html' %}
+    
+    {{ search_macros.parse_search() }}
+    {{ search_macros.parse_facets_filters(facets_filters) }}
+
+    <div class="container-main-facets">
+        {{ search_macros.parse_top_level_facets(facets, 'facets', 'search-date-main') }}
+    </div>
+    {{ salling_macros.parse_pagination_total(pagination_data) }}
+    {{ search_macros.parse_pagination(pagination_data) }}
+    {{ search_macros.parse_search_result(search_result) }}
+    {% if pagination_data["total_pages"] != 1 %}
+    {{ search_macros.parse_pagination(pagination_data) }}
+    {% endif %}
+
+    {% set meta_links = [
+        {'label': 'JSON', 'url': url_for('search_get_json') ~ "?" ~ query_str_search | string}
+    ] %}
+    
+    {{ common_macros.parse_meta_block(meta_links, permissions_list) }}
+</div>
+
+<script type="module">
+    import { searchEvents } from "/static/js/search.js";
+    import { autoCompleteInit  } from '/static/js/auto-complete-instance.js';
+    import { config } from '/static/js/config.js';
+
+    searchEvents();
+
+    if (config.autoComplete) {
+        const searchBaseUrl = '/search?';
+        window.addEventListener("pageshow", function(event) {
+            if (!event.persisted) {
+                autoCompleteInit(searchBaseUrl);
+            }
+        });
+    }
+</script>
+
+{% endblock content %}

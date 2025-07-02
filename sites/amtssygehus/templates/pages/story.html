@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+
+{% block body_class %}page-story{% endblock %}
+
+{% block content %}
+{% include "includes/main_title.html" %}
+
+<div class="story-sections">
+
+    <div class="story-section">
+        <div class="story-section-text">
+            {% for paragraph in first_section.paragraphs %}
+            <p>{{ paragraph }}</p>
+            {% endfor %}
+        </div>
+        <div class="story-section-image">
+            <a href="/records/{{ first_section.recordIds[0] }}">
+                <div class="story-image-container">
+                    <img src="{{ first_section.urls[0] }}" alt="{{ first_section.heading }}">
+                    {% if first_section.summary and first_section.summary[0] %}
+                        <p class="story-image-summary">{{ first_section.summary[0] }}</p>
+                    {% endif %}
+                </div>
+            </a>
+        </div>
+    </div>
+
+    {% for section in sections %}
+    <div class="story-section">
+        <div class="story-section-text">
+        {% if section.date %}
+        <h4 class="section-title">{{ section.date }} </h4>
+        <h4 class="section-title">{{ section.heading }} </h4>
+        {% for paragraph in section.paragraphs %}
+        <p>{{ paragraph }}</p>
+        {% endfor %}
+        {% endif %}
+        </div>    
+        
+        {% if section.urls and section.urls[0] %}
+        <div class="story-section-image">
+            <a href="/records/{{ section.recordIds[0] }}">
+                <div class="story-image-container">
+                    <img src="{{ section.urls[0] }}" alt="{{ section.heading }}">
+                    {% if section.summary and section.summary[0] %}
+                        <p class="story-image-summary">{{ section.summary[0] }}</p>
+                    {% endif %}
+                </div>
+            </a>
+        </div>
+        {% else %}
+        <div></div>
+        {% endif %}
+        
+    </div>
+    {% endfor %}
+</div>
+
+<style>
+
+    .story-image-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 10px;
+        padding: 20px;
+        min-width: 100%;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        border-radius: 12px;
+    }
+    
+    .story-image-summary {
+        margin: 0;
+        font-style: italic;
+        text-decoration: none;
+    }
+
+    .story-section-image a {
+        text-decoration: none;
+        color: var(--text)
+    }
+
+    .story-sections {
+        display: flex;
+        flex-direction: column;
+        gap: 40px;
+    }
+
+    .story-section {
+        display: flex;
+        gap: 20px;
+        align-items: center;
+    }
+
+    .story-section-text {
+        width: 50%;
+    }
+
+    .story-section-image {
+        width: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    
+    .story-section-image p, .story-section img {
+        max-width: 300px;
+        width: auto;
+    }
+
+    /** change to columns when width is 992px */
+    @media (max-width: 992px) {
+        .story-section {
+            flex-direction: column;
+        }
+        .story-image-container {
+            width: 100%;
+        }
+        .story-section-text {
+            width: 100%;
+        }
+    } 
+</style>
+
+<pre>{# to_json(sections) #}</pre>
+
+{% endblock content %}
