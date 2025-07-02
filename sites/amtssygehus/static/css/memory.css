@@ -1,0 +1,105 @@
+
+/** 
+ * Styles a single memory that consists of some text and one or multiple images
+*/
+.memory-first p:first-child {
+    font-weight: bold;
+}
+
+.memory-container {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+
+    gap: 2em; 
+    margin-top: 20px;
+}
+
+.memory-first {
+    display: contents;
+    
+}
+.memory-first > * {
+    align-self: center;
+}
+
+.memory-first > *:first-child {
+    grid-column: span 3;
+}
+
+.memory-first > *:nth-child(2) {
+    grid-column: span 1;
+}
+
+.memory-rest {
+    display: contents;
+}
+
+@media (max-width: 992px) {
+    .memory-container {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .memory-first > *:first-child,
+    .memory-first > *:nth-child(2) {
+        grid-column: span 1;
+    }
+}
+
+@media (max-width: 576px) {
+    .memory-container {
+        grid-template-columns: 1fr;
+    }
+
+    .memory-first > *:first-child,
+    .memory-first > *:nth-child(2) {
+        grid-column: span 1;
+    }
+}
+
+.memory-result {
+    border-radius: 5px;
+    break-inside: avoid;
+    margin-bottom: 20px;
+    background: var(--search-result-background);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    padding: 10px;
+    min-height: 100%;
+}
+
+.memory-result:hover {
+    background-color: var(--search-result-background-hover);
+}
+
+.memory-link {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    gap: 1em;
+}
+
+a.memory-link {
+    text-decoration: none;
+    color: var(--text);
+    font-size: 0.9rem;
+}
+
+.memory-potrait {
+    flex: 1;
+}
+
+.memory-portrait img {
+    height: 100%;
+    width: auto;
+    aspect-ratio: 1 / 1;
+    object-fit: contain;
+}
+
+.memory-summary {
+    flex-grow: 1;
+}
+
+/*
+.memory-date {
+    font-size: 0.9em;
+}
+*/

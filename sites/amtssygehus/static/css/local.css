@@ -1,0 +1,217 @@
+/** salling local css */
+
+/** only display #menu-hamburger menu devices where max-width is 768px */
+#menu-hamburger {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    #menu-hamburger {
+        display: block;
+    }
+}
+
+@media (min-width: 769px) {
+    .main-menu-overlay {
+        /** 
+         * This is the absolute simplest way to hide the overlay menu on desktop
+         * without changing the html structure or adding javascript.
+        */
+        display: none !important;
+    }
+}
+
+.page-about .container-medium,
+.page-cookies .container-medium {
+    width: 700px;
+    max-width: 100%;
+}
+
+.page-records-search .record_content_collectors,
+.page-records-search .record_content_collection {
+    display: none;
+}
+
+.page-records-view .record-section:nth-of-type(2) {
+    flex-direction: row-reverse;
+}
+
+@media (max-width: 768px) {
+    .page-records-view .record-section:nth-of-type(2) {
+        flex-direction: column;
+    }
+}
+
+.container-max {
+    max-width: 1200px;
+    padding-top: 20px;
+    padding: unset;
+}
+
+.container-main {
+    padding: 0 20px;
+    margin: unset;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5em;
+}
+
+.container-left {
+    display: none;
+}
+
+
+.facets-toggle-container {
+    display: block;
+}
+
+.record-content .content {
+    max-width: var(--text-max-width);
+}
+
+.logo-text-end {
+    font-weight: bold;
+}
+
+.navigation {
+    align-items: center;
+    box-shadow: 1px 1px 5px var(--record-representation-box-shadow);
+}
+
+.logo a {
+    font-size: 2em;
+    text-decoration: none;
+}
+
+.logo > a > div {
+    display: flex;
+}
+
+@media (max-width: 1024px) {
+    .logo a {
+        font-size: 1.5em;
+    }
+}
+
+
+.menu-text a,
+.main-menu-overlay a {
+    text-transform: unset;
+    font-size: 1.4em;
+}
+
+@media (max-width: 1024px) {
+    .menu-text a {
+        font-size: 1.0em;
+    }
+}
+
+.page-records-search-grid .search-portrait-gallery img {
+    width: 100%;
+    height: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+}
+
+.page-records-search-grid .search-summary-gallery {
+    font-size: 1.4em;
+    font-weight: bold;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-height: 1.6em;
+    text-align: left;
+}
+
+.search-result-date-gallery {
+    text-align: left;
+    font-size: 1.0em;
+}
+
+.search-results {
+    max-width: unset;
+}
+
+.facets-toggle-container {
+    display: none;
+}
+
+.search-option {
+    margin-right: unset;
+    /* margin-left: 10px; */
+}
+
+.search-options {
+    gap: 10px;
+}
+
+@media (max-width: 890px) {
+    #q {
+        width: 100%;
+    }
+
+    .container-search-form {
+        width: 100%;
+    }
+
+    .container-search-form #submit {
+        display: none;
+    }
+}
+
+.search-form {
+    gap: 15px;
+}
+
+.container-main-facets {
+    display: none !important;
+}
+
+.footer {
+    background-color: #F2F2F2;
+}
+
+/* media max width 1024px. Set padding: 20px 20px; */
+@media (max-width: 1200px) {
+
+    .footer {
+        padding: unset;
+    }
+
+
+    .footer-content {
+        padding: 20px;
+    }
+}
+
+body>footer {
+    margin-top: 0px;
+}
+
+.main-title {
+    text-transform: uppercase;
+    margin-top: 25px;
+}
+
+/*
+.search-thumbnail img {
+    min-width: 240px;
+    height: 240px;
+    width: 240px;
+    object-fit: contain;
+}*/
+
+.search-thumbnail img {
+    /* min-width: 240px; */
+    /* height: 240px; */
+    /* width: 240px; */
+    /* max-height: 120px; */
+    object-fit: contain;
+}
+
+
+.no-select {
+    user-select: none;  
+    -webkit-user-select: none; 
+    -ms-user-select: none;
+  }
+
