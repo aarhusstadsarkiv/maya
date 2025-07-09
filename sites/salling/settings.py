@@ -2,8 +2,8 @@ import typing
 
 
 settings: dict[str, typing.Any] = {
-    "client_name": "development",
-    "client_url": "https://demo.openaws.dk",
+    "client_name": "SallingArkivet",
+    "client_url": "https://www.sallingarkivet.dk",
     "client_email": "stadsarkivet@aarhusarkivet.dk",
     "language": "da",
     "log_handlers": ["rotating_file"],
