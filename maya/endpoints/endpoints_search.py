@@ -17,6 +17,7 @@ from maya.core import query
 from maya.core.hooks import get_hooks
 from maya.records import normalize_dates
 from maya.settings_query_params import settings_query_params
+from maya.core.object_storage import set_presigned_urls
 
 log = get_log()
 
@@ -245,7 +246,7 @@ def set_response_cookie(response: Response, context: dict):
     return response
 
 
-def _normalize_search_result(records: dict):
+async def _normalize_search_result(records: dict):
     """
     Normalize date
     Get collection and content_type from facets_resolved
@@ -254,6 +255,10 @@ def _normalize_search_result(records: dict):
     facets_resolved = records["facets_resolved"]
 
     for record in records["result"]:
+
+        if settings.get("boto3_presigned_urls", False):
+            record = await set_presigned_urls(record)
+
         record = normalize_dates.split_date_strings(record)
         record = normalize_dates.normalize_dates(record)
 
@@ -309,7 +314,7 @@ async def get_search_context_values(request: Request, extra_query_params: list =
 
     # Call api and get search results
     search_result = await api.proxies_records(request, query_params_before_search)
-    search_result = _normalize_search_result(search_result)
+    search_result = await _normalize_search_result(search_result)
 
     # Alter query params after search
     # You may want to remove all curators except one after search results are obtained
