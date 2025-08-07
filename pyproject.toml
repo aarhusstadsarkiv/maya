@@ -82,7 +82,7 @@ include-package-data = true
 line-length = 140
 
 [tool.mypy]
-exclude = [".venv", "tests", "example-config", "build", "bin-local", "sites"]
+exclude = [".venv", ".venv-docs", "tests", "example-config", "build", "bin-local", "sites"]
 
 [tool.bump_version]
 version_file = "maya/__init__.py"

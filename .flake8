@@ -1,5 +1,5 @@
 [flake8]
-exclude = .git, __pycache__, .mypy_cache, .pytest_cache, .venv, .github, \
+exclude = .git, __pycache__, .mypy_cache, .pytest_cache, .venv, .venv-docs, .github, \
     stadsarkiv_client/templates,stadsarkiv_client/locales, generate_client, tests, \
     example-config-aarhus, example-config-simple, example-config-teater, build, \
     bin-local
