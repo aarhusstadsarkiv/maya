@@ -21,6 +21,7 @@ class MultiStaticFiles(StaticFiles):
     """
     A subclass of Starlette's StaticFiles that allows serving static files from multiple directories.
     """
+
     def __init__(self, directories: typing.List[PathLike] = [], **kwargs) -> None:
         super().__init__(**kwargs)
         self.all_directories = self.all_directories + directories

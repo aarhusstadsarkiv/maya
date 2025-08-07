@@ -1,8 +1,8 @@
 """
 Middleware configuration module for the application.
 
-This module defines and registers a set of custom and third-party middleware 
-components used in a Starlette-based web application. The middleware stack 
+This module defines and registers a set of custom and third-party middleware
+components used in a Starlette-based web application. The middleware stack
 enhances the request/response lifecycle by adding features such as:
 
 - Request timing and performance logging
@@ -29,7 +29,6 @@ Third-party Middleware:
 
 The middleware list is assembled dynamically based on application settings.
 """
-
 
 from starsessions import CookieStore, SessionMiddleware, SessionAutoloadMiddleware
 from starlette.middleware import Middleware
