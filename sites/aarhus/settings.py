@@ -90,4 +90,5 @@ settings: dict[str, typing.Any] = {
         "orders": "local/data/orders.db",
     },
     "cron_orders": True,
+    "boto3_presigned_urls": True,
 }
