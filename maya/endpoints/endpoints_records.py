@@ -14,6 +14,7 @@ from maya.core.dataclasses import RecordPagination
 import asyncio
 import json
 import typing
+import copy
 from maya.endpoints.endpoints_utils import get_record_data
 
 
@@ -145,7 +146,7 @@ async def records_get_misc(request: Request):
 
         permissions = await api.me_permissions(request)
         record = await api.proxies_record_get_by_id(record_id)
-        record_original = record.copy()
+        record_original = copy.deepcopy(record)
 
         record, meta_data, record_and_types = await get_record_data(request, record, permissions)
 
