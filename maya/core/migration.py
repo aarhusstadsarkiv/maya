@@ -1,8 +1,8 @@
 """
 Module for managing and applying database schema migrations using SQLite.
 
-This module defines a `Migration` class that handles the execution and tracking of SQL-based migrations 
-on an SQLite database. It ensures that each migration is applied only once by maintaining a `migrations` 
+This module defines a `Migration` class that handles the execution and tracking of SQL-based migrations
+on an SQLite database. It ensures that each migration is applied only once by maintaining a `migrations`
 table within the database. The module performs the following key functions:
 
 - Initializes the SQLite connection and checks for the existence of the migrations tracking table.
@@ -22,7 +22,6 @@ Typical usage:
     migrator.run_migrations()
     migrator.close()
 """
-
 
 import sqlite3
 import logging
