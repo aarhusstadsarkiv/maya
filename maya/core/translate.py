@@ -16,7 +16,6 @@ Functions:
 
 """
 
-
 from maya.core.dynamic_settings import settings
 from maya.core.paths import get_base_dir_path
 from maya.core.logging import get_log
