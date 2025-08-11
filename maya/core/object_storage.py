@@ -28,7 +28,7 @@ async def set_presigned_urls(record: dict) -> dict:
 
     if "representations" in record:
         representations = record["representations"]
-        for key in ["full_image", "large_image", "record_image", "video", "audio"]:
+        for key in ["full_image", "large_image", "record_image", "video", "audio", "web_document_url"]:
             if key in representations:
                 representations[key] = await _get_presigned_url(representations[key])
     return record
