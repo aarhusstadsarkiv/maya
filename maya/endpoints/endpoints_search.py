@@ -394,12 +394,36 @@ def _normalize_auto_complete_results(results: list):
     But collections is different:
 
     /collections/7 -> /search?collection=7
+
     """
+
     for result in results:
         if result["domain"] == "collections":
             result["search_query"] = "collection"
         else:
             result["search_query"] = result["domain"]
+
+        # Get domain and look up the label in settings_query_params
+        domain = result["domain"]
+        if domain in settings_query_params:
+            result["domain_human"] = settings_query_params[domain]["label"]
+
+        # Clean up sub_display if poluted with domain name
+        if domain == "organisations":
+            if result["sub_display"].startswith("Organisation, "):
+                result["sub_display"] = result["sub_display"].replace("Organisation, ", "")
+
+        elif domain == "locations":
+            if result["sub_display"].startswith("Sted, "):
+                result["sub_display"] = result["sub_display"].replace("Sted, ", "")
+        elif domain == "people":
+            if result["sub_display"].startswith("Person, "):
+                result["sub_display"] = result["sub_display"].replace("Person, ", "")
+        elif domain == "events":
+            if result["sub_display"].startswith("Begivenhed, "):
+                result["sub_display"] = result["sub_display"].replace("Begivenhed, ", "")
+        elif domain == "collection":
+            result["sub_display"] = result["sub_display"].replace("Samling, ", "")
 
     return results
 
