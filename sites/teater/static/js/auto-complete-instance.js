@@ -17,6 +17,13 @@ const renderFunction = (data) => {
     // Tryk på søgeknappen for at fritekstsøge i stedet.
     if (data.length == 0) return `<div class="search-suggestion-info">Ingen forslag.</div>`;
 
+    // Alter data
+    data.forEach(item => {
+        if (item.is_alt) {
+            item.sub_display = `<span class="search-synonym">Synonym for: </span>${item.sub_display}`;
+        }
+    });
+
     // Help text and suggestions
     // <strong>eller</strong> tryk på søgeknappen for at fritekstsøge i stedet.
     const suggestionHelp = `<div class="search-suggestion-info">Vælg et forslag nedenfor.</div>`;
@@ -25,6 +32,7 @@ const renderFunction = (data) => {
     const suggestions = data.map(item => `
         <div class="search-suggestion-item" data-url="/${item.domain}/${item.id}">
             <div>
+                <span class="search-icon">${item.icon}</span>
                 <a href="/${item.domain}/${item.id}">${item.display}</a>
             </div>
             <div>${item.sub_display}</div>
