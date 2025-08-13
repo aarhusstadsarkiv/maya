@@ -5,7 +5,7 @@ Proxy for search records endpoints
 from starlette.requests import Request
 from starlette.responses import Response
 from starlette.responses import JSONResponse
-from maya.core.templates import templates
+from maya.core.templates import templates, get_icon
 from maya.core.context import get_context
 from maya.core.translate import translate
 from maya.core.logging import get_log
@@ -410,20 +410,29 @@ def _normalize_auto_complete_results(results: list):
 
         # Clean up sub_display if poluted with domain name
         if domain == "organisations":
+            result["icon"] = get_icon("organisation", size=16)
             if result["sub_display"].startswith("Organisation, "):
                 result["sub_display"] = result["sub_display"].replace("Organisation, ", "")
 
         elif domain == "locations":
+            result["icon"] = get_icon("address", size=16)
             if result["sub_display"].startswith("Sted, "):
                 result["sub_display"] = result["sub_display"].replace("Sted, ", "")
         elif domain == "people":
+            result["icon"] = get_icon("person", size=16)
             if result["sub_display"].startswith("Person, "):
                 result["sub_display"] = result["sub_display"].replace("Person, ", "")
         elif domain == "events":
+            result["icon"] = get_icon("event", size=16)
             if result["sub_display"].startswith("Begivenhed, "):
                 result["sub_display"] = result["sub_display"].replace("Begivenhed, ", "")
-        elif domain == "collection":
+        elif domain == "collections":
+            result["icon"] = get_icon("collection", size=16)
             result["sub_display"] = result["sub_display"].replace("Samling, ", "")
+        elif domain == "collectors":
+            result["icon"] = get_icon("collection", size=16)
+        else:
+            result["icon"] = ""
 
     return results
 
