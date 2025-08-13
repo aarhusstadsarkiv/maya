@@ -103,6 +103,11 @@ details>summary.inactive {
     display: inline-block;
 }
 
+.search-synonym {
+    font-style: italic;
+    color: var(--text-muted);
+}
+
 .search-option,
 .search-button {
     margin-right: 10px;
@@ -141,6 +146,11 @@ details>summary.inactive {
 .search-summary {
     color: var(--links);
     max-width: var(--text-max-width);
+}
+
+.search-icon {
+    display: inline-block;
+    vertical-align: middle;
 }
 
 .search-summary:first-of-type {
@@ -191,7 +201,7 @@ details>summary.inactive {
 
 .search-suggestion-item:hover {
     cursor: pointer;
-    background-color:var(--background-body);
+    background-color: var(--background-body);
 }
 
 /**
@@ -261,6 +271,7 @@ a.search-link-gallery {
     .search-results-gallery {
         column-count: 1;
     }
+
     .search-link {
         flex-flow: column;
     }
