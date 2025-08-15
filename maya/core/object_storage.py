@@ -51,7 +51,12 @@ async def _get_presigned_url(url: str):
             return cached_url
 
         # Generate a new pre-signed URL
-        presigned_url = await _generate_presigned_url(url)
+        try:
+            presigned_url = await _generate_presigned_url(url)
+
+        except Exception:
+            log.exception("Error generating pre-signed URL")
+            return url
 
         # Store the generated URL in cache
         await database_cache.set(cache_key, presigned_url)
@@ -63,10 +68,6 @@ async def _generate_presigned_url(url: str) -> str:
     Generate a pre-signed URL for an object in S3 storage.
     E.g. https://nbg1.your-objectstorage.com/aca-access/520/000520432_f.jpg
     """
-
-    log.debug(f"Generating pre-signed URL for: {url}")
-
-    raise Exception("This function is not implemented yet")
 
     # Get object key which is "520/000520432_f.jpg" part of the URL
     object_key = url.split("https://nbg1.your-objectstorage.com/aca-access/")[-1]
