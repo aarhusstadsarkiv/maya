@@ -18,7 +18,7 @@ settings: dict[str, typing.Any] = {
         "secure": True,
         "samesite": "lax",
     },
-    "api_base_url": "https://api.openaws.dk/v1",
+    "api_base_url": "https://staging.openaws.dk/v1",
     # Top menu items. These are the default items. You may remove or add more.
     "main_menu_top": [{"name": "search_get", "title": "Søg", "type": "icon", "icon": "search"}],
     #

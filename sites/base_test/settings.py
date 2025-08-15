@@ -16,7 +16,7 @@ settings: dict[str, typing.Any] = {
         "samesite": "lax",
     },
     # "api_base_url": "http://localhost:8000/v1",
-    "api_base_url": "https://dev.openaws.dk/v1",
+    "api_base_url": "https://staging.openaws.dk/v1",
     "main_menu_top": [
         {"name": "search_get", "title": "Søg", "type": "icon", "icon": "search"},
     ],

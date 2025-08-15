@@ -66,6 +66,8 @@ async def _generate_presigned_url(url: str) -> str:
 
     log.debug(f"Generating pre-signed URL for: {url}")
 
+    raise Exception("This function is not implemented yet")
+
     # Get object key which is "520/000520432_f.jpg" part of the URL
     object_key = url.split("https://nbg1.your-objectstorage.com/aca-access/")[-1]
 

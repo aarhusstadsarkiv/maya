@@ -34,7 +34,7 @@ custom_error: "Der skete en system fejl. Prøv igen lidt senere!"
 
 # Is you are running in production, you should change the api_base_url to the production API.
 # production "api_base_url": "https://api.openaws.dk/v1"
-api_base_url: https://dev.openaws.dk/v1
+api_base_url: https://staging.openaws.dk/v1
 
 # pages
 # "name" is the route name. 
