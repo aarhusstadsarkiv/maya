@@ -12,8 +12,23 @@ BOTO3_EXPIRE = 3600
 log = get_log()
 
 
-async def set_presigned_urls(record: dict) -> dict:
+async def set_presigned_urls_search(search_result: dict) -> dict:
 
+    # Get thumbnail URL
+    thumbnail_url = search_result.get("thumbnail", "")
+    if thumbnail_url:
+        thumbnail_url = await _get_presigned_url(thumbnail_url)
+        search_result["thumbnail"] = thumbnail_url
+
+    portrait = search_result.get("portrait", "")
+    if portrait:
+        portrait = await _get_presigned_url(portrait)
+        search_result["portrait"] = portrait
+
+    return search_result
+
+
+async def set_presigned_urls_record(record: dict) -> dict:
     # Get thumbnail URL
     thumbnail_url = record.get("thumbnail", "")
     if thumbnail_url:
@@ -34,6 +49,32 @@ async def set_presigned_urls(record: dict) -> dict:
     return record
 
 
+async def set_presigned_urls_resource(resource: dict) -> dict:
+
+    # Get thumbnail URL
+    thumbnail_url = resource.get("thumbnail", "")
+    if thumbnail_url:
+        log.info(f"Thumbnail URL is: {thumbnail_url}")
+        thumbnail_url = await _get_presigned_url(thumbnail_url)
+        resource["thumbnail"] = thumbnail_url
+
+    # portrait can both be a URL or a list of URLs
+    portrait = resource.get("portrait", "")
+    if portrait:
+        log.info(f"Portrait URLs are: {portrait}")
+        for i in range(len(portrait)):
+            portrait[i] = await _get_presigned_url(portrait[i])
+
+    # highlights is a list of URLs
+    if "highlights" in resource:
+        log.info(f"Highlights URLs are: {resource['highlights']}")
+        highlights = resource["highlights"]
+        for i in range(len(highlights)):
+            highlights[i] = await _get_presigned_url(highlights[i])
+
+    return resource
+
+
 async def _get_presigned_url(url: str):
 
     # Check if URL shoud be generated
@@ -45,7 +86,7 @@ async def _get_presigned_url(url: str):
     async with database_connection.transaction_scope_async() as connection:
 
         database_cache = DatabaseCache(connection)
-        cached_url = await database_cache.get(cache_key, expire_in=BOTO3_EXPIRE)  # Cache for 1 hour
+        cached_url = await database_cache.get(cache_key, expire_in=BOTO3_EXPIRE)
 
         if cached_url:
             return cached_url
@@ -75,7 +116,7 @@ async def _generate_presigned_url(url: str) -> str:
     # Initialize the S3 client
     s3 = boto3.client(
         "s3",
-        endpoint_url="https://nbg1.your-objectstorage.com",  # custom endpoint
+        endpoint_url="https://nbg1.your-objectstorage.com",
         aws_access_key_id=AWS_ACCESS_KEY_ID,
         aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
     )
@@ -84,7 +125,7 @@ async def _generate_presigned_url(url: str) -> str:
     url = s3.generate_presigned_url(
         ClientMethod="get_object",
         Params={"Bucket": "aca-access", "Key": object_key},
-        ExpiresIn=BOTO3_EXPIRE,  # 1 hour
+        ExpiresIn=BOTO3_EXPIRE,
     )
 
     log.debug(f"Generated pre-signed URL: {url}")

@@ -17,6 +17,7 @@ from maya.core.logging import get_log
 from maya.core import api
 from maya.resources import resource_alter
 from maya.core.hooks import get_hooks
+from maya.core.object_storage import set_presigned_urls_resource
 import json
 
 
@@ -32,6 +33,7 @@ async def _get_resource(request: Request):
     resource_type = request.path_params["resource_type"]
 
     resource = await api.proxies_get_resource(request, resource_type, id=id)
+    resource = await set_presigned_urls_resource(resource)
     resource = await hooks.after_get_resource(resource_type, resource)
 
     # remove leading zeros from id string

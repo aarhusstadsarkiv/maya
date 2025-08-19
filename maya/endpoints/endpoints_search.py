@@ -17,7 +17,7 @@ from maya.core import query
 from maya.core.hooks import get_hooks
 from maya.records import normalize_dates
 from maya.settings_query_params import settings_query_params
-from maya.core.object_storage import set_presigned_urls
+from maya.core.object_storage import set_presigned_urls_search
 
 log = get_log()
 
@@ -257,7 +257,7 @@ async def _normalize_search_result(records: dict):
     for record in records["result"]:
 
         if settings.get("boto3_presigned_urls", False):
-            record = await set_presigned_urls(record)
+            record = await set_presigned_urls_search(record)
 
         record = normalize_dates.split_date_strings(record)
         record = normalize_dates.normalize_dates(record)

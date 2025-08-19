@@ -7,7 +7,7 @@ from maya.core.logging import get_log
 from maya.core.hooks import get_hooks
 from maya.records import record_alter
 from maya.records.meta_data_record import get_record_meta_data
-from maya.core.object_storage import set_presigned_urls
+from maya.core.object_storage import set_presigned_urls_record
 from maya.core.dynamic_settings import settings
 import typing
 
@@ -22,7 +22,7 @@ async def get_record_data(request: Request, record, permissions) -> typing.Tuple
     hooks = get_hooks(request)
 
     if settings.get("boto3_presigned_urls", False):
-        record = await set_presigned_urls(record)
+        record = await set_presigned_urls_record(record)
 
     meta_data = get_record_meta_data(request, record, permissions)
     record, meta_data = await hooks.after_get_record(record, meta_data)
