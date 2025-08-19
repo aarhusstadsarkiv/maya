@@ -54,20 +54,17 @@ async def set_presigned_urls_resource(resource: dict) -> dict:
     # Get thumbnail URL
     thumbnail_url = resource.get("thumbnail", "")
     if thumbnail_url:
-        log.info(f"Thumbnail URL is: {thumbnail_url}")
         thumbnail_url = await _get_presigned_url(thumbnail_url)
         resource["thumbnail"] = thumbnail_url
 
     # portrait can both be a URL or a list of URLs
     portrait = resource.get("portrait", "")
     if portrait:
-        log.info(f"Portrait URLs are: {portrait}")
         for i in range(len(portrait)):
             portrait[i] = await _get_presigned_url(portrait[i])
 
     # highlights is a list of URLs
     if "highlights" in resource:
-        log.info(f"Highlights URLs are: {resource['highlights']}")
         highlights = resource["highlights"]
         for i in range(len(highlights)):
             highlights[i] = await _get_presigned_url(highlights[i])
@@ -128,5 +125,4 @@ async def _generate_presigned_url(url: str) -> str:
         ExpiresIn=BOTO3_EXPIRE,
     )
 
-    log.debug(f"Generated pre-signed URL: {url}")
     return url
