@@ -57,7 +57,7 @@ async def set_presigned_urls_resource(resource: dict) -> dict:
         thumbnail_url = await _get_presigned_url(thumbnail_url)
         resource["thumbnail"] = thumbnail_url
 
-    # portrait can both be a URL or a list of URLs
+    # portrait is a list of URLs
     portrait = resource.get("portrait", "")
     if portrait:
         for i in range(len(portrait)):

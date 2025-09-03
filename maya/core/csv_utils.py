@@ -4,17 +4,14 @@ This is only used with the sites/aarhus hooks.
 """
 
 import csv
-import os
-
-
-CWD = os.getcwd()
+from maya.core.dynamic_settings import get_base_dir_path
 
 
 def bookmarks_by_email(email):
     """ "
     Get bookmarks by email from csv file
     """
-    bookmarks_file = os.path.join(CWD, "data", "csv", "bookmarks_with_emails.csv")
+    bookmarks_file = get_base_dir_path("data", "csv", "bookmarks_with_emails.csv")
     resource_ids = []
     with open(bookmarks_file, "r") as bookmarks_file:
         reader = csv.DictReader(bookmarks_file)
@@ -28,7 +25,7 @@ def email_exists(email):
     """
     Check if email exists in user file
     """
-    users_emails_file = os.path.join(CWD, "data", "csv", "emails.csv")
+    users_emails_file = get_base_dir_path("data", "csv", "emails.csv")
     with open(users_emails_file, "r") as users_emails_file:
         reader = csv.DictReader(users_emails_file)
         for row in reader:
