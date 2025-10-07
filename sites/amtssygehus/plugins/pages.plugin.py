@@ -81,7 +81,7 @@ async def memories_index(request: Request):
     context = await get_context(
         request,
         context_values={
-            "title": "Udvalgte Sallingminder",
+            "title": "Udvalgte minder",
             "memories": memories,
         },
     )

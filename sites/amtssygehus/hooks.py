@@ -26,7 +26,7 @@ class Hooks(HooksSpec):
         """
         Alter the context dictionary. Before the context is returned to the template.
         """
-        context["meta_title"] = context["meta_title"] + " | SallingArkivet"
+        context["meta_title"] = context["meta_title"] + " | AmtssygehusArkivet"
 
         try:
             main_menu_top = context["main_menu_top"]
