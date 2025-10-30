@@ -1,0 +1,12 @@
+name: CodeQL
+on: [push, pull_request]
+permissions: { contents: read, security-events: write, actions: read }
+jobs:
+  codeql:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: github/codeql-action/init@v3
+        with: { languages: auto }   # or: languages: 'javascript,python' 
+      - uses: github/codeql-action/autobuild@v3   # for compiled langs use your build commands instead
+      - uses: github/codeql-action/analyze@v3
