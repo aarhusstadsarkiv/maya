@@ -77,11 +77,11 @@ def _save_file_dict(lang) -> None:
         return
 
     if lang == "en":
-        with open("stadsarkiv_client/locales/en.yml", "w", encoding="utf8") as file:
+        with open("maya/locales/en.yml", "w", encoding="utf8") as file:
             yaml.dump(en, file, allow_unicode=True, sort_keys=True)
 
     if lang == "da":
-        with open("stadsarkiv_client/locales/da.yml", "w", encoding="utf8") as file:
+        with open("maya/locales/da.yml", "w", encoding="utf8") as file:
             yaml.dump(da, file, allow_unicode=True, sort_keys=True)
 
 

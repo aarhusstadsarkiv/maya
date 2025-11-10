@@ -1,6 +1,6 @@
 /**
  * If editing this file, please also update `StatusesUser` in `orders.py`
- * stadsarkiv_client/database/utils_orders.py
+ * maya/database/utils_orders.py
  */
 
 class OrderStatus {

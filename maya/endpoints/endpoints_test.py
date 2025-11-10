@@ -62,9 +62,6 @@ async def test_post(request: Request):
     return templates.TemplateResponse(request, "testing/thanks.html", context)
 
 
-# from stadsarkiv_client.core.dataclasses import Mail
-
-
 async def test_mail(request: Request):
     """
     /test/mail

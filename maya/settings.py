@@ -1,5 +1,5 @@
 """
-Default settings for stadsarkiv_client
+Default settings for maya
 These settings can be overridden by creating a local settings file.
 """
 

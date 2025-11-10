@@ -1,5 +1,5 @@
 """
-Main application file for the stadsarkiv_client application.
+Main application file for the maya application.
 """
 
 from maya.core.dynamic_settings import settings

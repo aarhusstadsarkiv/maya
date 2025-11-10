@@ -7,7 +7,7 @@ If a query fails, the transaction is rolled back and an exception is raised. Oth
 Example usage:
 
 ```
-from stadsarkiv_client.database.utils import DatabaseTransaction
+from maya.database.utils import DatabaseTransaction
 
 database_url = settings["sqlite3"]["default"]
 database_transation = DatabaseTransaction(database_url)
