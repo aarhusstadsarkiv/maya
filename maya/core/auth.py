@@ -85,6 +85,8 @@ async def _check_authentication(request: Request, permissions, message, verified
         _log_403_error(request, f"403 Forbidden: {request.url}. User {users_me_get['email']}. User is not verified")
         message = translate("You need to verify your email address to view this page.")
         if json_response:
+            # json version of message
+            message = translate("You need to verify your email address to perform this action.")
             raise AuthExceptionJSON(message=message)
         raise AuthException(request, message=message, redirect_url="/auth/me")
 
