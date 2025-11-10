@@ -136,23 +136,26 @@
                     </span>
                 </td>
                 <td>
+
                     <span>
-                        <a class="action-link" href="/admin/orders/{{order.order_id}}/edit">Rediger</a>
-                        <span>
-                            {% if not order.user_actions_deactivated %}
-                            <span class="complete-order">
-                                <a class="action-link" data-id="{{order.order_id}}" data-action="completed"
-                                    title="Brugeren er færdig med bestillingen" href="#">Afslut</a>
-                            </span>
-                            {% endif %}
-                            <span>
-                                <a class="action-link" href="/admin/orders/logs?order_id={{order.order_id}}"
-                                    title="Se logs for bestillingen">Logs</a>
-                            </span>
-                            <span>
-                                <a class="action-link print-external"
-                                    href="/admin/orders/print?order_id={{order.order_id}}" title="Udskriv bestilling">Print</a>
-                            </span>
+                        <a class="action-link print-external"
+                            href="/admin/orders/print?order_id={{order.order_id}}" title="Udskriv bestilling">Print</a>
+                    </span>
+
+                    <span>
+                        <a class="action-link" href="/admin/orders/{{order.order_id}}/edit">Noter</a>
+                    </span>
+
+                    {% if not order.user_actions_deactivated %}
+                    <span class="complete-order">
+                        <a class="action-link" data-id="{{order.order_id}}" data-action="completed"
+                            title="Brugeren er færdig med bestillingen" href="#">Afslut</a>
+                    </span>
+                    {% endif %}
+                    <span>
+                        <a class="action-link" href="/admin/orders/logs?order_id={{order.order_id}}"
+                            title="Se logs for bestillingen">Logs</a>
+                    </span>
                 </td>
             </tr>
 
