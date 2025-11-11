@@ -1,13 +1,36 @@
 {% extends "mails/mail_template.html" %}
 
 {% block content %}
-<p>Hej {{ order.user_display_name }},</p>
+<p>Kære {{ order.user_display_name }},</p>
 
 <p>{{ message|safe }}</p>
 
-<p>Det drejer sig om følgende materiale:</p>
+<p>Denne mail gælder bestilling af følgende materiale:</p>
 
 <p><a href="{{client_domain_url}}/records/{{ order.record_id }}">{{ order.label }}</a></p>
+
+<p>
+    Vi har fire studiepladser til rådighed i tidsrummet tirsdag-torsdag kl. 9-16. (Lukket: Helligdage, mellem jul og
+    nytår og i juli.)
+</p>
+
+<p>
+    Læs mere på <a href="https://stadsarkiv.aarhus.dk/besoeg-arkivet/besoeg-stadsarkivet">Stadsarkivets hjemmeside</a>
+    om besøg i studierummet og hvad du må medbringe.
+</p>
+
+<p>
+    Vær opmærksom på særlige retningslinjer ved brug af studierummet:
+</p>
+<ul>
+    <li>Overtøj, tasker og andet, som ikke må medtages på Stadsarkivet, skal venligst efterlades i garderoben.</li>
+    <li>Mobiltelefon og evt. Pc skal være på lydløs af hensyn til andre gæster.</li>
+    <li>Mad- og drikkevarer må ikke medbringes ved studiepladserne.</li>
+</ul>
+
+<p>
+    Materialet skal tages i brug inden 30 dage, hvorefter det sendes retur til magasinet.
+</p>
 
 <p>Med venlig hilsen</p>
 
