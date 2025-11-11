@@ -27,7 +27,7 @@ class RecordLocation:
 RECORD_LOCATION = RecordLocation()
 RECORD_LOCATION_HUMAN = {
     1: "På magasin",  # Initial status
-    2: "Pakket til læsesal",
+    2: "Pakket til depot",
     4: "På læsesalen",
     5: "Pakket til magasin",
 }
