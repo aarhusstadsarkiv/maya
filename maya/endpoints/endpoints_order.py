@@ -262,9 +262,22 @@ async def orders_admin_patch_single(request: Request):
         )
 
 
+def _get_lb_number(record_and_types: dict) -> str:
+    admin_data = record_and_types.get("admin_data", {}).get("value", [])
+    if admin_data and isinstance(admin_data, list):
+        first_admin_data = admin_data[0]
+        box = first_admin_data.get("Æske")
+        if box:
+            return box
+        lbnr = first_admin_data.get("MeE_Lbnr")
+        if lbnr:
+            return lbnr
+    return ""
+
+
 async def orders_admin_get(request: Request):
     """
-    GET endpoint for displaying all orders for an employee
+    GET endpoint for displaying all orders for an "employee" user
     """
     await is_authenticated(request, permissions=["employee"])
     me = await api.users_me_get(request)
@@ -283,6 +296,10 @@ async def orders_admin_get(request: Request):
     orders, filters = await crud_orders.get_orders_admin(
         filters=filters,
     )
+
+    for order in orders:
+        admin_data_extra = _get_lb_number(order["record_and_types"])
+        order["lb_number"] = admin_data_extra
 
     context_values = {
         "title": "Bestillinger",
@@ -314,16 +331,6 @@ async def orders_admin_get_edit(request: Request):
     return templates.TemplateResponse(request, "order/order_admin_edit.html", context)
 
 
-def _get_admin_data_extra(record_and_types: dict) -> dict:
-    admin_data = record_and_types.get("admin_data", {}).get("value", [])
-    if admin_data and isinstance(admin_data, list):
-        first_admin_data = admin_data[0]
-        box = first_admin_data.get("Æske")
-        lbnr = first_admin_data.get("MeE_Lbnr")
-        return {"box": box, "lbnr": lbnr}
-    return {"box": None, "lbnr": None}
-
-
 async def orders_record_get(request: Request):
     """
     Simple display of a record
@@ -335,8 +342,8 @@ async def orders_record_get(request: Request):
     record = await api.proxies_record_get_by_id(record_id)
 
     record, meta_data, record_and_types = await get_record_data(request, record, permissions)
-    extra_admin_data = _get_admin_data_extra(record_and_types)
-    log.debug(f"Extra admin data: {extra_admin_data}")
+    lb_number = _get_lb_number(record_and_types)
+    log.debug(f"Extra admin data: {lb_number}")
 
     all_keys = list(record_and_types.keys())
     all_keys = ["collectors", "resources", "subjects", "date_normalized", "desc_notes", "admin_data"]
