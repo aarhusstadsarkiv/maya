@@ -314,6 +314,16 @@ async def orders_admin_get_edit(request: Request):
     return templates.TemplateResponse(request, "order/order_admin_edit.html", context)
 
 
+def _get_admin_data_extra(record_and_types: dict) -> dict:
+    admin_data = record_and_types.get("admin_data", {}).get("value", [])
+    if admin_data and isinstance(admin_data, list):
+        first_admin_data = admin_data[0]
+        box = first_admin_data.get("Æske")
+        lbnr = first_admin_data.get("MeE_Lbnr")
+        return {"box": box, "lbnr": lbnr}
+    return {"box": None, "lbnr": None}
+
+
 async def orders_record_get(request: Request):
     """
     Simple display of a record
@@ -325,8 +335,11 @@ async def orders_record_get(request: Request):
     record = await api.proxies_record_get_by_id(record_id)
 
     record, meta_data, record_and_types = await get_record_data(request, record, permissions)
+    extra_admin_data = _get_admin_data_extra(record_and_types)
+    log.debug(f"Extra admin data: {extra_admin_data}")
+
     all_keys = list(record_and_types.keys())
-    all_keys = ["collectors", "resources", "subjects", "date_normalized", "desc_notes"]
+    all_keys = ["collectors", "resources", "subjects", "date_normalized", "desc_notes", "admin_data"]
     html = utils_core.get_parsed_data_as_table(record_and_types, all_keys, debug=True)
     context_variables = {
         "html": html,
