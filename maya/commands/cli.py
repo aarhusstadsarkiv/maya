@@ -11,6 +11,8 @@ import sys
 import json
 import logging
 from maya.core import logging_handlers
+import asyncio
+from maya.database.crud_orders import cron_orders_expire, cron_renewal_emails
 from maya import __version__, __program__
 
 
@@ -140,6 +142,39 @@ def server_dev(port: int, workers: int, host: str, base_dir: str, reload=True):
     except subprocess.CalledProcessError as e:
         logger.error(f"Uvicorn failed to start {e}")
         exit(1)
+
+
+async def _run_cron_tasks() -> None:
+    """
+    Run nightly cron tasks:
+
+    - Expire orders
+    - Send renewal emails
+    """
+
+    # Expire orders
+    try:
+        await cron_orders_expire()
+    except Exception:
+        pass
+
+    # Send renewal emails
+    try:
+        await cron_renewal_emails()
+    except Exception:
+        pass
+
+
+@cli.command(help="Run scheduled cron tasks (orders expire, renewal emails).")
+@click.argument("base_dir")
+def cron(base_dir: str):
+    """
+    Example usage:
+        maya cron sites/aarhus
+    """
+    base_dir = _get_base_dir(base_dir)
+    os.environ["BASE_DIR"] = base_dir
+    asyncio.run(_run_cron_tasks())
 
 
 @cli.command(help="Execute a script within a config context.")

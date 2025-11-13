@@ -10,7 +10,6 @@ from maya.core.middleware import middleware
 from maya.core.exception_handlers import exception_handlers
 from maya.core.hooks import get_hooks
 from maya.core.paths import get_data_dir_path
-from maya.core.scheduler import scheduler
 import contextlib
 import os
 import sys
@@ -44,7 +43,6 @@ async def lifespan(app):
             raise RuntimeError("Missing required environment variable: API_KEY")
         yield
     finally:
-        scheduler.shutdown()
         log.info("App lifecycle ended")
 
 
