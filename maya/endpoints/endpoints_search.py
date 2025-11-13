@@ -177,6 +177,10 @@ def _clean_query_params(query_params: list) -> list:
     # If key equals collection then remove left padded zeros
     query_params = [(key, value.lstrip("0")) if key == "collection" else (key, value) for key, value in query_params]
 
+    # remove duplicate query params
+    seen = set()
+    query_params = [x for x in query_params if not (x in seen or seen.add(x))]
+
     return query_params
 
 
