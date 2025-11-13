@@ -179,9 +179,13 @@ def _clean_query_params(query_params: list) -> list:
 
     # remove duplicate query params
     seen = set()
-    query_params = [x for x in query_params if not (x in seen or seen.add(x))]
+    deduped = []
+    for pair in query_params:
+        if pair not in seen:
+            seen.add(pair)
+            deduped.append(pair)
 
-    return query_params
+    return deduped
 
 
 def _get_facets_and_filters(request: Request, search_result: dict, query_params=[], query_str=""):
