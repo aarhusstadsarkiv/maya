@@ -20,7 +20,7 @@ from maya.core.translate import translate
 from maya.core.logging import get_log
 from maya.core import flash
 from maya.core.auth import AuthException, AuthExceptionJSON
-from httpx import HTTPStatusError
+from httpx import HTTPStatusError, TimeoutException
 import traceback
 
 HTML_404_PAGE = "404"
@@ -68,6 +68,33 @@ async def http_status_error(request: Request, exc: HTTPStatusError):
     return templates.TemplateResponse(request, "errors/default.html", context, status_code=exc.response.status_code)
 
 
+async def http_timeout_error(request: Request, exc: TimeoutException):
+    """
+    Any HTTPX timeout error (connect/read/write/pool) when calling external APIs.
+    """
+
+    exc_traceback = traceback.format_exc()
+    status_code = 504  # Gateway Timeout
+
+    context_values = {
+        "title": f"{status_code}. {translate('Error. Request Timeout')}",
+        "status_code": status_code,
+        "human_error": (
+            "Der skete en fejl, da systemet hentede data fra et API. "
+            "Forespørgslen tog for lang tid og blev afbrudt. Fejlen er blevet logget, "
+            "og vi vil kigge på det hurtigst muligt."
+        ),
+        "exc": exc,
+        "exc_traceback": exc_traceback,
+    }
+
+    extra = {"error_code": status_code, "error_url": str(request.url)}
+    log.exception(f"{status_code} Timeout: {request.url}", extra=extra)
+
+    context = await get_context(request, context_values=context_values)
+    return templates.TemplateResponse("errors/default.html", context, status_code=status_code)
+
+
 async def server_error(request: Request, exc: Exception):
     """
     Any 500 error that is not caught by the application.
@@ -107,6 +134,7 @@ exception_handlers = {
     404: not_found,
     500: server_error,
     HTTPStatusError: http_status_error,
+    TimeoutException: http_timeout_error,
     AuthException: auth_exception_handler,
     AuthExceptionJSON: auth_exception_json_handler,
 }
