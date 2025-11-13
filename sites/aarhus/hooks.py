@@ -1,16 +1,10 @@
 from maya.core.logging import get_log
 from maya.core.hooks_spec import HooksSpec
-from maya.core.api_error import OpenAwsException
 from maya.records import record_utils
 from maya.records import record_alter
 from maya.core import api
 import json
-from maya.database.crud_default import database_url
-from maya.database.crud import CRUD
 from maya.database import crud_orders
-from maya.database.utils import DatabaseConnection
-from maya.database.cache import DatabaseCache
-from maya.core import csv_utils
 
 
 log = get_log()
@@ -19,63 +13,6 @@ log = get_log()
 class Hooks(HooksSpec):
     def __init__(self, request):
         super().__init__(request)
-
-    async def after_login_success(self, response: dict) -> dict:
-        """
-        After a successful login.
-        """
-        try:
-
-            me = await api.me_get(self.request)
-            user_id = me["id"]
-            email = me["email"]
-
-            database_connection = DatabaseConnection(database_url)
-            async with database_connection.transaction_scope_async() as connection:
-                crud_default = CRUD(connection)
-                database_cache = DatabaseCache(connection)
-
-                cache_key = f"bookmarks_imported_{user_id}"
-                result = await database_cache.get(cache_key)
-
-                if not result:
-                    log.info(f"Importing bookmarks for user: {email}")
-                    bookmarks_from_file = csv_utils.bookmarks_by_email(email)
-
-                    insert_values_many = []
-                    for record_id in bookmarks_from_file:
-                        insert_values_many.append({"user_id": user_id, "record_id": record_id})
-
-                    await crud_default.insert_many(table="bookmarks", insert_values_many=insert_values_many)
-                    await database_cache.set(cache_key, True)
-        except Exception:
-            log.exception("Error importing bookmarks")
-            raise OpenAwsException(500, "Error importing bookmarks")
-
-        return response
-
-    async def after_login_failure(self, response: dict) -> dict:
-        """
-        After a login failure
-        """
-        request = self.request
-        form = await request.form()
-        email = str(form.get("email"))
-
-        database_connection = DatabaseConnection(database_url)
-        async with database_connection.transaction_scope_async() as connection:
-            database_cache = DatabaseCache(connection)
-            email_exists = await database_cache.get(f"email_exists_{email}")
-
-        if csv_utils.email_exists(email) and not email_exists:
-            user_message = """Kære bruger. Du er tilknyttet det gamle system.
-    Men da vi er overgået til et nyt system, skal du oprette en ny bruger.
-    Hvis du bruger samme email vil systemet ved første login forsøge at importere data fra det gamle system."""
-            raise OpenAwsException(
-                401,
-                user_message,
-            )
-        return response
 
     async def before_get_auto_complete(self, query_params: list) -> list:
         query_params.append(("limit", "10"))
