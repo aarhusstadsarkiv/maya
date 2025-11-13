@@ -6,13 +6,14 @@ from maya.core.dynamic_settings import settings
 from maya.database.crud import CRUD
 from maya.database import utils_orders
 from maya.database.utils import DatabaseConnection
-from maya.core.logging import get_log
+from maya.core.logging import get_log, get_custom_log
 from dataclasses import dataclass
 from typing import Optional
 import json
 
 
 log = get_log()
+cron_log = get_custom_log("cron")
 
 
 try:
@@ -720,6 +721,7 @@ async def cron_orders_expire():
     Check if expire has passed and update user status to COMPLETED
     """
     # Get orders where expire_at has passed
+    cron_log.info("Starting cron_orders_expire")
     try:
         database_connection = DatabaseConnection(orders_url)
         async with database_connection.transaction_scope_async() as connection:
@@ -735,9 +737,9 @@ async def cron_orders_expire():
             params = {"current_date": utils_orders.get_current_date_time()}
             orders_expire = await crud.query(query, params)
 
-            log.info(f"Found {len(orders_expire)} orders to expire")
+            cron_log.info(f"Found {len(orders_expire)} orders to expire")
     except Exception:
-        log.exception("Failed to get orders for cron_orders")
+        cron_log.exception("Failed to get orders for cron_orders")
         return
 
     for order in orders_expire:
@@ -753,6 +755,7 @@ async def cron_orders_expire():
 
 async def cron_renewal_emails():
 
+    cron_log.info("Starting cron_renewal_emails")
     try:
         database_connection = DatabaseConnection(orders_url)
         async with database_connection.transaction_scope_async() as connection:
@@ -769,10 +772,10 @@ AND o.order_status = {utils_orders.ORDER_STATUS.ORDERED}
             """
             params = {"expire_at": date_indicating_renewal}
             renewal_orders = await crud.query(query, params)
-            log.info(f"Found {len(renewal_orders)} orders with expire_at = {date_indicating_renewal}")
+            cron_log.info(f"Found {len(renewal_orders)} orders with expire_at = {date_indicating_renewal}")
 
     except Exception:
-        log.exception("Cron renewal emails failed")
+        cron_log.exception("Cron renewal emails failed")
         return
 
     for order in renewal_orders:
@@ -783,10 +786,10 @@ AND o.order_status = {utils_orders.ORDER_STATUS.ORDERED}
                 crud = CRUD(connection)
 
                 if not await _is_renew_possible(crud, order):
-                    log.info(f"Order {order['order_id']} could not be renewed")
+                    cron_log.info(f"Order {order['order_id']} could not be renewed")
                     continue
 
-                log.info(f"Order {order['order_id']} has expire_at indicating renewal. Sending mail")
+                cron_log.info(f"Order {order['order_id']} has expire_at indicating renewal. Sending mail")
 
                 await utils_orders.send_order_message(MAIL_MESSAGE_ORDER_RENEW_TITLE, MAIL_MESSAGE_ORDER_RENEW, order)
                 await _insert_log_message(
@@ -796,7 +799,7 @@ AND o.order_status = {utils_orders.ORDER_STATUS.ORDERED}
                     message=LOG_MESSAGES.RENEWAL_SENT,
                 )
         except Exception:
-            log.exception(f"Failed to send renewal email for order {order['order_id']}")
+            cron_log.exception(f"Failed to send renewal email for order {order['order_id']}")
 
 
 async def _get_orders(
