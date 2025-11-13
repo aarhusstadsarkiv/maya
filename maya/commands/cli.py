@@ -12,7 +12,6 @@ import json
 import logging
 from maya.core import logging_handlers
 import asyncio
-from maya.database.crud_orders import cron_orders_expire, cron_renewal_emails
 from maya import __version__, __program__
 
 
@@ -151,6 +150,7 @@ async def _run_cron_tasks() -> None:
     - Expire orders
     - Send renewal emails
     """
+    from maya.database.crud_orders import cron_orders_expire, cron_renewal_emails
 
     # Expire orders
     try:
