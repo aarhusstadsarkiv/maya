@@ -74,7 +74,7 @@ Then:
 
 Install `bump-py-version`:
 
-    pipx install git+https://github.com/diversen/bump-py-version@v2.0.3
+    uv tool install git+https://github.com/diversen/bump-py-version@v2.0.3
 
 Bump version:
 
@@ -84,10 +84,10 @@ Bump version:
 
 Install main branch: 
     
-    pipx install git+https://github.com/aarhusstadsarkiv/maya.git
+    uv tool install git+https://github.com/aarhusstadsarkiv/maya.git
 
 Install latest version: 
 <!-- LATEST-VERSION-PIPX -->
-	pipx install git+https://github.com/aarhusstadsarkiv/maya@v1.3.851
+    uv tool install git+https://github.com/aarhusstadsarkiv/maya@v1.3.851
 
 Usage is the same as for development.
