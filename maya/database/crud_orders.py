@@ -77,7 +77,7 @@ async def has_active_order(user_id: str, record_id: str):
 
 async def is_owner(user_id: str, order_id: int):
     """
-    Check if user is owner of order
+    Check if user is owner of an order
     """
     database_connection = DatabaseConnection(orders_url)
     async with database_connection.transaction_scope_async() as connection:
@@ -114,19 +114,19 @@ async def _has_active_order(crud: "CRUD", user_id: str, record_id: str):
 async def _is_renew_possible(crud: "CRUD", order: dict):
     """
     Check if an order can be renewed
-    - Check if user status is ORDERED
-    - Order has a expire_at date
-    - Order has not passed expire_at
-    - Check if no other order is in the queue in the same record
     """
 
+    # only orders that the user has loaned can be renewed
+    # expire_at is only set when the order is eligible in the reading room
     if not order["expire_at"]:
         return False
 
+    # renewal only possible if the days until expire_at is less than DEADLINE_DAYS_RENEWAL
     days_remaining_ = utils_orders.get_days_until_expire(order)
     if days_remaining_ > utils_orders.DEADLINE_DAYS_RENEWAL:
         return False
 
+    # if there is a queued order for the same record, renewal is not possible
     queued = await _get_orders_one(
         crud,
         record_id=order["record_id"],
@@ -140,12 +140,16 @@ async def _is_renew_possible(crud: "CRUD", order: dict):
 
 
 async def renew_order(user_id: str, order_id: int):
+    """
+    Renew an order by updating its expire_at date.
+    """
     database_connection = DatabaseConnection(orders_url)
     async with database_connection.transaction_scope_async() as connection:
         crud = CRUD(connection)
         order = await _get_orders_one(crud, order_id=order_id)
 
-        if not await _is_renew_possible(crud, order):
+        renew_possible = await _is_renew_possible(crud, order)
+        if not renew_possible:
             raise Exception(f"Bestilling {order_id} kan ikke fornyes")
 
         expire_at_date = utils_orders.get_expire_at_date()
@@ -179,7 +183,7 @@ async def _save_data(meta_data: dict, record_and_types: dict, me: dict):
         json.dump(me, f, ensure_ascii=False)
 
 
-async def insert_order(meta_data: dict, record_and_types: dict, me: dict):
+async def insert_order(meta_data: dict, record_and_types: dict, me: dict) -> dict:
     """
     Insert an order into the database with proper validations and updates.
     """
@@ -375,17 +379,17 @@ async def update_order(
     update_values: dict,
 ):
     """
-    Updates an order's details (location, comment, and order_status)
+    Updates an order's details (location or comment or order_status or expire_at).
     """
     database_connection = DatabaseConnection(orders_url)
     async with database_connection.transaction_scope_async() as connection:
         crud = CRUD(connection)
 
         # Only one of the following can be updated at a time
-        comment = update_values.get("comment", "")
-        order_status = update_values.get("order_status", 0)
-        location = update_values.get("location", 0)
-        expire_at = update_values.get("expire_at", "")
+        comment = update_values.get("comment")
+        order_status = update_values.get("order_status")
+        location = update_values.get("location")
+        expire_at = update_values.get("expire_at")
 
         # comment should also be updated if empty string
         if comment is not None:
@@ -394,11 +398,13 @@ async def update_order(
         if location:
             await _update_location(crud, user_id, order_id, location)
 
-        elif order_status:
+        if order_status:
             await _update_status(crud, user_id, order_id, order_status)
 
-        elif expire_at:
-            """only used in tests"""
+        if expire_at:
+            """
+            only used in tests
+            """
             update_values = {"expire_at": expire_at}
             await crud.update(
                 table="orders",
@@ -716,9 +722,10 @@ async def get_order_by_record_id(user_id: str, record_id: str):
         return order
 
 
-async def cron_orders_expire():
+async def cron_orders_expire() -> int:
     """
     Check if expire has passed and update user status to COMPLETED
+    Returns number of orders expired
     """
     # Get orders where expire_at has passed
     cron_log.info("Starting cron_orders_expire")
@@ -742,18 +749,30 @@ async def cron_orders_expire():
         cron_log.exception("Failed to get orders for cron_orders")
         return
 
+    num_orders_expired = 0
     for order in orders_expire:
         try:
             database_connection = DatabaseConnection(orders_url)
             async with database_connection.transaction_scope_async() as connection:
                 crud = CRUD(connection)
                 log.info(f"Order {order['order_id']} has passed expire_at. Setting status to COMPLETED")
-                await _update_status(crud, SYSTEM_USER_ID, order["order_id"], utils_orders.ORDER_STATUS.COMPLETED)
+                await _update_status(
+                    crud,
+                    SYSTEM_USER_ID,
+                    order["order_id"],
+                    utils_orders.ORDER_STATUS.COMPLETED,
+                )
+                num_orders_expired += 1
         except Exception:
             log.exception(f"Failed to update order {order['order_id']} to COMPLETED")
 
+    return num_orders_expired
 
-async def cron_renewal_emails():
+async def cron_renewal_emails() -> int:
+    """
+    Cron job for sending renewal emails
+    Returns number of emails sent
+    """
 
     cron_log.info("Starting cron_renewal_emails")
     try:
@@ -778,8 +797,9 @@ AND o.order_status = {utils_orders.ORDER_STATUS.ORDERED}
         cron_log.exception("Cron renewal emails failed")
         return
 
+    num_renewal_emails = 0
     for order in renewal_orders:
-
+        
         try:
             database_connection = DatabaseConnection(orders_url)
             async with database_connection.transaction_scope_async() as connection:
@@ -798,9 +818,11 @@ AND o.order_status = {utils_orders.ORDER_STATUS.ORDERED}
                     order=order,
                     message=LOG_MESSAGES.RENEWAL_SENT,
                 )
+                num_renewal_emails += 1
         except Exception:
             cron_log.exception(f"Failed to send renewal email for order {order['order_id']}")
 
+    return num_renewal_emails
 
 async def _get_orders(
     crud: "CRUD",

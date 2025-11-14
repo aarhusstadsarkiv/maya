@@ -44,7 +44,7 @@ class TestDB(unittest.TestCase):
         """
         Simple integration test for orders
         """
-        # Generate a new database for testing
+        # generate a new database for testing
         db_path = "/tmp/orders.db"
         if os.path.exists(db_path):
             os.remove(db_path)
@@ -54,40 +54,57 @@ class TestDB(unittest.TestCase):
 
         me, me_2, meta_data, record_and_types = self.get_test_data()
 
-        # Test insert_order
-        await crud_orders.insert_order(meta_data, record_and_types, me)
-        order = await crud_orders.get_order(1)
-
-        # except order status to be equal utils_orders.ORDER_STATUS.ORDERED
-        self.assertEqual(order["order_status"], utils_orders.ORDER_STATUS.ORDERED)
-
-        """
-        DEADLINE_DAYS_RENEWAL = 3
-        DEADLINE_DAYS = 30
-        """
-        DAYS_TO_RENEW = utils_orders.DEADLINE_DAYS - (utils_orders.DEADLINE_DAYS_RENEWAL) + 1
-
-        # Shift time DEADLINE_DAYS - DEADLINE_DAYS_RENEWAL to see renewal mail if renew email is being sent
-
-        # Generate time stamp that expired at midnight
-        # utc_now = arrow.utcnow()
-        # expire_at = utc_now.floor("day").shift(days=0)
-        # expired_at_midnight = expire_at.format("YYYY-MM-DD HH:mm:ss")
-
-        utc_now = arrow.utcnow()
-        date_to_renew = utc_now.floor("day").shift(days=DAYS_TO_RENEW)
-        days_to_renew_str = date_to_renew.format("YYYY-MM-DD HH:mm:ss")
-
-        log.info(days_to_renew_str)
-
+        # insert order
+        order_1 = await crud_orders.insert_order(meta_data, record_and_types, me)
+        order_2 = await crud_orders.insert_order(meta_data, record_and_types, me_2)
+        
+        self.assertEqual(order_2["order_status"], utils_orders.ORDER_STATUS.QUEUED)
         await crud_orders.update_order(
             me["id"],
-            order["order_id"],
-            update_values={"expire_at": days_to_renew_str},
+            order_1["order_id"],
+            update_values={"order_status": utils_orders.ORDER_STATUS.ORDERED},
         )
 
-        await crud_orders.cron_orders_expire()
+        num_renewal_emails = await crud_orders.cron_renewal_emails()
+        self.assertEqual(num_renewal_emails, 0)
 
+        # set location to READING_ROOM
+        await crud_orders.update_order(
+            me["id"],
+            order_1["order_id"],
+            update_values={"location": utils_orders.RECORD_LOCATION.READING_ROOM},
+        )
+
+        num_renewal_emails = await crud_orders.cron_renewal_emails()
+        self.assertEqual(num_renewal_emails, 0)
+
+        # set expire_at to to 3 + 1 days in the future
+        # deadline is the last day the order is valid. 
+        # Therefor we add one extra day which is the day it expires
+        utc_now = arrow.utcnow()
+        expire_at_date = utc_now.floor("day").shift(days=utils_orders.DEADLINE_DAYS_RENEWAL + 1)
+        expire_at_str = expire_at_date.format("YYYY-MM-DD HH:mm:ss")
+        await crud_orders.update_order(
+            me["id"],
+            order_1["order_id"],
+            update_values={"expire_at": expire_at_str},
+        )
+
+        # the order can not be renewed as a another order is queued for 
+        # the same record by another user
+        num_renewal_emails = await crud_orders.cron_renewal_emails()
+        self.assertEqual(num_renewal_emails, 0)
+
+        # Set status of order_2 to COMPLETED so order_1 can be renewed
+        await crud_orders.update_order(
+            me_2["id"],
+            order_2["order_id"],
+            update_values={"order_status": utils_orders.ORDER_STATUS.COMPLETED},
+        )
+
+        # Now the order can be renewed
+        num_renewal_emails = await crud_orders.cron_renewal_emails()
+        self.assertEqual(num_renewal_emails, 1)
 
 if __name__ == "__main__":
     unittest.main()

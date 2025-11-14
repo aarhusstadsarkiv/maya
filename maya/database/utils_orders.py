@@ -175,12 +175,11 @@ def get_days_until_expire(order: dict) -> int:
 
 def get_date_indicating_renewal_mail() -> str:
     """
-    Records can be renewed between (expire_at - DEADLINE_DAYS_RENEWAL) and expire_at
-
     This def gets a date string DEADLINE_DAYS_RENEWAL days into the future.
-    If this date corresponds to the expire_at of an order, the order can be renewed
-    and a mail can be sent to the user
+    If this date corresponds to the expire_at of an order a mail can be sent to the user
+    so they can renew the order.
     """
+    # deadline is the last day the order is valid. Therefor we add one extra day which is the day it expires
     date_send_renewal = arrow.utcnow().floor("day").shift(days=DEADLINE_DAYS_RENEWAL + 1)
     date_send_renewal_str = date_send_renewal.format("YYYY-MM-DD HH:mm:ss")
     return date_send_renewal_str

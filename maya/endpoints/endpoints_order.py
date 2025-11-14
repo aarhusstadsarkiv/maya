@@ -146,7 +146,7 @@ async def _process_order_deletion(request: Request, id_key: str):
                 }
             )
 
-        # Update the order with the status. Location is not altered, hence it is set to 0
+        # Update the order with the status.DELETED
         update_values = {
             "order_status": utils_orders.ORDER_STATUS.DELETED,
         }
@@ -201,7 +201,7 @@ async def orders_admin_patch_multiple(request: Request):
             location = order_location["location"]
             assert isinstance(location, int)
 
-            log.debug(f"Updating order {order_id} to location {location}")
+            log.info(f"Updating order {order_id} to location {location}")
 
             await crud_orders.update_order(
                 user_id=me["id"],
@@ -233,6 +233,8 @@ async def orders_admin_patch_single(request: Request):
 
         order_id = request.path_params["order_id"]
         update_values: dict = await request.json()
+        comment = update_values.get("comment", "")
+        update_values={"comment": comment}
 
         await crud_orders.update_order(
             user_id=me["id"],
