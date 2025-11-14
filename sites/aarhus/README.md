@@ -39,6 +39,6 @@ sudo crontab -u www-data -e
 
 Add the following line (runs two hours past midnight every day): 
 
-     0 2 * * * cd /var/www/aarhus && .venv/bin/maya cron local
+     0 2 * * * cd /var/www/aarhus-client && .venv/bin/maya cron local
 
 
