@@ -99,7 +99,7 @@
                 <td class="width-300" title="{{ order.collectors }}">{{ order.collectors }} </td>
                 <td class="width-300" title="{{ order.label }}">{{ order.label }} </td>
                 <td>{{ order.lb_number }}</td>
-                <td>{{ order.user_display_name }}</td>
+                <td title="{{ order.user_email }}">{{ order.user_display_name }}</td>
                 <td class="width-100">{{ order.order_status_human }}</td>
                 <td>{{ order.updated_at }}</td>
                 {% if order.deadline_human %}
