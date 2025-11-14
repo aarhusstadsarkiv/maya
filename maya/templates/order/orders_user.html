@@ -79,7 +79,7 @@
         </div>
 
         <div class="action-links">
-            <a data-id="{{order.order_id}}" class="delete-order" href="#">Slet bestilling</a>
+            <a data-id="{{order.order_id}}" class="delete-order" href="#">Afslut bestilling</a>
             {% if order.renewal_possible %}
             <a data-id="{{order.order_id}}" href="/order/renew/{{ order.order_id }}" class="renew-order">Forny bestilling</a>
             {% endif %}
@@ -104,7 +104,7 @@
     const spinner = document.querySelector('.loadingspinner');
 
     async function handleDeleteUserClick(event) {
-        const res = confirm('Er du sikker på at du vil slette denne bestilling?');
+        const res = confirm('Er du sikker på at du vil afslutte denne bestilling?');
         if (!res) {
             return;
         }

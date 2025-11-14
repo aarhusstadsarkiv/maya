@@ -146,9 +146,9 @@ async def _process_order_deletion(request: Request, id_key: str):
                 }
             )
 
-        # Update the order with the status.DELETED
+        # Update the order with the status.COMPLETED
         update_values = {
-            "order_status": utils_orders.ORDER_STATUS.DELETED,
+            "order_status": utils_orders.ORDER_STATUS.COMPLETED,
         }
 
         await crud_orders.update_order(
