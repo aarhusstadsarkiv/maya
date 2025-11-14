@@ -768,6 +768,7 @@ async def cron_orders_expire() -> int:
 
     return num_orders_expired
 
+
 async def cron_renewal_emails() -> int:
     """
     Cron job for sending renewal emails
@@ -799,7 +800,7 @@ AND o.order_status = {utils_orders.ORDER_STATUS.ORDERED}
 
     num_renewal_emails = 0
     for order in renewal_orders:
-        
+
         try:
             database_connection = DatabaseConnection(orders_url)
             async with database_connection.transaction_scope_async() as connection:
@@ -823,6 +824,7 @@ AND o.order_status = {utils_orders.ORDER_STATUS.ORDERED}
             cron_log.exception(f"Failed to send renewal email for order {order['order_id']}")
 
     return num_renewal_emails
+
 
 async def _get_orders(
     crud: "CRUD",

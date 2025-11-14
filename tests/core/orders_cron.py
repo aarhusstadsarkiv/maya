@@ -57,7 +57,7 @@ class TestDB(unittest.TestCase):
         # insert order
         order_1 = await crud_orders.insert_order(meta_data, record_and_types, me)
         order_2 = await crud_orders.insert_order(meta_data, record_and_types, me_2)
-        
+
         self.assertEqual(order_2["order_status"], utils_orders.ORDER_STATUS.QUEUED)
         await crud_orders.update_order(
             me["id"],
@@ -79,7 +79,7 @@ class TestDB(unittest.TestCase):
         self.assertEqual(num_renewal_emails, 0)
 
         # set expire_at to to 3 + 1 days in the future
-        # deadline is the last day the order is valid. 
+        # deadline is the last day the order is valid.
         # Therefor we add one extra day which is the day it expires
         utc_now = arrow.utcnow()
         expire_at_date = utc_now.floor("day").shift(days=utils_orders.DEADLINE_DAYS_RENEWAL + 1)
@@ -90,7 +90,7 @@ class TestDB(unittest.TestCase):
             update_values={"expire_at": expire_at_str},
         )
 
-        # the order can not be renewed as a another order is queued for 
+        # the order can not be renewed as a another order is queued for
         # the same record by another user
         num_renewal_emails = await crud_orders.cron_renewal_emails()
         self.assertEqual(num_renewal_emails, 0)
@@ -105,6 +105,7 @@ class TestDB(unittest.TestCase):
         # Now the order can be renewed
         num_renewal_emails = await crud_orders.cron_renewal_emails()
         self.assertEqual(num_renewal_emails, 1)
+
 
 if __name__ == "__main__":
     unittest.main()
