@@ -63,7 +63,7 @@ class TestDB(unittest.TestCase):
 
         """
         DEADLINE_DAYS_RENEWAL = 3
-        DEADLINE_DAYS = 7
+        DEADLINE_DAYS = 30
         """
         DAYS_TO_RENEW = utils_orders.DEADLINE_DAYS - (utils_orders.DEADLINE_DAYS_RENEWAL) + 1
 
@@ -78,7 +78,7 @@ class TestDB(unittest.TestCase):
         date_to_renew = utc_now.floor("day").shift(days=DAYS_TO_RENEW)
         days_to_renew_str = date_to_renew.format("YYYY-MM-DD HH:mm:ss")
 
-        log.debug(days_to_renew_str)
+        log.info(days_to_renew_str)
 
         await crud_orders.update_order(
             me["id"],

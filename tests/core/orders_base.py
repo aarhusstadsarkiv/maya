@@ -74,7 +74,7 @@ class TestDB(unittest.TestCase):
         # Test no expire_at
         order = await crud_orders.get_order(1)
 
-        # Test is user is owner
+        # Test if user is owner
         is_owner = await crud_orders.is_owner(me["id"], order["order_id"])
         self.assertTrue(is_owner)
 
