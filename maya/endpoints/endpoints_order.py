@@ -225,7 +225,7 @@ async def orders_admin_patch_multiple(request: Request):
 async def orders_admin_patch_single(request: Request):
     """
     Patch a single order as admin
-    Used to update the comment on the order
+    Used to update the comment on the order and complete an order
     """
     try:
         await is_authenticated_json(request, verified=True, permissions=["employee"])
@@ -233,8 +233,6 @@ async def orders_admin_patch_single(request: Request):
 
         order_id = request.path_params["order_id"]
         update_values: dict = await request.json()
-        comment = update_values.get("comment", "")
-        update_values={"comment": comment}
 
         await crud_orders.update_order(
             user_id=me["id"],
@@ -316,7 +314,7 @@ async def orders_admin_get(request: Request):
 
 async def orders_admin_get_edit(request: Request):
     """
-    GET endpoint for displaying a single order for editing
+    GET endpoint for editing notes on a single order as admin
     """
     await is_authenticated(request, permissions=["employee"])
 

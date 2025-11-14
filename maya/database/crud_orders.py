@@ -747,7 +747,7 @@ async def cron_orders_expire() -> int:
             cron_log.info(f"Found {len(orders_expire)} orders to expire")
     except Exception:
         cron_log.exception("Failed to get orders for cron_orders")
-        return
+        return 0
 
     num_orders_expired = 0
     for order in orders_expire:
@@ -795,7 +795,7 @@ AND o.order_status = {utils_orders.ORDER_STATUS.ORDERED}
 
     except Exception:
         cron_log.exception("Cron renewal emails failed")
-        return
+        return 0
 
     num_renewal_emails = 0
     for order in renewal_orders:
