@@ -262,19 +262,6 @@ async def orders_admin_patch_single(request: Request):
         )
 
 
-def _get_lb_number(record_and_types: dict) -> str:
-    admin_data = record_and_types.get("admin_data", {}).get("value", [])
-    if admin_data and isinstance(admin_data, list):
-        first_admin_data = admin_data[0]
-        box = first_admin_data.get("Æske")
-        if box:
-            return box
-        lbnr = first_admin_data.get("MeE_Lbnr")
-        if lbnr:
-            return lbnr
-    return ""
-
-
 async def orders_admin_get(request: Request):
     """
     GET endpoint for displaying all orders for an "employee" user
@@ -298,7 +285,7 @@ async def orders_admin_get(request: Request):
     )
 
     for order in orders:
-        admin_data_extra = _get_lb_number(order["record_and_types"])
+        admin_data_extra = utils_orders.get_lb_number(order["record_and_types"])
         order["lb_number"] = admin_data_extra
 
     context_values = {
@@ -342,7 +329,7 @@ async def orders_record_get(request: Request):
     record = await api.proxies_record_get_by_id(record_id)
 
     record, meta_data, record_and_types = await get_record_data(request, record, permissions)
-    lb_number = _get_lb_number(record_and_types)
+    lb_number = utils_orders.get_lb_number(record_and_types)
     log.debug(f"Extra admin data: {lb_number}")
 
     all_keys = list(record_and_types.keys())
@@ -409,6 +396,8 @@ async def _get_print_data(request: Request, order_id: int = 0):
     # Get the legal information
     record_keys = ["availability_normalized", "contractual_status_normalized", "other_legal_restrictions_normalized"]
     legal_info = utils_core.get_record_and_types_as_strings(record_and_types, record_keys)
+
+    # log.info(f"material_base_info for print: {meta_data.get('resources', {})}")
 
     data = {
         "material_base_info": material_base_info,

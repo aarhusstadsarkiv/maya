@@ -212,6 +212,19 @@ def format_log_display(log: dict):
     return log
 
 
+def get_lb_number(record_and_types: dict) -> str:
+    admin_data = record_and_types.get("admin_data", {}).get("value", [])
+    if admin_data and isinstance(admin_data, list):
+        first_admin_data = admin_data[0]
+        box = first_admin_data.get("Æske")
+        if box:
+            return box
+        lbnr = first_admin_data.get("MeE_Lbnr")
+        if lbnr:
+            return lbnr
+    return ""
+
+
 def get_expire_at_date() -> str:
     """
     Get a expire_at date
