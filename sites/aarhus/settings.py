@@ -5,7 +5,7 @@ settings: dict[str, typing.Any] = {
     "client_name": "Aarhus Stadsarkiv",
     "client_url": "https://www.aarhusarkivet.dk",
     "client_email": "stadsarkivet@aarhusarkivet.dk",
-    "client_email_orders": "stadsarkiv@aarhus.dk",
+    "client_email_orders_reply_to": "stadsarkiv@aarhus.dk",
     "language": "da",
     "log_handlers": ["rotating_file"],
     "cookie": {
