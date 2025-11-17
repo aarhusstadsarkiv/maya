@@ -5,6 +5,7 @@ import { config } from "/static/js/config.js";
 
 const spinner = document.querySelector('.loadingspinner');
 const orderElem = document.getElementById('record-order');
+const orderMessageElem = document.querySelector('.order-message');
 
 // <div class ="action-links"><a href="#" id="record-order" data-id="1">Bestil materialet</a></div>
 
@@ -36,7 +37,6 @@ if (orderElem) {
             }
 
             res = await Requests.asyncPostJson(url, {});
-            
             if (res.error) {
                 console.log(res.message);
                 Flash.setMessage(res.message, 'error');
@@ -46,12 +46,14 @@ if (orderElem) {
                     Flash.setMessage(res.message, 'success');
                     orderElem.innerText = 'Bestil til læsesal';
                     orderElem.setAttribute('data-action', 'create');
+                    orderMessageElem.innerText = "";
                 }
 
                 if (action === 'create') {
                     Flash.setMessage(res.message, 'success');
-                    orderElem.innerText = 'Slet bestilling';
+                    orderElem.innerText = 'Afslut bestilling';
                     orderElem.setAttribute('data-action', 'delete');
+                    orderMessageElem.innerText = res.order_message;
                 }
             }
 

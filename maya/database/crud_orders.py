@@ -72,7 +72,8 @@ async def has_active_order(user_id: str, record_id: str):
     database_connection = DatabaseConnection(orders_url)
     async with database_connection.transaction_scope_async() as connection:
         crud = CRUD(connection)
-        return await _has_active_order(crud, user_id, record_id)
+        active_order = await _has_active_order(crud, user_id, record_id)
+        return active_order
 
 
 async def is_owner(user_id: str, order_id: int):
@@ -249,6 +250,9 @@ async def insert_order(meta_data: dict, record_and_types: dict, me: dict) -> dic
             order=inserted_order,
             message=". ".join(log_messages),
         )
+
+        # get the final inserted order
+        inserted_order = await _get_orders_one(crud, order_id=last_order_id)
 
         return inserted_order
 

@@ -109,8 +109,9 @@ async def orders_post(request: Request):
         if is_ordered:
             return JSONResponse({"message": "Bestilling på dette materiale eksisterer allerede", "error": True})
         else:
-            await crud_orders.insert_order(meta_data, record_and_types, me)
-            return JSONResponse({"message": "Din bestilling er blevet oprettet", "error": False})
+            inserted_order = await crud_orders.insert_order(meta_data, record_and_types, me)
+            order_message = utils_orders.get_single_order_message(inserted_order)
+            return JSONResponse({"message": "Din bestilling er blevet oprettet", "order_message": order_message, "error": False})
     except Exception as e:
         log.exception("Error in auth_orders_post")
         return JSONResponse({"message": str(e), "error": True})
@@ -161,7 +162,9 @@ async def _process_order_deletion(request: Request, id_key: str):
         log.exception("Error in orders_user_delete")
         return JSONResponse({"message": "Der opstod en fejl. Bestilling kunne ikke slettes.", "error": True})
 
-    return JSONResponse({"message": "Din bestilling er slettet", "error": False})
+    updated_order = await crud_orders.get_order(order_id)
+    order_message = utils_orders.get_single_order_message(updated_order)
+    return JSONResponse({"message": "Din bestilling er slettet", "order_message": order_message, "error": False})
 
 
 async def orders_user_delete_by_order_id(request: Request):
@@ -393,11 +396,15 @@ async def _get_print_data(request: Request, order_id: int = 0):
     material_base_info = utils_core.get_record_and_types_as_strings(record_and_types, record_keys)
     material_base_info["title"] = meta_data["meta_title"]
 
+    # get resources
+    resources = meta_data.get("resources", {})
+    lb_number = utils_orders.get_lb_number(record_and_types)
+    if lb_number:
+        resources["Lb-nr"] = lb_number
+
     # Get the legal information
     record_keys = ["availability_normalized", "contractual_status_normalized", "other_legal_restrictions_normalized"]
     legal_info = utils_core.get_record_and_types_as_strings(record_and_types, record_keys)
-
-    # log.info(f"material_base_info for print: {meta_data.get('resources', {})}")
 
     data = {
         "material_base_info": material_base_info,
