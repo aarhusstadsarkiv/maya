@@ -247,7 +247,7 @@ async def send_order_message(title: str, message: str, order: dict):
             "user_id": order["user_id"],
             "subject": title,
             "sender": {"email": settings["client_email"], "name": settings["client_name"]},
-            "reply_to": {"email": settings["client_email"], "name": settings["client_name"]},
+            "reply_to": {"email": settings["client_email_orders"], "name": settings["client_name"]},
             "html_content": html_content,
             "text_content": html_content,
         }
