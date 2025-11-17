@@ -242,12 +242,14 @@ async def send_order_message(title: str, message: str, order: dict):
     }
 
     html_content = await get_template_content("mails/order_mail.html", template_values)
+    reply_to_email = settings["client_email_orders_reply_to"] if settings.get("client_email_orders_reply_to") else settings["client_email"]
+
     mail_dict = {
         "data": {
             "user_id": order["user_id"],
             "subject": title,
             "sender": {"email": settings["client_email"], "name": settings["client_name"]},
-            "reply_to": {"email": settings["client_email_orders"], "name": settings["client_name"]},
+            "reply_to": {"email": reply_to_email, "name": settings["client_name"]},
             "html_content": html_content,
             "text_content": html_content,
         }
