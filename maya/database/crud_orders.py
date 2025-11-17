@@ -515,6 +515,9 @@ def _get_and_filters_str_and_values(filters: OrderFilter) -> tuple:
 
 
 async def _get_active_orders(crud: "CRUD", filters: OrderFilter, offset: int = 0) -> list:
+    """
+    Get active orders (ORDERED and optionally QUEUED)
+    """
     search_filters_as_str, placeholder_values = _get_and_filters_str_and_values(filters)
 
     if filters.filter_show_queued:
@@ -537,7 +540,18 @@ LIMIT {filters.filter_limit} OFFSET {offset}
     return orders
 
 
-async def _get_completed_orders(crud: "CRUD", filters: OrderFilter, offset: int = 0) -> list:
+async def _get_completed_records(crud: "CRUD", filters: OrderFilter, offset: int = 0) -> list:
+    """
+    Return the latest finished order per material, only for materials that are no longer active.
+
+    More precisely:
+    - Select only orders with status COMPLETED or DELETED.
+    - For each record, keep only the most recent COMPLETED/DELETED order
+      (based on updated_at, then order_id).
+    - Exclude any record that still has an ORDERED order (i.e. has an active order).
+    - Exclude records whose location is IN_STORAGE, since those materials are considered
+      back in storage after completion.
+    """
     search_filters_as_str, placeholder_values = _get_and_filters_str_and_values(filters)
     query = f"""
 SELECT o.*, r.*, u.*
@@ -545,10 +559,10 @@ FROM orders o
 LEFT JOIN records r ON o.record_id = r.record_id
 LEFT JOIN users u ON o.user_id = u.user_id
 WHERE
-    -- Only COMPLETED orders
+    -- Only COMPLETED and DELETED orders
     o.order_status IN ({utils_orders.ORDER_STATUS.COMPLETED}, {utils_orders.ORDER_STATUS.DELETED})
 
-    -- Make sure we pick the most recent COMPLETED order for each record
+    -- Make sure we pick the most recent COMPLETED or DELETED order for each record
     AND o.order_id = (
         SELECT o2.order_id
         FROM orders o2
@@ -559,13 +573,15 @@ WHERE
     )
 
     -- Exclude records that have an ORDERED status
+    -- We don't need QUEUED here as there will be no QUEUED if there is an ORDERED order
     AND o.record_id NOT IN (
         SELECT record_id
         FROM orders
         WHERE order_status = {utils_orders.ORDER_STATUS.ORDERED}
     )
 
-    -- Also exclude records with location = IN_STORAGE
+    -- Also exclude records with location IN_STORAGE
+    -- as these materials are back in the storage
     AND r.location <> {utils_orders.RECORD_LOCATION.IN_STORAGE}
 
     -- Search filters
@@ -580,6 +596,10 @@ LIMIT {filters.filter_limit} OFFSET {offset};
 
 
 async def _get_history_orders(crud: "CRUD", filters: OrderFilter, offset: int = 0) -> list:
+    """
+    Select all orders with status COMPLETED or DELETED for order history.
+    """
+
     search_filters_as_str, placeholder_values = _get_and_filters_str_and_values(filters)
 
     query = f"""
@@ -624,7 +644,7 @@ async def get_orders_admin(filters: OrderFilter) -> tuple[list, OrderFilter]:
             orders_next = await _get_active_orders(crud, filters, offset_next)
 
         if filters.filter_status == "completed":
-            orders = await _get_completed_orders(crud, filters, offset)
+            orders = await _get_completed_records(crud, filters, offset)
 
             for order in orders:
                 order = utils_orders.format_order_display(order)
@@ -632,7 +652,7 @@ async def get_orders_admin(filters: OrderFilter) -> tuple[list, OrderFilter]:
                 order["allow_location_change"] = True
 
             offset_next = offset + filters.filter_limit
-            orders_next = await _get_completed_orders(crud, filters, offset_next)
+            orders_next = await _get_completed_records(crud, filters, offset_next)
 
         if filters.filter_status == "order_history":
             orders = await _get_history_orders(crud, filters, offset)
