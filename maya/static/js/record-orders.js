@@ -37,7 +37,6 @@ if (orderElem) {
             }
 
             res = await Requests.asyncPostJson(url, {});
-            console.log(res);
             if (res.error) {
                 console.log(res.message);
                 Flash.setMessage(res.message, 'error');
