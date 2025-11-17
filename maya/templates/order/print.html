@@ -19,7 +19,9 @@
             <img src="{{ url_for('static', path='assets/orders-logo.png') }}" alt="Logo">
         </div>
 
-        {#<pre> to_json(order) </pre>#}
+        {#
+        <pre> to_json(order) </pre>
+        #}
 
         <div class="print-date">
             <p>Dato for bestilling: {{ order.created_at_human }}</p>
@@ -40,7 +42,7 @@
                 </tr>
             </tbody>
         </table>
-        
+
         {# iterate record_and_types_str and output key and value in a table #}
         <h3>Materiale</h3>
         <table>
@@ -48,13 +50,13 @@
                 {% for key, value in material_base_info.items() %}
                 <tr>
                     <td class="width-200">{{ translate("label_" + key) }}</td>
-                    <td >{{ value }}</td>
+                    <td>{{ value }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
 
-        
+
     </div>
 
     <div class="print-section" style="margin-top: 20px;">
@@ -85,7 +87,10 @@
                 {% endfor %}
             </tbody>
         </table>
+    </div>
 
+    <div class="print-footer">
+        Denne bestillingseddel skal følge arkivenheden
     </div>
 
 </div>
@@ -97,7 +102,7 @@
         margin: 0;
         padding: 0;
         height: 100%;
-        font-size: 14px;
+        font-size: 12px;
     }
 
     .print-container {
@@ -111,9 +116,15 @@
         flex: 1;
     }
 
+    .print-footer {
+        margin-top: auto;
+        text-align: center;
+        padding-top: 20px;
+    }
+
     /* Print-specific adjustments */
     @media print {
-        
+
         .print-container {
             height: 100vh;
         }
