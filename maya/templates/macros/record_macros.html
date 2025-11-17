@@ -140,10 +140,7 @@
                 -->
             {% endif %}
             </div>
-            {% if meta_data.has_active_order %}
             <div class="order-message">{{ meta_data.get('active_order_message', '') }}</div>
-            {% endif %}
-
         {% endif %}
 
         {% if key in record_and_types %}
