@@ -37,9 +37,6 @@ class TestDB(unittest.TestCase):
 
         return me, me_2, meta_data, record_and_types
 
-    def test_cron_orders(self):
-        asyncio.run(self._test_cron_orders())
-
     async def _test_cron_orders(self):
         """
         Simple integration test for orders
@@ -105,6 +102,65 @@ class TestDB(unittest.TestCase):
         # Now the order can be renewed
         num_renewal_emails = await crud_orders.cron_renewal_emails()
         self.assertEqual(num_renewal_emails, 1)
+
+    def test_cron_orders(self):
+        asyncio.run(self._test_cron_orders())
+
+    async def _test_cron_expire_orders(self):
+        """
+        Simple integration test for expiring orders
+        """
+        # generate a new database for testing
+        db_path = "/tmp/orders.db"
+        if os.path.exists(db_path):
+            os.remove(db_path)
+
+        migration = Migration(db_path=db_path, migrations=migrations_orders)
+        migration.run_migrations()
+
+        me, me_2, meta_data, record_and_types = self.get_test_data()
+
+        # insert order
+        order = await crud_orders.insert_order(meta_data, record_and_types, me)
+        order_2 = await crud_orders.insert_order(meta_data, record_and_types, me_2)
+
+        self.assertEqual(order["order_status"], utils_orders.ORDER_STATUS.ORDERED)
+        self.assertEqual(order_2["order_status"], utils_orders.ORDER_STATUS.QUEUED)
+
+        num_expired_orders = await crud_orders.cron_orders_expire()
+        self.assertEqual(num_expired_orders, 0)
+
+        # set expire_at to today
+        utc_now = arrow.utcnow()
+        expire_at_date = utc_now.floor("day").shift(days=0)
+        expire_at_str = expire_at_date.format("YYYY-MM-DD HH:mm:ss")
+
+        log.info(f"Setting expire_at to {expire_at_str} for order {order['order_id']}")
+        await crud_orders.update_order(
+            me["id"],
+            order["order_id"],
+            update_values={"expire_at": expire_at_str},
+        )
+
+        # This is queued order - should not be expired
+        await crud_orders.update_order(
+            me_2["id"],
+            order_2["order_id"],
+            update_values={"expire_at": expire_at_str},
+        )
+
+        num_expired_orders = await crud_orders.cron_orders_expire()
+        self.assertEqual(num_expired_orders, 1)
+
+        # First order is expired now so we can expire the second order
+        num_expired_orders = await crud_orders.cron_orders_expire()
+        self.assertEqual(num_expired_orders, 1)
+
+        num_expired_orders = await crud_orders.cron_orders_expire()
+        self.assertEqual(num_expired_orders, 0)
+
+    def test_cron_expire_orders(self):
+        asyncio.run(self._test_cron_expire_orders())
 
 
 if __name__ == "__main__":
