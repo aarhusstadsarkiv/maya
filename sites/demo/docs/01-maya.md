@@ -88,6 +88,6 @@ Install main branch:
 
 Install latest version: 
 <!-- LATEST-VERSION-PIPX -->
-    uv tool install git+https://github.com/aarhusstadsarkiv/maya@v1.3.851
+	pipx install git+https://github.com/aarhusstadsarkiv/maya@v1.3.852
 
 Usage is the same as for development.
