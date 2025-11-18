@@ -32,6 +32,8 @@ async def mail_status(request: Request):
 async def mail_verify_token(request: Request):
     """
     Webhook after user has registered
+    Note: This is not testable is using localhost as client url and a remote webservice for sending mails
+    as the remote service cannot reach localhost. So no logging of success.
     """
 
     # Get json data from request
@@ -77,6 +79,8 @@ async def mail_verify_token(request: Request):
 async def mail_reset_token(request: Request):
     """
     Webhook after user has requested a password reset
+    Note: This is not testable is using localhost as client url and a remote webservice for sending mails
+    as the remote service cannot reach localhost. So no logging of success.
     """
     # Get json data from request
     try:

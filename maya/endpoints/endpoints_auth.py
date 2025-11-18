@@ -21,6 +21,9 @@ log = get_log()
 
 
 async def auth_login_get(request: Request):
+    """
+    Login GET endpoint
+    """
     is_logged_in = await api.is_logged_in(request)
 
     post_url = "/auth/login"
@@ -45,6 +48,9 @@ async def auth_login_get(request: Request):
 
 
 async def auth_login_post(request: Request):
+    """
+    Login POST endpoint
+    """
     next_url = request.query_params.get("next")
 
     try:
@@ -70,7 +76,9 @@ async def auth_login_post(request: Request):
 
 
 async def auth_logout_get(request: Request):
-
+    """
+    Logout GET endpoint
+    """
     try:
         user.logout(request)
         flash.set_message(request, translate("You have been logged out."), type="success")
@@ -85,6 +93,9 @@ async def auth_logout_get(request: Request):
 
 
 async def auth_logout_post(request: Request):
+    """
+    Logout POST endpoint
+    """
     try:
         user.logout(request)
         flash.set_message(request, translate("You have been logged out."), type="success")
@@ -99,8 +110,10 @@ async def auth_logout_post(request: Request):
 
 
 async def auth_set_cooke(request: Request):
-
-    # get all POST variables
+    """
+    Set cookie endpoint
+    Used to remember dark theme preference
+    """
     post_data = await request.json()
     cookie_name = post_data.get("cookie_name")
     cookie_value = post_data.get("cookie_value")
@@ -122,7 +135,9 @@ async def auth_set_cooke(request: Request):
 
 
 async def auth_register_get(request: Request):
-
+    """
+    Register new user GET endpoint
+    """
     context_values = {
         "title": translate("Register new user"),
         "register_done": request.query_params.get("register_done"),
@@ -132,6 +147,11 @@ async def auth_register_get(request: Request):
 
 
 async def auth_register_post(request: Request):
+    """
+    Register new user POST endpoint. This will send a request to the webservice, which will then send
+    a token to a webook running on the client and then the client will send an email to the user with
+    instructions on how to reset the password.
+    """
     try:
         await api.auth_register_post(request)
         flash.set_message(
@@ -149,6 +169,9 @@ async def auth_register_post(request: Request):
 
 
 async def auth_verify(request: Request):
+    """
+    Verify request token sent by email
+    """
     try:
         await api.auth_verify_post(request)
         flash.set_message(
@@ -167,17 +190,10 @@ async def auth_verify(request: Request):
     return RedirectResponse(url="/auth/login", status_code=302)
 
 
-async def me_permission_translated(request: Request):
-    permission_list = await api.me_permissions(request)
-    permissions_translated = []
-
-    for permission in permission_list:
-        permissions_translated.append(translate(f"Permission {permission}"))
-
-    return permissions_translated[-1]
-
-
 async def auth_me_get(request: Request):
+    """
+    Endpoint for displaying user profile for authenticated users.
+    """
     await is_authenticated(request)
     try:
 
@@ -207,6 +223,9 @@ async def auth_me_get(request: Request):
 
 
 async def auth_search_results(request: Request):
+    """
+    Endpoint for displaying saved search results for authenticated users.
+    """
     await is_authenticated(request)
     try:
         me = await api.users_me_get(request)
@@ -223,12 +242,20 @@ async def auth_search_results(request: Request):
 
 
 async def auth_forgot_password_get(request: Request):
+    """
+    Forgot password GET endpoint
+    """
     context_values = {"title": translate("Forgot your password")}
     context = await get_context(request, context_values=context_values)
     return templates.TemplateResponse(request, "auth/forgot_password.html", context)
 
 
 async def auth_forgot_password_post(request: Request):
+    """
+    Forgot password POST endpoint. This will send a request to the webservice, which will then send
+    a token to a webook running on the client and then the client will send an email to the user with
+    instructions on how to reset the password.
+    """
     try:
         await api.auth_forgot_password(request)
         flash.set_message(
@@ -246,6 +273,9 @@ async def auth_forgot_password_post(request: Request):
 
 
 async def auth_reset_password_get(request: Request):
+    """
+    Reset password GET endpoint
+    """
     token = request.path_params["token"]
     context_values = {"title": translate("Enter new password"), "token": token}
     context = await get_context(request, context_values=context_values)
@@ -253,6 +283,9 @@ async def auth_reset_password_get(request: Request):
 
 
 async def auth_reset_password_post(request: Request):
+    """
+    Reset password POST endpoint
+    """
     try:
         await api.auth_reset_password_post(request)
         flash.set_message(
@@ -273,6 +306,9 @@ async def auth_reset_password_post(request: Request):
 
 
 async def auth_send_verify_email(request: Request):
+    """
+    Send verify email endpoint
+    """
     try:
         await api.auth_request_verify_post(request)
         flash.set_message(
