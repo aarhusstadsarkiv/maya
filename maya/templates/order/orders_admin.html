@@ -138,8 +138,8 @@
                 <td>
 
                     <span>
-                        <a class="action-link print-external"
-                            href="/admin/orders/print?order_id={{order.order_id}}" title="Udskriv bestilling">Print</a>
+                        <a class="action-link print-external" href="/admin/orders/print?order_id={{order.order_id}}"
+                            title="Udskriv bestilling">Print</a>
                     </span>
 
                     <span>
@@ -194,7 +194,7 @@
     const spinner = document.querySelector('.loadingspinner');
 
     /**
-     * Handle FINISHED (afsluttet) and DELETED (slettet) clicks
+     * Section that handles FINISHED (afsluttet) and DELETED (slettet) clicks
      */
     async function handleUserStatusClick(event) {
 
@@ -253,7 +253,7 @@
     });
 
     /**
-     * all locations
+     * Section that handles location updates
      */
     const locationElements = document.querySelectorAll('.location');
 
@@ -281,8 +281,6 @@
                 }
             });
 
-            
-
             const url = '/admin/orders/patch';
             spinner.classList.toggle('hidden');
 
@@ -301,7 +299,9 @@
         });
     }
 
-
+    /**
+     * Section that handles filtering and pagination
+     */
     const filterForm = document.querySelector('form');
 
     function submitFilteredForm() {
@@ -395,6 +395,9 @@
         });
     }
 
+    /**
+     * Section that handles printing orders in a hidden iframe
+    */
     function setPrint() {
         const closePrint = () => {
             document.body.removeChild(this);

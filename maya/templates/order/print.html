@@ -5,6 +5,9 @@
 {% block body_class %}page-orders-record-html{% endblock %}
 
 {% block head %}
+<!-- set in case user is using light theme. This is meant for print only -->
+<link rel="stylesheet" href="http://localhost:5555/static/css/light.css?v={{ get_setting('version') }}">
+
 <link rel="stylesheet" href="{{ url_for('static', path='/css/table.css') }}?v={{ get_setting('version') }}">
 <link rel="stylesheet" href="{{ url_for('static', path='/css/orders.css') }}?v={{ get_setting('version') }}">
 {% endblock head %}
@@ -18,10 +21,6 @@
         <div class="print-logo">
             <img src="{{ url_for('static', path='assets/orders-logo.png') }}" alt="Logo">
         </div>
-
-        {#
-        <pre> to_json(order) </pre>
-        #}
 
         <div class="print-date">
             <p>Dato for bestilling: {{ order.created_at_human }}</p>
@@ -43,7 +42,6 @@
             </tbody>
         </table>
 
-        {# iterate record_and_types_str and output key and value in a table #}
         <h3>Materiale</h3>
         <table>
             <tbody>
@@ -62,7 +60,6 @@
     <div class="print-section" style="margin-top: 20px;">
         {% if resources %}
         <h3>Til brug på magasin</h3>
-        {# iterate key and value from dict resources and output in a table #}
         <table>
             <tbody>
                 {% for key, value in resources.items() %}
@@ -75,7 +72,6 @@
         </table>
         {% endif %}
 
-        {# iterate legal_info and output key and value in a table #}
         <h3>Tilgængelighed og anden juridisk beskyttelse</h3>
         <table>
             <tbody>
@@ -102,7 +98,8 @@
         margin: 0;
         padding: 0;
         height: 100%;
-        font-size: 12px;
+        font-size: 14px;
+        color: #000;
     }
 
     .print-container {
@@ -138,6 +135,7 @@
 
     .print-logo img {
         max-width: 150px;
+        margin-top: 20px;
     }
 </style>
 

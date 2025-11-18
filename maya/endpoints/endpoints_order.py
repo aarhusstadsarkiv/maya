@@ -332,8 +332,6 @@ async def orders_record_get(request: Request):
     record = await api.proxies_record_get_by_id(record_id)
 
     record, meta_data, record_and_types = await get_record_data(request, record, permissions)
-    lb_number = utils_orders.get_lb_number(record_and_types)
-    log.debug(f"Extra admin data: {lb_number}")
 
     all_keys = list(record_and_types.keys())
     all_keys = ["collectors", "resources", "subjects", "date_normalized", "desc_notes", "admin_data"]
