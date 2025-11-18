@@ -158,6 +158,9 @@ def _get_types_and_values(schema, entity):
 
 
 async def entities_get_single(request: Request):
+    """
+    Get single entity endpoint. Not protected, as entities are public.
+    """
     entity: dict = await api.entity_get(request)
     schema_name, schema_version = api.schema_get_name_version_from_entity(entity)
 
@@ -175,6 +178,9 @@ async def entities_get_single(request: Request):
 
 
 async def entities_get_single_json(request: Request):
+    """
+    Get single entity as JSON endpoint. Not protected, as entities are public.
+    """
     type = request.path_params["type"]
     entity: dict = await api.entity_get(request)
     schema_name, schema_version = api.schema_get_name_version_from_entity(entity)

@@ -238,14 +238,6 @@ def set_response_cookie(response: Response, context: dict):
         "q": context.get("q"),
     }
 
-    # # 365 days
-    # DAYS_365 = 60 * 60 * 24 * 365 * 1
-
-    # response.set_cookie(key="search", value=json.dumps(search_cookie_value), httponly=True, max_age=DAYS_365, expires=DAYS_365)
-    # response.set_cookie(key="size", value=size, httponly=True, max_age=DAYS_365, expires=DAYS_365)
-    # response.set_cookie(key="sort", value=sort, httponly=True, max_age=DAYS_365, expires=DAYS_365)
-    # response.set_cookie(key="view", value=view, httponly=True, max_age=DAYS_365, expires=DAYS_365)
-
     response.set_cookie(key="search", value=json.dumps(search_cookie_value), httponly=True)
     response.set_cookie(key="size", value=size, httponly=True)
     response.set_cookie(key="sort", value=sort, httponly=True)

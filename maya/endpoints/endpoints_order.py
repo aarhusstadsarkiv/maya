@@ -270,6 +270,7 @@ async def orders_admin_get(request: Request):
     GET endpoint for displaying all orders for an "employee" user
     """
     await is_authenticated(request, permissions=["employee"])
+
     me = await api.users_me_get(request)
     await crud_orders.replace_employee(me)
 

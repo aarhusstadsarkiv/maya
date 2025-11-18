@@ -12,6 +12,7 @@ log = get_log()
 
 async def relations_post(request: Request):
     await is_authenticated(request, permissions=["employee"])
+
     try:
         await api.proxies_post_relations(request)
         return JSONResponse({"error": False, "message": "Relation er oprettet"})
