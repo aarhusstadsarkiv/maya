@@ -210,12 +210,24 @@ def _set_order_info(meta_data: dict, record: dict):
     except KeyError:
         resources = {}
 
-    orderable = False
+    meta_data["resources"] = resources
+    legal_id = meta_data["legal_id"]
+    contractual_id = meta_data["contractual_id"]
     availability_id = meta_data["availability_id"]
-    if availability_id in [1, 2]:
+
+    orderable = False
+    orderable_online = False
+    orderable_by_form = False
+
+    if availability_id == 2 and legal_id == 1 and contractual_id > 2:
         orderable = True
+        orderable_online = True
+
+    if availability_id == 2 and legal_id in [2, 3] and contractual_id == 2:
+        orderable = True
+        orderable_by_form = True
 
     meta_data["orderable"] = orderable
-    meta_data["resources"] = resources
-
+    meta_data["orderable_online"] = orderable_online
+    meta_data["orderable_by_form"] = orderable_by_form
     return meta_data
