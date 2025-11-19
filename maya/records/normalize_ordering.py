@@ -21,9 +21,7 @@ def normalize_ordering(record: dict, meta_data: dict):
     if availability_id == 2 and legal_id == 1 and contractual_id > 2:
         result.append(translate("ordering_by_mail"))
         for curator in curators:
-            if curator.get("id") == 2:
-                result.append(translate("ordering_from_rigsarkivet"))
-            elif curator.get("id") == 4:
+            if curator.get("id") == 4:
                 result.append(translate("ordering_aarhus_teatret"))
 
     if result:
