@@ -180,8 +180,8 @@ You need to be logged in to view this page.: Du er ikke logget ind. Log ind for 
   se siden.
 You need to verify your email address to perform this action.: Du skal verificere
   din email for at udføre denne handling.
-You need to verify your email address to view this page.: Du skal verificere din
-  email for at se denne side.
+You need to verify your email address to view this page.: Du skal verificere din email
+  for at se denne side.
 You will need to log in order to get access to your profile: Du skal logge ind for
   at se din profil.
 Your bookmarks: Bogmærker
@@ -356,6 +356,7 @@ legal_restrictions_id_4: Materialet er utilgængeligt som følge af særlige jur
   forhold.
 of: af
 ordering_aarhus_teatret: Materialet kan ses på Aarhus Teaters Arkiv.
+ordering_by_application: Materialet er ikke umiddelbart tilgængeligt. Ansøg om tilladelse til at se materiale.
 ordering_by_mail: Du kan bestille materialet ved at sende en mail til bestil.stadsarkiv@aarhus.dk,
   hvori du angiver materialets arkiv-ID, som kan ses øverst på siden.
 search: search
