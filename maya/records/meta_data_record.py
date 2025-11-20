@@ -43,6 +43,7 @@ def get_record_meta_data(request: Request, record: dict, user_permissions=[]) ->
     meta_data["real_id"] = _strip_pre_zeroes(record["id"])
     meta_data["allowed_by_ip"] = _is_allowed_by_ip(request) or permssion_granted
     meta_data["permission_granted"] = permssion_granted
+
     meta_data["title"] = _get_record_title(record)
     meta_data["meta_title"] = _get_meta_title(record)
     meta_data["summary"] = record.get("summary", "")
@@ -62,17 +63,14 @@ def get_record_meta_data(request: Request, record: dict, user_permissions=[]) ->
     meta_data["resources"] = _get_order_resources(record)
     meta_data["is_representations_online"] = _is_representation_online(record, meta_data)
 
-    # Unrestricted case -> always "icon"
-    if not _has_restrictions(meta_data):
+    if not _has_representation_restrictions(meta_data):
         meta_data["record_type"] = "icon"
 
-    # Restricted but allowed + has representations
     elif _has_representation_permission(meta_data) and "representations" in record:
         meta_data["record_type"] = record["representations"].get("record_type")
         meta_data["representations"] = _build_representations(record)
         meta_data["portrait"] = record.get("portrait")
 
-    # Collection-specific override (sejrs_sedler)
     if _is_sejrs_collection(record):
         meta_data["record_type"] = "sejrs_sedler"
         meta_data["representations"] = _build_representations(record)
@@ -120,7 +118,7 @@ def _is_representation_online(record: dict, meta_data: dict) -> bool:
         return True
 
     # No restrictions
-    if not _has_restrictions(meta_data):
+    if not _has_representation_restrictions(meta_data):
         return True
 
     # Allow by IP or permission with actual representations
@@ -130,7 +128,10 @@ def _is_representation_online(record: dict, meta_data: dict) -> bool:
     return False
 
 
-def _has_restrictions(meta_data: dict) -> bool:
+def _has_representation_restrictions(meta_data: dict) -> bool:
+    """
+    Restricted material
+    """
     return meta_data["legal_id"] == 1 and meta_data["contractual_id"] > 2
 
 
