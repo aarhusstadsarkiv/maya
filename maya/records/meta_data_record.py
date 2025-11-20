@@ -5,6 +5,7 @@ Get some usefull meta data for a record
 from maya.core.logging import get_log
 from starlette.requests import Request
 from maya.records import record_utils
+from maya.records.constants import LEGAL, CONTRACT, AVAILABILITY, USABILITY
 
 
 log = get_log()
@@ -132,11 +133,14 @@ def _has_representation_restrictions(meta_data: dict) -> bool:
     """
     Restricted material
     """
-    return meta_data["legal_id"] == 1 and meta_data["contractual_id"] > 2
+    return meta_data["legal_id"] == LEGAL.NO_OTHER_RESTRICTIONS and meta_data["contractual_id"] not in [
+        CONTRACT.UNAVAILABLE,
+        CONTRACT.APPLICATION_ONLY,
+    ]
 
 
 def _has_representation_permission(meta_data: dict) -> bool:
-    return meta_data["availability_id"] == 4 or meta_data["permission_granted"] or meta_data["allowed_by_ip"]
+    return meta_data["availability_id"] == AVAILABILITY.ONLINE_ACCESS or meta_data["permission_granted"] or meta_data["allowed_by_ip"]
 
 
 def _is_sejrs_collection(record: dict) -> bool:
@@ -174,9 +178,9 @@ def _is_allowed_by_ip(request: Request) -> bool:
 def _is_downloadable(meta_data: dict) -> bool:
     return (
         meta_data.get("representations", False)
-        and meta_data["legal_id"] == 1
-        and meta_data["contractual_id"] > 3
-        and meta_data["usability_id"] in [1, 2, 3]
+        and meta_data["legal_id"] == LEGAL.NO_OTHER_RESTRICTIONS
+        and meta_data["contractual_id"] == CONTRACT.INTERNET
+        and meta_data["usability_id"] not in [USABILITY.ALL_RIGHTS_RESERVED]
         and meta_data["record_type"] != "video"
     )
 
