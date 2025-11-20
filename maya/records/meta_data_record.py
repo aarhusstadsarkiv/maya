@@ -239,23 +239,6 @@ def _get_content_type_label(record: dict):
     return formatted_label
 
 
-def _is_orderable(meta_data: dict):
-    """
-    Get info describing if the record can be ordered
-    """
-    legal_id = meta_data["legal_id"]
-    contractual_id = meta_data["contractual_id"]
-    availability_id = meta_data["availability_id"]
-
-    if availability_id == 2 and legal_id == 1 and contractual_id > 2:
-        return True
-
-    if availability_id == 2 and legal_id in [2, 3] and contractual_id == 2:
-        return True
-
-    return False
-
-
 def _is_orderable_online(meta_data: dict):
     """
     Get info describing if the record can be ordered online
@@ -264,7 +247,11 @@ def _is_orderable_online(meta_data: dict):
     contractual_id = meta_data["contractual_id"]
     availability_id = meta_data["availability_id"]
 
-    if availability_id == 2 and legal_id == 1 and contractual_id > 2:
+    if (
+        availability_id == AVAILABILITY.IN_STORAGE
+        and legal_id == LEGAL.NO_OTHER_RESTRICTIONS
+        and contractual_id in [CONTRACT.INTERNET, CONTRACT.READING_ROOM]
+    ):
         return True
 
     return False
@@ -278,10 +265,21 @@ def _is_orderable_by_form(meta_data: dict):
     contractual_id = meta_data["contractual_id"]
     availability_id = meta_data["availability_id"]
 
-    if availability_id == 2 and legal_id in [2, 3] and contractual_id == 2:
+    if (
+        availability_id == AVAILABILITY.IN_STORAGE
+        and legal_id in [LEGAL.PERSONAL_DATA, LEGAL.ARCHIVE_LAW]
+        and contractual_id == CONTRACT.APPLICATION_ONLY
+    ):
         return True
 
     return False
+
+
+def _is_orderable(meta_data: dict) -> bool:
+    """
+    Get info describing if the record can be ordered
+    """
+    return _is_orderable_online(meta_data) or _is_orderable_by_form(meta_data)
 
 
 def _get_order_resources(record: dict):
