@@ -29,6 +29,67 @@ ICONS = {
 }
 
 
+def get_record_meta_data(request: Request, record: dict, user_permissions=[]) -> dict:
+    """
+    Get usefull meta data for a record
+    """
+    meta_data = {}
+
+    _fix_missing_representation(request, record)
+
+    permssion_granted = "employee" in user_permissions
+
+    meta_data["id"] = record["id"]
+    meta_data["real_id"] = _strip_pre_zeroes(record["id"])
+    meta_data["allowed_by_ip"] = _is_allowed_by_ip(request) or permssion_granted
+    meta_data["permission_granted"] = permssion_granted
+    meta_data["title"] = _get_record_title(record)
+    meta_data["meta_title"] = _get_meta_title(record)
+    meta_data["summary"] = record.get("summary", "")
+    meta_data["meta_description"] = _get_meta_description(record)
+
+    meta_data["icon"] = _get_icon(record)
+    meta_data["copyright_id"] = record["copyright_status"].get("id")
+    meta_data["legal_id"] = record["other_legal_restrictions"].get("id")
+    meta_data["contractual_id"] = record["contractual_status"].get("id")
+    meta_data["availability_id"] = record["availability"].get("id")
+    meta_data["usability_id"] = record["usability"].get("id")
+    meta_data["collection_id"] = record.get("collection", {}).get("id")
+    meta_data["content_types_label"] = _get_content_type_label(record)
+    meta_data["orderable"] = _is_orderable(meta_data)
+    meta_data["orderable_online"] = _is_orderable_online(meta_data)
+    meta_data["orderable_by_form"] = _is_orderable_by_form(meta_data)
+    meta_data["resources"] = _get_order_resources(record)
+    meta_data["is_representations_online"] = _is_representation_online(record, meta_data)
+
+    # Unrestricted case -> always "icon"
+    if not _has_restrictions(meta_data):
+        meta_data["record_type"] = "icon"
+
+    # Restricted but allowed + has representations
+    elif _has_representation_permission(meta_data) and "representations" in record:
+        meta_data["record_type"] = record["representations"].get("record_type")
+        meta_data["representations"] = _build_representations(record)
+        meta_data["portrait"] = record.get("portrait")
+
+    # Collection-specific override (sejrs_sedler)
+    if _is_sejrs_collection(record):
+        meta_data["record_type"] = "sejrs_sedler"
+        meta_data["representations"] = _build_representations(record)
+        meta_data["is_representations_online"] = True
+
+    meta_data["is_downloadable"] = _is_downloadable(meta_data)
+
+    return meta_data
+
+
+def _fix_missing_representation(request: Request, record: dict):
+    if "representations" in record and "record_type" not in record["representations"]:
+        extra = {"error_code": 499, "error_url": request.url}
+        log.error(f"Record {record['id']}. Representations but no record_type", extra=extra)
+        del record["representations"]
+
+
 def _get_icon(record: dict):
     """
     Get icon for the record based on content type
@@ -49,87 +110,51 @@ def _strip_pre_zeroes(value: str) -> str:
     return value.lstrip("0")
 
 
-def get_record_meta_data(request: Request, record: dict, user_permissions=[]) -> dict:
+def _is_representation_online(record: dict, meta_data: dict) -> bool:
     """
-    Get usefull meta data for a record
+    This indicates if the record has representations online
+    (images, audio, video, pdf, sejrs_sedler).
     """
-    meta_data = {}
+    # Collection 1 (sejrs_sedler) always have online representations
+    if _is_sejrs_collection(record):
+        return True
 
-    if "representations" in record and "record_type" not in record["representations"]:
-        extra = {"error_code": 499, "error_url": request.url}
-        log.error(f"Record {record['id']}. Representations but no record_type", extra=extra)
-        del record["representations"]
+    # No restrictions
+    if not _has_restrictions(meta_data):
+        return True
 
-    title = _get_record_title(record)
-    if not title:
-        quote_title = record_utils.meaningful_substring(record.get("summary", ""), 200)
-        title = f"[{quote_title}]"
+    # Allow by IP or permission with actual representations
+    if _has_representation_permission(meta_data) and "representations" in record:
+        return True
 
-    # check if "user" in user_permissions
-    # then the user has the permission as if the user is allowed_by_ip
-    permssion_granted = "employee" in user_permissions
-
-    meta_data["id"] = record["id"]
-    meta_data["real_id"] = _strip_pre_zeroes(record["id"])
-    meta_data["allowed_by_ip"] = _is_allowed_by_ip(request) or permssion_granted
-    meta_data["permission_granted"] = permssion_granted
-    meta_data["title"] = title
-    meta_data["meta_title"] = _get_meta_title(record)
-    meta_data["summary"] = record.get("summary", "")
-    meta_data["meta_description"] = record_utils.meaningful_substring(record.get("summary", ""), 120)
-
-    if not meta_data["meta_description"]:
-        meta_data["meta_description"] = meta_data["meta_title"]
-
-    meta_data["icon"] = _get_icon(record)
-    meta_data["copyright_id"] = record["copyright_status"].get("id")
-    meta_data["legal_id"] = record["other_legal_restrictions"].get("id")
-    meta_data["contractual_id"] = record["contractual_status"].get("id")
-    meta_data["availability_id"] = record["availability"].get("id")
-    meta_data["usability_id"] = record["usability"].get("id")
-    meta_data["collection_id"] = record.get("collection", {}).get("id")
-    meta_data["content_types_label"] = _get_content_type_label(record)
-
-    meta_data = _set_order_info(meta_data, record)
-    meta_data = _set_representations(meta_data, record)
-
-    meta_data["is_downloadable"] = _is_downloadable(meta_data)
-
-    return meta_data
+    return False
 
 
-def _set_representations(meta_data: dict, record: dict):
-    """
-    This indicates if the record has representations, which images, audio, video, pdf, sejrs_sedler
-    """
+def _has_restrictions(meta_data: dict) -> bool:
+    return meta_data["legal_id"] == 1 and meta_data["contractual_id"] > 2
 
-    meta_data["is_representations_online"] = False
 
-    if meta_data["legal_id"] == 1 and meta_data["contractual_id"] > 2:
-        if meta_data["availability_id"] == 4 or meta_data["permission_granted"] or meta_data["allowed_by_ip"]:
-            if "representations" in record:
-                meta_data["record_type"] = record["representations"].get("record_type")
+def _has_representation_permission(meta_data: dict) -> bool:
+    return meta_data["availability_id"] == 4 or meta_data["permission_granted"] or meta_data["allowed_by_ip"]
 
-                meta_data["is_representations_online"] = True
-                meta_data["representations"] = record["representations"]
 
-                if "large_image" not in meta_data["representations"]:
-                    meta_data["representations"]["large_image"] = meta_data["representations"].get("record_image")
+def _is_sejrs_collection(record: dict) -> bool:
+    return record.get("collection", {}).get("id") == 1
 
-                if "full_image" in meta_data["representations"]:
-                    meta_data["representations"]["large_image"] = meta_data["representations"]["full_image"]
 
-                meta_data["portrait"] = record.get("portrait")
-    else:
-        meta_data["record_type"] = "icon"
-        meta_data["is_representations_online"] = True
+def _build_representations(record: dict) -> dict:
+    representations = dict(record.get("representations", {}) or {})
 
-    collection_id = record.get("collection", {}).get("id")
-    if collection_id == 1:
-        meta_data["record_type"] = "sejrs_sedler"
-        meta_data["is_representations_online"] = True
+    if not representations:
+        return representations
 
-    return meta_data
+    if "large_image" not in representations:
+        representations["large_image"] = representations.get("record_image")
+
+    if "full_image" in representations:
+        representations["large_image"] = representations["full_image"]
+
+    return representations
 
 
 def _is_allowed_by_ip(request: Request) -> bool:
@@ -171,6 +196,26 @@ def _get_record_title(record: dict):
     return title
 
 
+def _get_meta_title(record: dict):
+    """
+    Get the meta title for the record. This is used as the meta title of the document, the <title> tag
+    """
+    meta_title = _get_record_title(record)
+
+    if not meta_title:
+        meta_title = record_utils.meaningful_substring(record.get("summary", ""), 60)
+
+    return meta_title
+
+
+def _get_meta_description(record: dict):
+
+    meta_description = record_utils.meaningful_substring(record.get("summary", ""), 120)
+    if not meta_description:
+        meta_description = _get_meta_title(record)
+    return meta_description
+
+
 def _get_content_type_label(record: dict):
     """
     content_types of a record is a list of lists of dicts, e.g.:
@@ -189,45 +234,55 @@ def _get_content_type_label(record: dict):
     return formatted_label
 
 
-def _get_meta_title(record: dict):
-    """
-    Get the meta title for the record. This is used as the meta title of the document, the <title> tag
-    """
-    meta_title = _get_record_title(record)
-
-    if not meta_title:
-        meta_title = record_utils.meaningful_substring(record.get("summary", ""), 60)
-
-    return meta_title
-
-
-def _set_order_info(meta_data: dict, record: dict):
+def _is_orderable(meta_data: dict):
     """
     Get info describing if the record can be ordered
     """
+    legal_id = meta_data["legal_id"]
+    contractual_id = meta_data["contractual_id"]
+    availability_id = meta_data["availability_id"]
+
+    if availability_id == 2 and legal_id == 1 and contractual_id > 2:
+        return True
+
+    if availability_id == 2 and legal_id in [2, 3] and contractual_id == 2:
+        return True
+
+    return False
+
+
+def _is_orderable_online(meta_data: dict):
+    """
+    Get info describing if the record can be ordered online
+    """
+    legal_id = meta_data["legal_id"]
+    contractual_id = meta_data["contractual_id"]
+    availability_id = meta_data["availability_id"]
+
+    if availability_id == 2 and legal_id == 1 and contractual_id > 2:
+        return True
+
+    return False
+
+
+def _is_orderable_by_form(meta_data: dict):
+    """
+    Get info describing if the record can be ordered by form
+    """
+    legal_id = meta_data["legal_id"]
+    contractual_id = meta_data["contractual_id"]
+    availability_id = meta_data["availability_id"]
+
+    if availability_id == 2 and legal_id in [2, 3] and contractual_id == 2:
+        return True
+
+    return False
+
+
+def _get_order_resources(record: dict):
     try:
         resources = record["resources"][0]
     except KeyError:
         resources = {}
 
-    meta_data["resources"] = resources
-    legal_id = meta_data["legal_id"]
-    contractual_id = meta_data["contractual_id"]
-    availability_id = meta_data["availability_id"]
-
-    orderable = False
-    orderable_online = False
-    orderable_by_form = False
-
-    if availability_id == 2 and legal_id == 1 and contractual_id > 2:
-        orderable = True
-        orderable_online = True
-
-    if availability_id == 2 and legal_id in [2, 3] and contractual_id == 2:
-        orderable = True
-        orderable_by_form = True
-
-    meta_data["orderable"] = orderable
-    meta_data["orderable_online"] = orderable_online
-    meta_data["orderable_by_form"] = orderable_by_form
-    return meta_data
+    return resources

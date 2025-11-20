@@ -39,6 +39,8 @@ class TestJSON(unittest.TestCase):
     "collection_id": 204,
     "content_types_label": "",
     "orderable": false,
+    "orderable_online": false,
+    "orderable_by_form": false,
     "resources": {
         "digital_size": "8469.218 MB",
         "mimetype": "application/zip",
@@ -85,6 +87,8 @@ class TestJSON(unittest.TestCase):
     "collection_id": 194,
     "content_types_label": "",
     "orderable": false,
+    "orderable_online": false,
+    "orderable_by_form": false,
     "resources": {
         "Fysisk omfang": "1",
         "type": "analog",
@@ -138,6 +142,8 @@ class TestJSON(unittest.TestCase):
     "collection_id": null,
     "content_types_label": "",
     "orderable": false,
+    "orderable_online": false,
+    "orderable_by_form": false,
     "resources": {
         "digital_size": "45.107 MB",
         "checksum_algorithm": "MD5",

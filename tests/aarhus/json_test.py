@@ -43,6 +43,8 @@ class TestJSON(unittest.TestCase):
     "collection_id": 1,
     "content_types_label": "",
     "orderable": false,
+    "orderable_online": false,
+    "orderable_by_form": false,
     "resources": {},
     "is_representations_online": true,
     "record_type": "sejrs_sedler",
