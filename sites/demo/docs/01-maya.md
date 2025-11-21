@@ -18,7 +18,7 @@ Sync project:
 
     uv sync
 
-You may also need to install danish language packs
+You may also need to install danish language packs on linux type systems:
 
     sudo apt-get install language-pack-da
     sudo locale-gen da_DK.UTF-8
