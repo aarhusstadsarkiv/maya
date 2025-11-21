@@ -14,11 +14,9 @@ The following describes how to install and use `maya`.
     uv venv # Python >= 3.10.6 should work
     source .venv/bin/activate
 
-Install requirements:
+Sync project:
 
-Using pip
-
-    uv pip install -r pyproject.toml
+    uv sync
 
 You may also need to install danish language packs
 
@@ -26,10 +24,6 @@ You may also need to install danish language packs
     sudo locale-gen da_DK.UTF-8
 
 ### Run for development
-
-Install `maya` and make the code "editable":
-
-    uv pip install -e .
 
 Show all commands: 
 
@@ -65,6 +59,7 @@ Run black, mypy and flake8:
 Before running the tests you must first export a valid `API_KEY`:
 
     export API_KEY=your-api-key
+    export BASE_DIR=sites/aarhus
 
 Then:
 
