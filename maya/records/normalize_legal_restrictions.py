@@ -2,7 +2,7 @@ from maya.core.translate import translate
 from maya.records.constants import LEGAL
 
 
-def normalize_legal_restrictions(record: dict, meta_data: dict):
+def normalize_legal_restrictions(record: dict, meta_data: dict) -> dict:
     """Add other_legal_restrictions_normalized to record"""
 
     legal_id = meta_data.get("legal_id")

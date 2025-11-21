@@ -14,7 +14,7 @@ creative_commons_license_nc = translate("copyright_creative_commons_license_nc")
 special_notice = translate("copyright_special_notice")
 
 
-def normalize_copyright_status(record: dict, meta_data: dict):
+def normalize_copyright_status(record: dict, meta_data: dict) -> dict:
     """Add copyright_status_normalized to record"""
     copyright_id = meta_data["copyright_id"]
 
@@ -68,7 +68,7 @@ def normalize_copyright_status(record: dict, meta_data: dict):
     return record
 
 
-def _get_special_notice_id(record: dict):
+def _get_special_notice_id(record: dict) -> bool:
     try:
         id = record["content_types"][0][0].get("id")
     except KeyError:

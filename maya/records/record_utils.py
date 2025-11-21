@@ -1,7 +1,7 @@
 from maya.core.dynamic_settings import settings
 
 
-def is_collection(record_dict: dict, collection_id: int):
+def is_collection(record_dict: dict, collection_id: int) -> bool:
     """
     Check if the record belongs to a collection.
     """
@@ -16,7 +16,7 @@ def is_collection(record_dict: dict, collection_id: int):
     return False
 
 
-def is_collector(record_dict: dict, collector_id: int):
+def is_collector(record_dict: dict, collector_id: int) -> bool:
     """
     Check if the record has a collector with id collector_id.
     """
@@ -32,7 +32,7 @@ def is_collector(record_dict: dict, collector_id: int):
     return False
 
 
-def is_curator(record_dict: dict, curator_id: int):
+def is_curator(record_dict: dict, curator_id: int) -> bool:
     """
     Check if first curator is the same as curator_id.
     """

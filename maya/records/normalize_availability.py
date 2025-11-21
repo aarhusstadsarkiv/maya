@@ -2,7 +2,7 @@ from maya.core.translate import translate
 from maya.records.constants import LEGAL, CONTRACT, AVAILABILITY
 
 
-def normalize_availability(record: dict, meta_data: dict):
+def normalize_availability(record: dict, meta_data: dict) -> dict:
     """
     Add availability_normalized to record
     """

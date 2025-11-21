@@ -11,14 +11,14 @@ from maya.core.date_format import date_format_day
 log = get_log()
 
 
-def _split_date_str(date):
+def _split_date_str(date: str) -> str:
     """
     Alter a string date like 19570101 into 1957-01-01
     """
     return f"{date[0:4]}-{date[4:6]}-{date[6:8]}"
 
 
-def split_date_strings(record):
+def split_date_strings(record: dict) -> dict:
     """
     Split date strings in a record
     """
@@ -41,7 +41,7 @@ def _iso_8601_date(date_string: str) -> str:
     return date_string
 
 
-def _extract_dates(record):
+def _extract_dates(record: dict) -> tuple:
     """
     Extracts 'date_from' and 'date_to' from the record dictionary and return them as a tuple.
     """
@@ -50,7 +50,7 @@ def _extract_dates(record):
     return (date_from, date_to)
 
 
-def normalize_dates(record):
+def normalize_dates(record: dict) -> dict:
     """
     Takes a record and returns a formatted date string.
     """

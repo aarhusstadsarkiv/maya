@@ -9,7 +9,7 @@ from maya.core.translate import translate
 log = get_log()
 
 
-def normalize_ordering(record: dict, meta_data: dict):
+def normalize_ordering(record: dict, meta_data: dict) -> dict:
     """
     Add information about ordering to record
     """

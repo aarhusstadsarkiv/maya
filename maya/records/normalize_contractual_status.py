@@ -4,7 +4,7 @@ from maya.records.constants import CONTRACT
 PAUL_PEDERSEN_CREATOR_ID = 108691
 
 
-def normalize_contractual_status(record, meta_data):
+def normalize_contractual_status(record: dict, meta_data: dict) -> dict:
     """
     Add contractual_status_normalized to record
     """

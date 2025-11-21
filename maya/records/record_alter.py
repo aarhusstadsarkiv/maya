@@ -19,7 +19,7 @@ _record_definitions = get_record_definitions()
 log = get_log()
 
 
-def record_alter(request: Request, record: dict, meta_data: dict):
+def record_alter(request: Request, record: dict, meta_data: dict) -> dict:
     record = record.copy()
 
     record_normalizer = RecordNormalizer()
@@ -35,7 +35,7 @@ def record_alter(request: Request, record: dict, meta_data: dict):
     return record
 
 
-def get_record_and_types(record):
+def get_record_and_types(record: dict) -> dict:
     """
     Get record with types
     """
@@ -59,7 +59,7 @@ def get_record_and_types(record):
     return record_altered
 
 
-def set_record_and_type(record_and_types, key, value, type):
+def set_record_and_type(record_and_types: dict, key: str, value, type: str) -> dict:
     """
     Set a new key value pair on record_and_type
     """
