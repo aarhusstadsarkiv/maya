@@ -82,14 +82,14 @@ def get_record_meta_data(request: Request, record: dict, user_permissions=[]) ->
     return meta_data
 
 
-def _fix_missing_representation(request: Request, record: dict):
+def _fix_missing_representation(request: Request, record: dict) -> None:
     if "representations" in record and "record_type" not in record["representations"]:
         extra = {"error_code": 499, "error_url": request.url}
         log.error(f"Record {record['id']}. Representations but no record_type", extra=extra)
         del record["representations"]
 
 
-def _get_icon(record: dict):
+def _get_icon(record: dict) -> dict:
     """
     Get icon for the record based on content type
     content-types is in this format: [{'id': [10], 'label': ['Forskrifter og vedtægter']}]
@@ -140,6 +140,9 @@ def _has_representation_restrictions(meta_data: dict) -> bool:
 
 
 def _has_representation_permission(meta_data: dict) -> bool:
+    """
+    Check if representation permission is granted
+    """
     return meta_data["availability_id"] == AVAILABILITY.ONLINE_ACCESS or meta_data["permission_granted"] or meta_data["allowed_by_ip"]
 
 
@@ -185,15 +188,15 @@ def _is_downloadable(meta_data: dict) -> bool:
     )
 
 
-def _get_record_title(record: dict):
+def _get_record_title(record: dict) -> str:
     """
     Try to get a title for the record. This is used as the title of the document, not the meta title
     """
 
     title = ""
-    record_title = record.get("title")
+    record_title = record.get("title", "")
     if not record_title:
-        record_title = record.get("heading")
+        record_title = record.get("heading", "")
 
     if record_title:
         title = record_title
@@ -201,7 +204,7 @@ def _get_record_title(record: dict):
     return title
 
 
-def _get_meta_title(record: dict):
+def _get_meta_title(record: dict) -> str:
     """
     Get the meta title for the record. This is used as the meta title of the document, the <title> tag
     """
@@ -213,7 +216,7 @@ def _get_meta_title(record: dict):
     return meta_title
 
 
-def _get_meta_description(record: dict):
+def _get_meta_description(record: dict) -> str:
 
     meta_description = record_utils.meaningful_substring(record.get("summary", ""), 120)
     if not meta_description:
@@ -221,7 +224,7 @@ def _get_meta_description(record: dict):
     return meta_description
 
 
-def _get_content_type_label(record: dict):
+def _get_content_type_label(record: dict) -> str:
     """
     content_types of a record is a list of lists of dicts, e.g.:
 
@@ -239,7 +242,7 @@ def _get_content_type_label(record: dict):
     return formatted_label
 
 
-def _is_orderable_online(meta_data: dict):
+def _is_orderable_online(meta_data: dict) -> bool:
     """
     Get info describing if the record can be ordered online
     """
@@ -257,7 +260,7 @@ def _is_orderable_online(meta_data: dict):
     return False
 
 
-def _is_orderable_by_form(meta_data: dict):
+def _is_orderable_by_form(meta_data: dict) -> bool:
     """
     Get info describing if the record can be ordered by form
     """
