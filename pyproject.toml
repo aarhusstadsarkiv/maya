@@ -95,15 +95,10 @@ maya = ["locales/**", "templates/**", "static/**", ".env-dist"]
 where = ["."]
 exclude = ["tests"]
 
-[tool.bump_version.replace_patterns.pip]
+[tool.bump_version.replace_patterns.uv]
 file = "sites/demo/docs/01-maya.md"
-search = "<!-- LATEST-VERSION-PIP -->"
-replace = "\tpip install git+https://github.com/aarhusstadsarkiv/maya@{version}\n"
-
-[tool.bump_version.replace_patterns.pipx]
-file = "sites/demo/docs/01-maya.md"
-search = "<!-- LATEST-VERSION-PIPX -->"
-replace = "\tpipx install git+https://github.com/aarhusstadsarkiv/maya@{version}\n"
+search = "<!-- LATEST-VERSION-UV -->"
+replace = "\tuv tool install git+https://github.com/aarhusstadsarkiv/maya@{version}\n"
 
 [dependency-groups]
 dev = [
