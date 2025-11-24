@@ -185,11 +185,14 @@ async def validate_display_name(request: Request):
 
 async def validate_captcha(request: Request):
     """
-    Validate that the captcha is correct.
+    Very simple captcha test.
     """
 
     form = await request.form()
     captcha = str(form.get("captcha"))
+
+    # Remove all non-digit characters
+    captcha = "".join(filter(str.isdigit, captcha))
 
     if captcha != "8000":
         raise OpenAwsException(
