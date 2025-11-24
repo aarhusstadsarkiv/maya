@@ -7,11 +7,20 @@
 {% include "includes/main_title.html" %}
 
 <form id="auth_register_post" method="post" action="{{ url_for('auth_register_post')}}">
-    <input type="text" name="captcha" placeholder="Postnummer Aarhus C" aria-label="Capcha" autocomplete="off">
-    <input type="text" name="display_name" placeholder="{{ translate('Username') }}">
-    <input type="text" name="email" placeholder="{{ translate('Email') }}" aria-label="Login" autocomplete="email">
-    <input type="password" name="password" placeholder="{{ translate('Password') }}" aria-label="Password">
-    <input type="password" name="password_2" placeholder="{{ translate('Repeat Password') }}" aria-label="Repeat Password">
+    <label for="captcha">Indtast postnummer for Aarhus C</label>
+    <input id="captcha" type="text" name="captcha" placeholder="Postnummer Aarhus C" aria-label="Capcha" autocomplete="off">
+    
+    <label for="display_name">Indtast dit visningsnavn. Mindst 3 tegn</label>
+    <input id="display_name" type="text" name="display_name" placeholder="{{ translate('Username') }}">
+      
+    <label for="email">Indtast korrekt e-mail</label>
+    <input id="email" type="text" name="email" placeholder="{{ translate('Email') }}" aria-label="Login" autocomplete="email">
+    
+    <label for="password">Indtast password</label>
+    <input id="password" type="password" name="password" placeholder="{{ translate('Password') }}" aria-label="Password">
+    
+    <label for="password_2">Gentag password</label>
+    <input id="password_2" type="password" name="password_2" placeholder="{{ translate('Repeat Password') }}" aria-label="Repeat Password">
     <button id="submit" type="submit">{{ translate('Register') }}</button>
 </form>
 <div class="loadingspinner hidden"></div>
