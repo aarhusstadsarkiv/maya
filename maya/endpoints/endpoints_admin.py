@@ -16,7 +16,7 @@ log = get_log()
 
 
 def _get_pagination(request: Request):
-    limit = "50"
+    limit = "1000"
     offset = int(request.query_params.get("offset", "0"))
     next_offset = str(offset + int(limit))
     prev_offset = str(max(offset - int(limit), 0))

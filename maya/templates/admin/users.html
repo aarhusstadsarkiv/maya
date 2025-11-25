@@ -18,6 +18,18 @@
 {# <pre>{{ to_json(users) }}</pre> #}
 
 <div class="container-table">
+
+    <!-- Quick client-side filter -->
+    <div class="table-filter">
+        <label for="user-filter">Filtrer brugere:</label>
+        <input
+            type="text"
+            id="user-filter"
+            placeholder="E-mail eller navn..."
+            autocomplete="off"
+        >
+    </div>
+
     <table>
         <thead>
             <tr>
@@ -112,6 +124,28 @@
         });
     });
 
+    // client side filter on email + display name ---
+    const filterInput = document.querySelector('#user-filter');
+    const tableRows = document.querySelectorAll('.container-table tbody tr');
+
+    if (filterInput) {
+        filterInput.addEventListener('input', () => {
+            const value = filterInput.value.toLowerCase().trim();
+
+            tableRows.forEach(row => {
+                // email is column 0, name is column 1
+                const email = row.cells[0]?.textContent.toLowerCase() || '';
+                const name = row.cells[1]?.textContent.toLowerCase() || '';
+
+                const matches =
+                    value === '' ||
+                    email.includes(value) ||
+                    name.includes(value);
+
+                row.style.display = matches ? '' : 'none';
+            });
+        });
+    }
 
 </script>
 <style>
@@ -132,6 +166,14 @@
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+    }
+
+    .table-filter {
+        margin-bottom: 10px;
+    }
+
+    .table-filter input {
+        max-width: 300px;
     }
 </style>
 
