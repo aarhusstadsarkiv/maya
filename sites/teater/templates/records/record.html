@@ -7,6 +7,11 @@
 
 {% block head %}
 <link rel="stylesheet" href="{{ url_for('static', path='/css/overlay.css') }}?v={{ get_setting('version') }}">
+
+{% if get_setting('canonical_url') %}
+<link rel="canonical" href="{{ get_setting('canonical_url') }}/records/{{ meta_data.id }}">
+{% endif %}
+
 <script type="module">
     import { } from "/static/js/record.js";
     import { activateOverlay } from "/static/js/overlay.js";

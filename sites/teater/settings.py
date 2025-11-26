@@ -8,6 +8,7 @@ settings: dict[str, typing.Any] = {
     "client_email": "stadsarkivet@aarhusarkivet.dk",
     "language": "da",
     "log_handlers": ["rotating_file"],
+    "canonical_url": "https://www.aarhusarkivet.dk",
     #
     # cookie settings
     #
