@@ -299,7 +299,11 @@ function searchEvents() {
         });
 
         // Focus on search input field
-        document.getElementById('q').focus();
+        // Only if not on mobile device
+        // if (window.innerWidth > config.mobileWidth) {
+        //     document.getElementById('q').focus();
+        // }
+        // document.getElementById('q').focus();
 
     } catch (error) {
         console.log(error)
