@@ -255,7 +255,7 @@ def _is_orderable_online(meta_data: dict) -> bool:
     if (
         availability_id in [AVAILABILITY.IN_STORAGE, AVAILABILITY.IN_READING_ROOM]
         and legal_id == LEGAL.NO_OTHER_RESTRICTIONS
-        and contractual_id in [CONTRACT.INTERNET, CONTRACT.READING_ROOM]
+        and contractual_id in [CONTRACT.INTERNET, CONTRACT.READING_ROOM, CONTRACT.NO_CLAUSES]
     ):
         return True
 
@@ -272,7 +272,7 @@ def _is_orderable_by_form(meta_data: dict) -> bool:
 
     if (
         availability_id == AVAILABILITY.IN_STORAGE
-        and legal_id in [LEGAL.PERSONAL_DATA, LEGAL.ARCHIVE_LAW]
+        and legal_id in [LEGAL.PERSONAL_DATA, LEGAL.ARCHIVE_LAW, LEGAL.SPECIAL_CIRCUMSTANCES]
         and contractual_id == CONTRACT.APPLICATION_ONLY
     ):
         return True

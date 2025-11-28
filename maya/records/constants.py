@@ -25,6 +25,9 @@ class CONTRACT:
     INTERNET: int = 4
     """4. Materialet må offentliggøres på internettet/kun på Aarhus Stadsarkivs hjemmesider. Ifølge aftale."""
 
+    NO_CLAUSES: int = 5
+    """5. Materialet er ikke begrænset af kontraktuelle klausuler."""
+
 
 class AVAILABILITY:
     IN_STORAGE: int = 2

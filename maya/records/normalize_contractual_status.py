@@ -10,7 +10,6 @@ def normalize_contractual_status(record: dict, meta_data: dict) -> dict:
     """
 
     contractual_id = meta_data.get("contractual_id")
-    text = translate("contractual_status_default")
 
     if contractual_id == CONTRACT.UNAVAILABLE:
         text = translate("contractual_status_id_1")
@@ -25,6 +24,9 @@ def normalize_contractual_status(record: dict, meta_data: dict) -> dict:
             text = translate("contractual_status_id_4_pp")
         else:
             text = translate("contractual_status_id_4")
+
+    elif contractual_id == CONTRACT.NO_CLAUSES:
+        text = translate("contractual_status_id_5")
 
     record["contractual_status_normalized"] = text
     return record
