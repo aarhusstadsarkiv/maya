@@ -38,8 +38,8 @@ class TestJSON(unittest.TestCase):
     "usability_id": 4,
     "collection_id": 204,
     "content_types_label": "",
-    "orderable": false,
-    "orderable_online": false,
+    "orderable": true,
+    "orderable_online": true,
     "orderable_by_form": false,
     "resources": {
         "digital_size": "8469.218 MB",
