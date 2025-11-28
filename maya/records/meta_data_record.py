@@ -250,8 +250,10 @@ def _is_orderable_online(meta_data: dict) -> bool:
     contractual_id = meta_data["contractual_id"]
     availability_id = meta_data["availability_id"]
 
+    log.debug(f"Orderable online check: legal_id={legal_id}, contractual_id={contractual_id}, availability_id={availability_id}")
+
     if (
-        availability_id == AVAILABILITY.IN_STORAGE
+        availability_id in [AVAILABILITY.IN_STORAGE, AVAILABILITY.IN_READING_ROOM]
         and legal_id == LEGAL.NO_OTHER_RESTRICTIONS
         and contractual_id in [CONTRACT.INTERNET, CONTRACT.READING_ROOM]
     ):
