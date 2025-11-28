@@ -29,7 +29,7 @@ RECORD_LOCATION_HUMAN = {
     1: "På magasin",  # Initial status
     2: "Pakket til depot",
     4: "På læsesalen",
-    5: "Pakket til magasin",
+    5: "Pakket retur",
 }
 
 
