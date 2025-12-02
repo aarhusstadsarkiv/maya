@@ -15,8 +15,7 @@ settings: dict[str, typing.Any] = {
         "secure": True,
         "samesite": "lax",
     },
-    # "api_base_url": "http://localhost:8000/v1",
-    "api_base_url": "https://staging.openaws.dk/v1",
+    "api_base_url": "https://api.openaws.dk/v1",
     "pages": [
         # {"name": "home_test", "title": "Hjem", "template": "pages/home.html", "url": "/"},
         {"name": "about", "title": "Om SallingArkivet", "template": "pages/about.html", "url": "/om-sallingarkivet"},
