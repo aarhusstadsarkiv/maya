@@ -74,9 +74,9 @@ def get_single_order_message(order: dict) -> str:
     """
     message = ""
     if order["order_status"] == ORDER_STATUS.ORDERED:
-        message = "Din bestilling er på vej. Du modtager en mail når den er klar."
+        message = "Materialet er bestilt. Du modtager en e-mail fra os, når materialet er klar til gennemsyn."
         if order["location"] == RECORD_LOCATION.READING_ROOM:
-            message = "Din bestilling er tilgængelig på læsesal"
+            message = "Dit bestilte materialle er tilgængeligt. Du kan gennemse det på læsesalen."
     elif order["order_status"] == ORDER_STATUS.QUEUED:
         message = "Din bestilling er i kø. Du modtager en mail når den er klar."
 
