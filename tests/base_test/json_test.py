@@ -169,3 +169,51 @@ class TestJSON(unittest.TestCase):
 
         json_expected = json.loads(json_expected)
         self.assertEqual(response_json, json_expected)
+
+    def test_orderable_by_form(self):
+        client = TestClient(app)
+        url = "/records/000472462/json/meta_data"
+        response = client.get(url)
+        response_json = response.json()
+
+        # Define expected JSON using a raw string to avoid issues with escape characters
+        json_expected = r"""
+{
+    "id": "000472462",
+    "real_id": "472462",
+    "allowed_by_ip": false,
+    "permission_granted": false,
+    "title": "Børneværnsudvalget. Dagsordener, udvalgsmøder",
+    "meta_title": "Børneværnsudvalget. Dagsordener, udvalgsmøder",
+    "summary": "",
+    "meta_description": "Børneværnsudvalget. Dagsordener, udvalgsmøder",
+    "icon": {
+        "icon": "folder_open",
+        "label": "Kommunale sager og planer"
+    },
+    "copyright_id": 1,
+    "legal_id": 2,
+    "contractual_id": 2,
+    "availability_id": 2,
+    "usability_id": 4,
+    "collection_id": 194,
+    "content_types_label": "",
+    "orderable": true,
+    "orderable_online": false,
+    "orderable_by_form": true,
+    "resources": {
+        "barcode": "8037309941",
+        "type": "analog",
+        "location": "Reol 43/fag 2/hylde 1",
+        "storage_id": [
+            "91+01295-98"
+        ]
+    },
+    "is_representations_online": true,
+    "record_type": "icon",
+    "is_downloadable": false
+}
+        """
+
+        json_expected = json.loads(json_expected)
+        self.assertEqual(response_json, json_expected)
