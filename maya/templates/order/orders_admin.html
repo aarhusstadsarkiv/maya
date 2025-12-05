@@ -1,3 +1,4 @@
+{# maya/templates/order/orders_admin.html #}
 {% import "macros/admin_macros.html" as admin_macros %}
 {% import "macros/basic_macros.html" as basic_macros %}
 {% import "macros/common_macros.html" as common_macros %}
@@ -17,7 +18,7 @@
 
 {{ basic_macros.page_title(title) }}
 
-<p><a class="action-link" href="/admin/orders/logs">Se Logs</a></p>
+<p><a title="Se logs" class="action-link" href="/admin/orders/logs">Se Logs</a></p>
 
 {# Select active, completed, order_history #}
 <form class="filters" method="GET" action="/admin/orders">
@@ -79,12 +80,12 @@
                 <th title="Antal brugere som står i kø">I Kø</th>
                 <th>Lokation</th>
                 <th></th><!-- has note indicator -->
+                <th>Print</th>
                 <th>Handling</th>
             </tr>
         </thead>
         <tbody>
             {% for order in orders %}
-
 
             {% if order.queued %}
             {% set queued = 'faded-row' %}
@@ -135,15 +136,19 @@
                         {% endif %}
                     </span>
                 </td>
+
+                <td class="width-50">
+                    <input
+                        type="checkbox"
+                        class="print-checkbox"
+                        data-order-id="{{ order.order_id }}"
+                        aria-label="Vælg bestilling {{ order.order_id }} til udskrift"
+                    >
+                </td>
+
                 <td>
-
                     <span>
-                        <a class="action-link print-external" href="/admin/orders/print?order_id={{order.order_id}}"
-                            title="Udskriv bestilling">Print</a>
-                    </span>
-
-                    <span>
-                        <a class="action-link" href="/admin/orders/{{order.order_id}}/edit">Noter</a>
+                        <a title="Indtast noter" class="action-link" href="/admin/orders/{{order.order_id}}/edit">Noter</a>
                     </span>
 
                     {% if not order.user_actions_deactivated %}
@@ -170,13 +175,20 @@
                 <td></td>
                 <td></td>
                 <td></td>
+
                 <td>
                     {% if filters.filter_status != 'order_history' %}
-                    <a href="#" class="action-link update-locations">Opdatér</a>
+                    <a href="#" title="Opdatér lokationer for valgte bestillinger" class="action-link update-locations">Opdatér</a>
                     {% endif %}
                 </td>
+
+                <td></td>
+
                 <td>
+                    <a href="#" title="Udskriv valgte bestillinger" class="action-link print-multiple">Print</a>
                 </td>
+
+                <td></td>
             </tr>
         </tbody>
     </table>
@@ -396,8 +408,8 @@
     }
 
     /**
-     * Section that handles printing orders in a hidden iframe
-    */
+     * Section that handles printing multiple orders in a hidden iframe
+     */
     function setPrint() {
         const closePrint = () => {
             document.body.removeChild(this);
@@ -407,18 +419,29 @@
         this.contentWindow.print();
     }
 
-    const printExternal = document.querySelectorAll('.print-external');
-    printExternal.forEach(element => {
-        element.addEventListener('click', function (event) {
+    const printMultiple = document.querySelector('.print-multiple');
+    if (printMultiple) {
+        printMultiple.addEventListener('click', function (event) {
             event.preventDefault();
-            const url = event.target.href;
+
+            const checked = Array.from(document.querySelectorAll('.print-checkbox:checked'));
+            if (checked.length === 0) {
+                Flash.setMessage('Vælg mindst én bestilling at udskrive.', 'error');
+                return;
+            }
+
+            const params = new URLSearchParams();
+            checked.forEach(cb => params.append('order_id', cb.dataset.orderId));
+
+            const url = '/admin/orders/print?' + params.toString();
+
             const hideFrame = document.createElement("iframe");
             hideFrame.onload = setPrint;
             hideFrame.style.display = "none"; // hide iframe
             hideFrame.src = url;
             document.body.appendChild(hideFrame);
         });
-    });
+    }
 
 </script>
 {% endblock content %}

@@ -10,10 +10,16 @@
 
 <link rel="stylesheet" href="{{ url_for('static', path='/css/table.css') }}?v={{ get_setting('version') }}">
 <link rel="stylesheet" href="{{ url_for('static', path='/css/orders.css') }}?v={{ get_setting('version') }}">
+<title>Bestillingseddel - AarhusArkivet</title>
 {% endblock head %}
 
 {% block content %}
 
+{% for order_data in orders %}
+{% set order = order_data.order %}
+{% set material_base_info = order_data.material_base_info %}
+{% set resources = order_data.resources %}
+{% set legal_info = order_data.legal_info %}
 <div class="print-container">
 
     <div class="print-section">
@@ -90,53 +96,106 @@
     </div>
 
 </div>
+{% endfor %}
+
 
 <style>
-    /* Common styles for both screen and print */
-    body,
-    html {
-        margin: 0;
-        padding: 0;
-        height: 100%;
-        font-size: 14px;
-        color: #000;
-    }
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
 
-    .print-container {
-        display: flex;
-        flex-direction: column;
-        height: 100vh;
-        width: 100vw;
-    }
+body,
+html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-size: 14px;
+  color: #000;
+}
 
-    .print-section {
-        flex: 1;
-    }
+.print-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  width: 100%;
+}
 
-    .print-footer {
-        margin-top: auto;
-        text-align: center;
-        padding-top: 20px;
-    }
+.print-section {
+  flex: 1;
+}
 
-    /* Print-specific adjustments */
-    @media print {
+.print-footer {
+  margin-top: auto;
+  text-align: center;
+  padding-top: 20px;
+}
 
-        .print-container {
-            height: 100vh;
-        }
-    }
+.print-date {
+  position: absolute;
+  right: 0;
+  top: 0;
+}
 
-    .print-date {
-        position: absolute;
-        right: 0;
-        top: 0;
-    }
+.print-logo img {
+  max-width: 150px;
+  margin-top: 20px;
+}
 
-    .print-logo img {
-        max-width: 150px;
-        margin-top: 20px;
-    }
+@media print {
+  @page {
+    margin: 10mm;
+  }
+
+  .print-container {
+    position: relative;
+    height: 100%;
+    min-height: 100%;
+    break-after: page;
+    page-break-after: always;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .print-container:last-child {
+    break-after: auto;
+    page-break-after: auto;
+  }
+
+  .print-section {
+    flex: 0 0 50%;
+    height: 50%;
+    position: relative;
+    display: block !important;
+    overflow: hidden;
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  .print-section[style] {
+    margin-top: 0 !important;
+  }
+
+  .print-footer {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin: 0;
+    padding-top: 0;
+    padding-bottom: 8mm;
+    text-align: center;
+  }
+
+  .print-date {
+    position: absolute;
+    right: 0;
+    top: 0;
+  }
+}
+
+
 </style>
 
 

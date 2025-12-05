@@ -372,16 +372,23 @@ async def order_admin_print(request: Request):
     """
     await is_authenticated(request, permissions=["employee"])
 
-    # get order_id from query params order_id
-    order_id = request.query_params.get("order_id", "0")
-    data = await _get_print_data(request, int(order_id))
+    order_ids = request.query_params.getlist("order_id")
+
+    data: dict = {}
     data["disable_js"] = True
+    data["title"] = "Bestilling"
+    orders: list[dict] = []
+    for order_id in order_ids:
+        order_data = await _get_print_data(request, int(order_id))
+        orders.append(order_data)
+
+    data["orders"] = orders
 
     context = await get_context(request, data, "record")
     return templates.TemplateResponse(request, "order/print.html", context)
 
 
-async def _get_print_data(request: Request, order_id: int = 0):
+async def _get_print_data(request: Request, order_id: int = 0) -> dict:
     order = await crud_orders.get_order(order_id)
     record_id = order["record_id"]
 
