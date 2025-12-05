@@ -3,6 +3,7 @@
     <a href="/admin/users" data-path="/admin/users">Brugere</a>
     {% endif %}
 
+    {# 
     {% if has_permission( "root", permissions_list) %}
     <a href="/entities">Entiteter</a>
     {% endif %}
@@ -10,7 +11,8 @@
     {% if has_permission( "root", permissions_list) %}
     <a href="/schemas">Skemaer</a>
     {% endif %}
-
+    #}
+    
     {% if get_setting('allow_online_ordering') and has_permission('employee', permissions_list) %}
     <a href="/admin/orders">Bestillinger</a>
     {% endif %}
