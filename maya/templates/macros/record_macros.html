@@ -113,15 +113,13 @@
         {% endif %}
         {% for key in block_keys %}
 
-        
         {% if key == 'bookmarks' %}
             <div class="action-links">
             {% if has_permission('user', permissions_list) and get_setting('allow_save_bookmarks') %}
             <a id="bookmark-action" data-id="{{ meta_data['id']}}" href="#"></a>
             {% endif %}
             
-            {% if has_permission('employee', permissions_list) and get_setting('allow_online_ordering') and meta_data["orderable"] %}
-
+            {% if has_permission('employee', permissions_list) and get_setting('allow_online_ordering') and meta_data.orderable %}
                 {% if meta_data.orderable_online %}
                     {% if meta_data.has_active_order %}
                     <a  id="record-order"
