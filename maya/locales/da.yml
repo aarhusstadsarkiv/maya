@@ -11,7 +11,8 @@ An email has been sent to you with instructions on how to reset your password.: 
 Are you sure: Er du sikker på at du vil logge ud?
 Bookmark has been added.: Bogmærke er blevet tilføjet.
 Bookmark has been removed.: Bogmærke er blevet fjernet.
-Captcha is not correct: Captcha svar skal være det korrekte postnummer for Aarhus C
+Captcha is not correct: Captcha svar skal være det korrekte postnummer for Aarhus
+  C
 Change your password: Ændr dit password
 Click in order to listen to the audio.: Klik for at lytte til lydfilen.
 Click on the image to open the PDF document.: Klik på billedet for at hente pdf-dokumentet.
@@ -43,6 +44,7 @@ Entity: Entity
 Error. Forbidden Error: Du har ikke adgang til siden.
 Error. Not Found: Siden eksisterer ikke.
 Error. Request Error: Der var et problem med din forespørgsel.
+Error. Request Timeout: Error. Request Timeout
 Error. Server Error: Der skete en system fejl.
 Failed to get schemas: Det var ikke muligt at hente skemaer
 First page: Første
@@ -357,10 +359,9 @@ legal_restrictions_id_4: Materialet er utilgængeligt som følge af særlige jur
   forhold.
 of: af
 ordering_aarhus_teatret: Materialet kan ses på Aarhus Teaters Arkiv.
-ordering_by_application: Materialet er ikke umiddelbart tilgængeligt. 
-  <a target="_blank" href="https://stadsarkiv.aarhus.dk/brug-arkivet/soeg-adgang-til-arkivmateriale">
+ordering_by_application: Materialet er ikke umiddelbart tilgængeligt. <a target="_blank"
+  href="https://stadsarkiv.aarhus.dk/brug-arkivet/soeg-adgang-til-arkivmateriale">
   Søg om adgang til at se arkivmateriale</a>
-
 ordering_by_mail: Du kan bestille materialet ved at sende en mail til bestil.stadsarkiv@aarhus.dk,
   hvori du angiver materialets arkiv-ID, som kan ses øverst på siden.
 search: search

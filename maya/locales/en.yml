@@ -46,6 +46,7 @@ Enter new password: Enter new password
 Entity: Entity
 Error. Not Found: Error. Not Found
 Error. Request Error: Error. Request Error
+Error. Request Timeout: Error. Request Timeout
 Error. Server Error: Error. Server Error
 Failed to get schemas: Failed to get schemas
 First page: First page
