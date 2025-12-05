@@ -123,11 +123,12 @@
                 {% if meta_data.orderable_online %}
                     {% if meta_data.has_active_order %}
                     <a  id="record-order"
+                        class="delete-order"
                         data-action="delete"
                         data-id="{{ record_and_types.id.value }}" 
                         href="/order/{{ record_and_types.id.value }}">{{ translate('Delete order') }}</a>
                     {% else %}
-                    <a  id="record-order" 
+                    <a  id="record-order"
                         data-action="create" 
                         data-id="{{ record_and_types.id.value }}" 
                         href="/order/{{ record_and_types.id.value }}">{{ translate('Order online') }}</a>

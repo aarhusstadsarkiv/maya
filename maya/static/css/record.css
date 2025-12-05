@@ -176,3 +176,7 @@
 .record-prev-next > span {
     min-width: 40px;
 }
+
+.action-links a.delete-order {
+    background-color: var(--flash-error-color);
+}
