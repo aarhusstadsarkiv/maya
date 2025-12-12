@@ -312,8 +312,13 @@ async def get_search_context_values(request: Request, extra_query_params: list =
     query_params_before_search = await hooks.before_get_search(query_params=query_params_before_search)
     query_str_search = query.get_str_from_list(query_params_before_search)
 
-    # Call api and get search results
-    search_result = await api.proxies_records(request, query_params_before_search)
+    # If q is 1 char long then alter it to "" to avoid 400 error from API
+    # make copy of query_params_before_search
+    query_params_before_search_copy = query_params_before_search.copy()
+    if q and len(q) == 1:
+        query_params_before_search_copy.append(("q", ""))
+
+    search_result = await api.proxies_records(request, query_params_before_search_copy)
     search_result = await _normalize_search_result(search_result)
 
     # Alter query params after search
