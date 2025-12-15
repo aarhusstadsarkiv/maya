@@ -41,7 +41,7 @@
         </div>
 
         <div class="record-content">
-            <div class="label">Materiale ID </div>
+            <div class="label">Arkiv ID </div>
             <div class="content">{{ order.record_id}}</div>
         </div>
 
@@ -59,14 +59,14 @@
 
         {% if order.deadline_human and order.days_remaining >= 0 %}
         <div class="record-content">
-            <div class="label">Deadline</div>
+            <div class="label">Tidsfrist</div>
             <div class="content">
                 {% if order.days_remaining == 0 %}
-                    {% set status = "deadline i dag" %}
+                    {% set status = "Udløber i dag" %}
                 {% elif order.days_remaining == 1 %}
-                    {% set status = order.days_remaining ~ " dag til deadline" %}
+                    {% set status = "Udløber om " ~ order.days_remaining ~ " dag" %}
                 {% else %}
-                    {% set status = order.days_remaining ~ " dage til deadline" %}
+                    {% set status = "Udløber om " ~ order.days_remaining ~ " dage" %}
                 {% endif %}
                 <span class="days-remaining">{{ order.deadline_human }} ({{ status }}) </span>
             </div>
