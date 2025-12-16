@@ -404,6 +404,8 @@ async def _get_print_data(request: Request, order_id: int = 0) -> dict:
 
     # get resources
     resources = meta_data.get("resources", {})
+    resources = {k: v for k, v in resources.items() if k in ["barcode", "location", "storage_id"]}
+
     lb_number = utils_orders.get_lb_number(record_and_types)
     if lb_number:
         resources["Lb-nr"] = lb_number
@@ -421,7 +423,7 @@ async def _get_print_data(request: Request, order_id: int = 0) -> dict:
         "meta_description": meta_data["meta_description"],
         "record_id": record_id,
         "order": order,
-        "resources": meta_data.get("resources", {}),
+        "resources": resources,
         "legal_info": legal_info,
     }
 
