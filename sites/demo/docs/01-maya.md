@@ -75,7 +75,7 @@ Bump version:
 
     bump-py-version v1.2.3 # or any other version
 
-## Install using pipx
+## Install using uv tool
 
 Install main branch: 
     
