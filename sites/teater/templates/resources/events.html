@@ -16,7 +16,7 @@
 <link rel="stylesheet" href="{{ url_for('static', path='/css/search_grid.css') }}?v={{ get_setting('version') }}">
 {% endif %}
 
-<script type="module">
+<script type="module" nonce="{{ request.state.csp_nonce }}">
     import { activateOverlay } from "/static/js/overlay.js";
     activateOverlay();
 </script>
@@ -62,7 +62,7 @@
 #}
 {% if has_permission( "employee", permissions_list) %}
 <div class="relations-edit-app"></div>
-<script type="module">
+<script type="module" nonce="{{ request.state.csp_nonce }}">
 
     import { initRelationsEdit } from '/static/js/relations-edit.js';
 

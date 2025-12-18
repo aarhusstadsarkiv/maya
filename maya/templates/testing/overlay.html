@@ -51,7 +51,7 @@
         <div id="magnifier"></div>
     </div>
 </body>
-<script>
+<script nonce="{{ request.state.csp_nonce }}">
 
     document.addEventListener('DOMContentLoaded', function () {
         var parentContainer = document.getElementById('overlay-image-container'); // The parent container

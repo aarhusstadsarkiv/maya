@@ -12,7 +12,7 @@
 <link rel="canonical" href="{{ get_setting('canonical_url') }}/records/{{ meta_data.id }}">
 {% endif %}
 
-<script type="module">
+<script type="module" nonce="{{ request.state.csp_nonce }}">
     import { } from "/static/js/record.js";
     import { activateOverlay } from "/static/js/overlay.js";
     activateOverlay();

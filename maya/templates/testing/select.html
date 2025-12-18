@@ -26,7 +26,7 @@
         display: none;
     }
 </style>
-<script>
+<script nonce="{{ request.state.csp_nonce }}">
 
     // select all modal buttons
     const modals = document.querySelectorAll('.open-modal');

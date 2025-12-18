@@ -35,7 +35,12 @@
 ] %}
 
 {{ common_macros.parse_meta_block(meta_links, permissions_list) }}
-{{ slideshow_macros.parse_slideshow_import() }}
+
+<script type="module" nonce="{{ request.state.csp_nonce }}">
+    import { initSlideshows } from "/static/js/slideshow.js";
+    const slideshows = document.querySelectorAll(".slideshow-container");
+    initSlideshows(slideshows);
+</script>
 
 {% endblock content %}
 

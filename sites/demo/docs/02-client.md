@@ -75,7 +75,7 @@ As you can see in the home.html template, you may add custom css and js files in
 
 ```html
 {% block head %}
-<script src="{{ url_for('static', path='/js/home.js') }}"></script>
+<script src="{{ url_for('static', path='/js/home.js') }}" nonce="{{ request.state.csp_nonce }}"></script>
 {% endblock head %}
 ```
 

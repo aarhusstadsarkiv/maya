@@ -7,7 +7,7 @@
 
     <link rel="stylesheet" href="{{ url_for('static', path='/css/search.css') }}?v={{ get_setting('version') }}">
     <link rel="stylesheet" href="{{ url_for('static', path='/css/search_suggestions.css') }}?v={{ get_setting('version') }}">
-    <script type="module">
+    <script type="module" nonce="{{ request.state.csp_nonce }}">
 
         import { initializeSlider } from '/static/js/search-suggestions.js?v={{ get_setting("version") }}';
         initializeSlider("search");

@@ -8,7 +8,7 @@
 <body>
     <h1>Test wait</h1>
 </body>
-<script type="module">
+<script type="module" nonce="{{ request.state.csp_nonce }}">
     import { Requests } from "/static/js/requests.js";
 
     Requests.REQUEST_TIMEOUT = 2

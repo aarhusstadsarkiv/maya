@@ -28,7 +28,7 @@
 {% include "includes/importmap.html" %}
 
 {% if not disable_js %}
-<script type="module">
+<script type="module" nonce="{{ request.state.csp_nonce }}" >
     import { Flash } from "/static/js/flash.js";
     Flash.clearMessages(); // Clear flash messages on page load
     

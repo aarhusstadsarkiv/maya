@@ -29,7 +29,7 @@
       <img src="{{ image }}">
     </figure>
     
-          <script>
+          <script nonce="{{ request.state.csp_nonce }}">
 
             function zoom(e) {
                 var zoomer = e.currentTarget;

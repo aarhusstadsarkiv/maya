@@ -3,7 +3,7 @@
 {% block body_class %}page-home{% endblock %}
 
 {% block head %}
-<script src="{{ url_for('static', path='/js/home.js') }}"></script>
+<script src="{{ url_for('static', path='/js/home.js') }}" nonce="{{ request.state.csp_nonce }}"></script>
 {% endblock head %}
 
 {% block content %}

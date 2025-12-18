@@ -93,7 +93,7 @@
 <pre>{# to_json(orders) #}</pre>
 
 <div class="loadingspinner hidden"></div>
-<script type="module">
+<script type="module" nonce="{{ request.state.csp_nonce }}">
 
     import { OrderStatus } from '/static/js/orders.js';
     import { asyncLogError } from "/static/js/error.js";

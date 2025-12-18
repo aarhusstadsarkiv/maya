@@ -196,7 +196,7 @@
 {% endif %}
 <div class="loadingspinner hidden"></div>
 
-<script type="module">
+<script type="module" nonce="{{ request.state.csp_nonce }}">
     import { asyncLogError } from "/static/js/error.js";
     import { Requests } from "/static/js/requests.js";
     import { Flash } from "/static/js/flash.js";

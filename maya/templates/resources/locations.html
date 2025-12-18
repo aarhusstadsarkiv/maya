@@ -7,7 +7,7 @@
 
 {% block head %}
 <link rel="stylesheet" href="{{ url_for('static', path='/css/overlay.css') }}?v={{ get_setting('version') }}">
-<script type="module">
+<script type="module" nonce="{{ request.state.csp_nonce }}">
     import { activateOverlay } from "/static/js/overlay.js";
     activateOverlay();
 </script>

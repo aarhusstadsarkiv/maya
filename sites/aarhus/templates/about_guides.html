@@ -33,7 +33,7 @@
 
     {% include "includes/flash.html" %}
 
-    <script type="module">
+    <script type="module" nonce="{{ request.state.csp_nonce }}">
 
         import { showTOC } from '/static/js/table-of-contents.js';
         const sourceElem = document.getElementById('article');

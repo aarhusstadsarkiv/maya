@@ -34,7 +34,7 @@
     {{ common_macros.parse_meta_block(meta_links, permissions_list) }}
 </div>
 
-<script type="module">
+<script type="module" nonce="{{ request.state.csp_nonce }}">
     import { searchEvents } from "/static/js/search.js";
     import { autoCompleteInit  } from '/static/js/auto-complete-instance.js';
     import { config } from '/static/js/config.js';

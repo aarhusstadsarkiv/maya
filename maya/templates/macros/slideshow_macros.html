@@ -49,11 +49,3 @@
 </div> 
 {% endif %}
 {% endmacro %}
-
-{% macro parse_slideshow_import() %}
-<script type="module">
-    import { initSlideshows } from "/static/js/slideshow.js";
-    const slideshows = document.querySelectorAll(".slideshow-container");
-    initSlideshows(slideshows);
-</script>
-{% endmacro %}
