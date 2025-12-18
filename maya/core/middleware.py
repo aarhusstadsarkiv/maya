@@ -104,6 +104,36 @@ class NoCacheMiddleware(BaseHTTPMiddleware):
         return response
 
 
+class CSPMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        nonce = os.urandom(16).hex()
+        request.state.csp_nonce = nonce
+
+        response = await call_next(request)
+
+        asset_src = [
+            "'self'",
+            "data:",
+            "https://storage.googleapis.com",
+            "https://acastorage.blob.core.windows.net",
+            "https://nbg1.your-objectstorage.com",
+        ]
+
+        csp_policy = (
+            "default-src 'self'; "
+            f"script-src 'self' 'nonce-{nonce}';"
+            f"script-src-elem 'self' 'nonce-{nonce}'; "
+            "style-src 'self' 'unsafe-inline'; "
+            f"img-src {' '.join(asset_src)}; "
+            f"media-src {' '.join(asset_src)}; "
+            "font-src 'self'; "
+            "connect-src 'self' https://analytics.aarhusstadsarkiv.dk;"
+        )
+
+        response.headers["Content-Security-Policy"] = csp_policy
+        return response
+
+
 class BeforeResponseMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request, call_next):
 
@@ -156,6 +186,7 @@ cookie_httponly = settings["cookie"]["httponly"]  # type: ignore
 middleware = []
 middleware.append(Middleware(CORSMiddleware, allow_origins=settings["cors_allow_origins"]))
 middleware.append(Middleware(RequestBeginMiddleware))
+middleware.append(Middleware(CSPMiddleware))
 middleware.append(Middleware(SessionMiddleware, store=session_store, cookie_https_only=cookie_httponly, lifetime=lifetime))
 middleware.append(Middleware(SessionAutoloadMiddleware, paths=["/"]))
 middleware.append(Middleware(BeforeResponseMiddleware))
