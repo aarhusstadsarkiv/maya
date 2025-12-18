@@ -268,6 +268,6 @@ if _is_source() and os.name != "nt":
             import_map["imports"][key] = value
 
         import_map = json.dumps(import_map, indent=4)
-        import_map_html = f'<script type="importmap">\n{import_map}\n</script>'
+        import_map_html = '<script type="importmap" nonce="{{request.state.csp_nonce}}">\n' f"{import_map}\n" "</script>"
         with open("maya/templates/includes/importmap.html", "w") as f:
             f.write(import_map_html)
