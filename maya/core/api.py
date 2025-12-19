@@ -781,7 +781,7 @@ async def proxies_get_relations(request: Request, type: str, id: str) -> typing.
 
 async def proxies_post_relations(request: Request):
     """
-    POST e a new relation
+    POST a new relation
     """
 
     form_data = await request.form()
