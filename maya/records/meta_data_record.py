@@ -179,10 +179,11 @@ def _is_allowed_by_ip(request: Request) -> bool:
 
 
 def _is_downloadable(meta_data: dict) -> bool:
+
     return (
         meta_data.get("representations", False)
         and meta_data["legal_id"] == LEGAL.NO_OTHER_RESTRICTIONS
-        and meta_data["contractual_id"] == CONTRACT.INTERNET
+        and meta_data["contractual_id"] in [CONTRACT.INTERNET, CONTRACT.NO_CLAUSES]
         and meta_data["usability_id"] not in [USABILITY.ALL_RIGHTS_RESERVED]
         and meta_data["record_type"] != "video"
     )
