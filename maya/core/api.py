@@ -265,7 +265,6 @@ async def users_get(request: Request, query_str: str) -> dict:
 
         if not response.is_success:
             json_response = response.json()
-            log.error(json_response)
             raise_openaws_exception(response.status_code, json_response)
 
         return response.json()
@@ -769,10 +768,12 @@ async def proxies_get_relations(request: Request, type: str, id: str) -> typing.
     """
     GET relations from the api
     """
+
+    headers = _get_jwt_headers(request, {"Accept": "application/json"})
+
     async with _get_async_client() as client:
         url = base_url + f"/proxy/{type}/{id}/relations"
-        response = await client.get(url)
-
+        response = await client.get(url, headers=headers)
         if response.is_success:
             return response.json()
         else:
@@ -789,6 +790,7 @@ async def proxies_post_relations(request: Request):
     async with _get_async_client() as client:
         url = base_url + "/proxy/relations"
         headers = {"Content-Type": "application/x-www-form-urlencoded", "Accept": "application/json"}
+        headers = _get_jwt_headers(request, headers)
 
         response = await client.post(url, data=form_data, headers=headers)
         if response.is_success:
@@ -807,7 +809,8 @@ async def proxies_delete_relations(request: Request):
     async with _get_async_client() as client:
         url = base_url + "/proxy/relations/" + rel_id
 
-        response = await client.delete(url)
+        headers = _get_jwt_headers(request, {"Accept": "application/json"})
+        response = await client.delete(url, headers=headers)
         if response.is_success:
             return response.json()
         else:
