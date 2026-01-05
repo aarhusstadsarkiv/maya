@@ -186,7 +186,10 @@
         <a href="{{ value['record_image'] }}"> {{ translate('Download medium size')}}</a><br>
         {% endif %}
         {% if value['large_image'] %}
-        <a href="{{ value['large_image'] }}"> {{ translate('Download large size')}}</a>
+        <a href="{{ value['large_image'] }}"> {{ translate('Download large size')}}</a><br>
+        {% endif %}
+        {% if value['full_image'] %}
+        <a href="{{ value['full_image'] }}"> {{ translate('Download full size')}}</a>
         {% endif %}
     </div>
 </div>
