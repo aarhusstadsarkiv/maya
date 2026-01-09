@@ -64,7 +64,7 @@ def _alter_record(context: dict) -> dict:
 
 class Hooks(HooksSpec):
 
-    context = {}
+    search_context = {}
     query_str_display = ""
 
     def __init__(self, request):
@@ -145,14 +145,14 @@ class Hooks(HooksSpec):
         query_params.append(("view", view))
 
         # fetch search result and relations
-        context, relations = await asyncio.gather(
+        search_context, relations = await asyncio.gather(
             get_search_context_values(self.request, extra_query_params=query_params),
             api.proxies_get_relations(self.request, type, id),
         )
 
-        Hooks.context = context
+        Hooks.search_context = search_context
 
-        search_result = context["search_result"]
+        search_result = search_context["search_result"]
         relations_formatted = format_relations(type, relations)
 
         # sort
@@ -176,7 +176,10 @@ class Hooks(HooksSpec):
         return resource
 
     async def before_response(self, response: HTMLResponse) -> HTMLResponse:
-
+        """
+        This is a small hack in order to set the search cookie on people and events pages.
+        So we can browse the inline search results as a normal search.
+        """
         if "endpoint" not in self.request.scope:
             return response
 
@@ -193,6 +196,6 @@ class Hooks(HooksSpec):
             # only set cookie on 'people' and 'events' because we know a search has been performed
             alter_response_on = ["people", "events"]
             if resource_type in alter_response_on:
-                set_response_cookie(response, Hooks.context)
+                set_response_cookie(response, Hooks.search_context)
 
         return response
