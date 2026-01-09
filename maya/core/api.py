@@ -133,6 +133,9 @@ async def auth_jwt_login_post(request: Request):
     username = str(form.get("email"))  # email is used as username
     password = str(form.get("password"))
 
+    if not username or not password:
+        raise OpenAwsException(400, translate("Email and password are required to login."))
+
     login_dict = {"username": username, "password": password}
 
     async with _get_async_client() as client:
