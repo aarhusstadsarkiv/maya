@@ -8,6 +8,7 @@
 A verify link has been sent to your email. You may verify your account now by clicking the link.: A
   verify link has been sent to your email. You may verify your account now by clicking
   the link.
+All fields should be filled out.: All fields should be filled out.
 An email has been sent to you with instructions on how to reset your password.: An
   email has been sent to you with instructions on how to reset your password.
 Are you sure: Are you sure
@@ -37,6 +38,7 @@ Download large size: Download large size
 Download medium size: Download medium size
 E-mail: E-mail
 Email: Email
+Email and password are required to login.: Email and password are required to login.
 Email needs to be correct.: Email needs to be correct.
 Email needs to be correct. Password needs to be at least 8 characters long.: Email
   needs to be correct. Password needs to be at least 8 characters long.
@@ -182,7 +184,6 @@ User has been deleted: User has been deleted
 User has been updated: User has been updated
 User is already verified.: User is already verified.
 Username: Username
-Username is required.: Username is required.
 View: View
 View schema: View schema
 You are already logged in.: You are already logged in.

@@ -4,6 +4,7 @@
 A verify link has been sent to your email. You may verify your account now by clicking the link.: Et
   verifikations-link er blevet sendt til din e-mail. Du kan nu verificere din konto
   ved at klikke på linket.
+All fields should be filled out.: Alle felter skal udfyldes.
 An email has been sent to you with instructions on how to reset your password.: En
   mail er blevet sendt til dig med instruktioner om hvordan du nulstiller dit password.
   Husk at din e-mail skal være registreret hos os. Hvis du ikke modtager en mail,
@@ -34,6 +35,7 @@ Download large size: Download stor størrelse
 Download medium size: Download mellem størrelse
 E-mail: E-mail
 Email: E-mail
+Email and password are required to login.: E-mail og password skal udfyldes for at logge ind.
 Email needs to be correct.: E-mail skal være korrekt.
 Email needs to be correct. Password needs to be at least 8 characters long.: Email
   er ikke korrekt. Password skal være mindst 8 tegn langt.
@@ -164,7 +166,6 @@ User has been updated: Brugeren er opdateret.
 User information could not be found.: Information omkring bruger kunne ikke findes.
 User is already verified.: Brugerens email er allerede verificeret.
 Username: Visningsnavn
-Username is required.: Visningsnavn er krævet.
 View: Vis
 View schema: Vis skema
 You are already logged in.: Du er logget ind.
