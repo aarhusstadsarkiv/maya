@@ -18,7 +18,7 @@ correct_login = {
     "password": valid_password,
 }
 incorrect_login = {"username": invalid_user, "password": invalid_password}
-
+headers = {"origin": "http://testserver"}
 """
 User already exists. At some point we should test with a user that does not exist.
 Before that is possible we should be allowed to delete a user from the database.
@@ -33,16 +33,18 @@ class TestAuth(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_login_post_correct(self):
-        client = TestClient(app)
+        client = TestClient(app, headers=headers)
 
         # Sometimes login credential uses "email" and sometimes "username" ... this is a bit confusing
         login = {"email": valid_user, "password": valid_password}
         response = client.post("/auth/login", data=login, follow_redirects=True)  # type: ignore
         expect_json = {"error": False, "redirect": "/search"}
+        log.debug(f"Response JSON: {response.json()}")
         self.assertEqual(response.json(), expect_json)
 
     def test_login_post_incorrect(self):
-        client = TestClient(app)
+
+        client = TestClient(app, headers=headers)
         response = client.post("/auth/login", data=incorrect_login, follow_redirects=True)  # type: ignore
         expect_json = {"message": "Email eller password er ikke korrekt.", "error": True}
         self.assertEqual(response.json(), expect_json)
@@ -58,7 +60,7 @@ class TestAuth(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_register_post(self):
-        client = TestClient(app)
+        client = TestClient(app, headers=headers)
         data = {
             "display_name": "test",
             "email": correct_login["username"],
@@ -86,7 +88,7 @@ class TestAuth(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_reset_password_post(self):
-        client = TestClient(app)
+        client = TestClient(app, headers=headers)
         response = client.post(
             "/auth/reset-password/fake-token", data={"password": valid_password, "password_2": valid_password}, follow_redirects=True
         )
@@ -98,8 +100,11 @@ class TestAuth(unittest.TestCase):
         self.assertEqual(response.url, "http://testserver/auth/login")
 
     def test_me_loggedin_get(self):
-        client = TestClient(app)
-        response = client.post("/auth/login", data=correct_login)  # type: ignore
+        client = TestClient(app, headers=headers)
+        response = client.post(
+            "/auth/login",
+            data=correct_login,
+        )  # type: ignore
         response = client.get("/auth/me")
         self.assertEqual(response.status_code, 200)
 
