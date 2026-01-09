@@ -112,7 +112,7 @@ def _get_error_string(error: str) -> str:
     if error == "value_error.email":
         return translate("Email needs to be correct.")
     if error == "value_error.missing":
-        return translate("Username is required.")
+        return translate("All fields should be filled out.")
 
     # verify errors
     if error == "VERIFY_USER_BAD_TOKEN":
