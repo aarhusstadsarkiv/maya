@@ -43,6 +43,8 @@ import os
 import json
 from time import time
 from maya.core.hooks import get_hooks
+from maya.core.api_error import OpenAwsException
+from starlette.responses import JSONResponse
 
 
 log = get_log()
@@ -64,16 +66,19 @@ class RequestBeginMiddleware(BaseHTTPMiddleware):
         return response
 
 
-class StaticPathSkippingMiddleware(BaseHTTPMiddleware):
-    async def dispatch(self, request: Request, call_next):
-        if request.url.path.startswith("/static"):
-            return await call_next(request)
-        return await call_next(request)
+class ApiLogMiddleware(BaseHTTPMiddleware):
+    """
+    Logs time spent on all API calls made during the request
+    """
 
-
-class ResponseTimeLoggingMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         response = await call_next(request)
+
+        # ignore /static
+        path = request.url.path
+        if path.startswith("/static"):
+            return response
+
         total_response_time = api.get_time_used(request)
         log.debug(json.dumps(total_response_time, indent=4, ensure_ascii=False))
         api.REQUEST_TIME_USED = {}
@@ -81,6 +86,10 @@ class ResponseTimeLoggingMiddleware(BaseHTTPMiddleware):
 
 
 class NoCacheMiddleware(BaseHTTPMiddleware):
+    """
+    Control caching behavior based on URL patterns
+    """
+
     async def dispatch(self, request, call_next):
         response = await call_next(request)
 
@@ -105,12 +114,20 @@ class NoCacheMiddleware(BaseHTTPMiddleware):
 
 
 class CSPMiddleware(BaseHTTPMiddleware):
+    """
+    Content Security Policy middleware.
+    Adds a Content-Security-Policy header to each response
+    """
+
     async def dispatch(self, request: Request, call_next):
+
+        # Set nonce on request state for use in templates
         nonce = os.urandom(16).hex()
         request.state.csp_nonce = nonce
 
         response = await call_next(request)
 
+        # Define Content Security Policy header
         asset_src = [
             "'self'",
             "data:",
@@ -135,25 +152,32 @@ class CSPMiddleware(BaseHTTPMiddleware):
 
 
 class BeforeResponseMiddleware(BaseHTTPMiddleware):
+    """
+    Apply before_response hooks to the response before sending it to the client
+    """
+
     async def dispatch(self, request, call_next):
 
-        hooks = get_hooks(request)
         response = await call_next(request)
+        hooks = get_hooks(request)
         response = await hooks.before_response(response)
         return response
 
 
 class AccessLogMiddleware(BaseHTTPMiddleware):
+    """
+    Log all access information for each request
+    """
+
     async def dispatch(self, request, call_next):
 
-        # Log request details
+        # Generate logging info from request
         method = request.method
         path = request.url.path
-        query_string = request.url.query  # Extract the query string
+        query_string = request.url.query
         if query_string:
             query_string = f"?{query_string}"
 
-        # Handle cases where request.client might be None
         if request.client:
             client_ip = request.client.host
             client_port = request.client.port
@@ -176,6 +200,34 @@ class AccessLogMiddleware(BaseHTTPMiddleware):
         return response
 
 
+class SameOriginMiddleware(BaseHTTPMiddleware):
+    def __init__(self, app, allowed_origins: list = [], allow_same_origin: bool = True):
+        super().__init__(app)
+        self.allowed_origins = allowed_origins
+        self.allow_same_origin = allow_same_origin
+
+    async def dispatch(self, request: Request, call_next):
+        if request.method in {"POST", "PUT", "PATCH", "DELETE"}:
+            origin = request.headers.get("origin")
+
+            try:
+                if not origin or origin == "null":
+                    raise OpenAwsException(403, "Forbidden. Bad Origin.")
+
+                allowed = set(self.allowed_origins)
+                if self.allow_same_origin:
+                    same_origin = f"{request.url.scheme}://{request.url.netloc}"
+                    allowed.add(same_origin)
+
+                if origin not in allowed:
+                    raise OpenAwsException(403, "Forbidden. Bad Origin.")
+            except OpenAwsException as exc:
+                log.exception(f"Forbidden request from origin: {origin}")
+                JSONResponse({"error": True, "message": exc.message}, status_code=exc.status_code)
+
+        return await call_next(request)
+
+
 # Variables for cookie handling
 secret_key = str(os.getenv("SECRET"))
 session_store: CookieStore = CookieStore(secret_key=secret_key)
@@ -184,17 +236,18 @@ cookie_httponly = settings["cookie"]["httponly"]  # type: ignore
 
 
 middleware = []
-middleware.append(Middleware(CORSMiddleware, allow_origins=settings["cors_allow_origins"]))
+
+middleware.append(Middleware(AccessLogMiddleware))
 middleware.append(Middleware(RequestBeginMiddleware))
+
+if settings["log_api_calls"]:
+    middleware.append(Middleware(ApiLogMiddleware))
+
+middleware.append(Middleware(GZipMiddleware))
+middleware.append(Middleware(CORSMiddleware, allow_origins=settings["cors_allow_origins"]))
 middleware.append(Middleware(CSPMiddleware))
+# middleware.append(Middleware(SameOriginMiddleware, allow_same_origin=True))
 middleware.append(Middleware(SessionMiddleware, store=session_store, cookie_https_only=cookie_httponly, lifetime=lifetime))
 middleware.append(Middleware(SessionAutoloadMiddleware, paths=["/"]))
 middleware.append(Middleware(BeforeResponseMiddleware))
-middleware.append(Middleware(StaticPathSkippingMiddleware))
-
-if settings["log_api_calls"]:
-    middleware.append(Middleware(ResponseTimeLoggingMiddleware))
-
 middleware.append(Middleware(NoCacheMiddleware))
-middleware.append(Middleware(AccessLogMiddleware))
-middleware.append(Middleware(GZipMiddleware, minimum_size=1))
