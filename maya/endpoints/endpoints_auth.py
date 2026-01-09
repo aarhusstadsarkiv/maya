@@ -56,13 +56,13 @@ async def auth_login_post(request: Request):
     try:
         await api.auth_jwt_login_post(request)
         flash.set_message(request, translate("You have been logged in."), type="success")
-
         if next_url:
             return JSONResponse({"error": False, "redirect": next_url})
         else:
             return JSONResponse({"error": False, "redirect": "/search"})
 
     except OpenAwsException as e:
+        log.exception("OpenAwsException in auth_login_post")
         return JSONResponse({"message": str(e), "error": True})
 
     except Exception:
