@@ -263,13 +263,12 @@ async def auth_forgot_password_post(request: Request):
             translate("An email has been sent to you with instructions on how to reset your password."),
             type="success",
         )
+        return JSONResponse({"error": False})
     except OpenAwsException as e:
-        flash.set_message(request, str(e), type="error")
+        return JSONResponse({"message": str(e), "error": True})
     except Exception as e:
         log.exception("Error in auth_forgot_password_post")
-        flash.set_message(request, str(e), type="error", use_settings=True)
-
-    return RedirectResponse(url="/auth/forgot-password", status_code=302)
+        return JSONResponse({"message": str(e), "error": True})
 
 
 async def auth_reset_password_get(request: Request):
@@ -293,16 +292,11 @@ async def auth_reset_password_post(request: Request):
             translate("Your password has been reset. You can now login."),
             type="success",
         )
-        return RedirectResponse(url="/auth/login", status_code=302)
-
+        return JSONResponse({"error": False, "redirect": "/auth/login"})
     except OpenAwsException as e:
-        flash.set_message(request, str(e), type="error")
+        return JSONResponse({"message": str(e), "error": True})
     except Exception as e:
-        log.exception("Error in auth_reset_password_post")
-        flash.set_message(request, str(e), type="error", use_settings=True)
-
-    token = request.path_params["token"]
-    return RedirectResponse(url="/auth/reset-password/" + token, status_code=302)
+        return JSONResponse({"message": str(e), "error": True})
 
 
 async def auth_send_verify_email(request: Request):
