@@ -246,6 +246,7 @@ if settings["log_api_calls"]:
 middleware.append(Middleware(GZipMiddleware))
 middleware.append(Middleware(CORSMiddleware, allow_origins=settings["cors_allow_origins"]))
 middleware.append(Middleware(CSPMiddleware))
+
 # middleware.append(Middleware(SameOriginMiddleware, allow_same_origin=True))
 middleware.append(Middleware(SessionMiddleware, store=session_store, cookie_https_only=cookie_httponly, lifetime=lifetime))
 middleware.append(Middleware(SessionAutoloadMiddleware, paths=["/"]))
