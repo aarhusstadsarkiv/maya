@@ -201,6 +201,10 @@ class AccessLogMiddleware(BaseHTTPMiddleware):
 
 
 class SameOriginMiddleware(BaseHTTPMiddleware):
+    """
+    Control same-origin policy for state-changing requests
+    """
+
     def __init__(self, app, allowed_origins: list = [], allow_same_origin: bool = True):
         super().__init__(app)
         self.allowed_origins = allowed_origins
@@ -244,9 +248,14 @@ if settings["log_api_calls"]:
     middleware.append(Middleware(ApiLogMiddleware))
 
 middleware.append(Middleware(GZipMiddleware))
+
+# Instruct what domain the client browser should permit loading resources from
 middleware.append(Middleware(CORSMiddleware, allow_origins=settings["cors_allow_origins"]))
+
+# Instruct what content sources the client browser should permit
 middleware.append(Middleware(CSPMiddleware))
 
+# Instruct what origin requests the client browser should permit for state-changing requests
 # middleware.append(Middleware(SameOriginMiddleware, allow_same_origin=True))
 middleware.append(Middleware(SessionMiddleware, store=session_store, cookie_https_only=cookie_httponly, lifetime=lifetime))
 middleware.append(Middleware(SessionAutoloadMiddleware, paths=["/"]))
