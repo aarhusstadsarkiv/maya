@@ -249,14 +249,14 @@ if settings["log_api_calls"]:
 
 middleware.append(Middleware(GZipMiddleware))
 
-# Instruct what domain the client browser should permit loading resources from
+# Indicate what domains the client browser should permit reading responses from. E.g. using fetch API calls
 middleware.append(Middleware(CORSMiddleware, allow_origins=settings["cors_allow_origins"]))
 
-# Instruct what content sources the client browser should permit
+# Instruct what resources and connections the client browser should permit
 middleware.append(Middleware(CSPMiddleware))
 
-# Instruct what origin requests the client browser should permit for state-changing requests
-# middleware.append(Middleware(SameOriginMiddleware, allow_same_origin=True))
+# Instruct what origins the client browser should permit for state-changing requests
+middleware.append(Middleware(SameOriginMiddleware, allow_same_origin=True))
 middleware.append(Middleware(SessionMiddleware, store=session_store, cookie_https_only=cookie_httponly, lifetime=lifetime))
 middleware.append(Middleware(SessionAutoloadMiddleware, paths=["/"]))
 middleware.append(Middleware(BeforeResponseMiddleware))
