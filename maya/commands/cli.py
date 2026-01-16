@@ -70,7 +70,7 @@ else:
 
     @cli.command(help="Start the production gunicorn server.")
     @click.option("--port", default=5555, help="Server port.")
-    @click.option("--workers", default=3, help="Number of workers.")
+    @click.option("--workers", default=1, help="Number of workers.")
     @click.option("--host", default="0.0.0.0", help="Server host.")
     @click.argument("base_dir")
     def server_prod(port: int, workers: int, host: str, base_dir: str):
