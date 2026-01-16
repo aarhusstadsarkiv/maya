@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block body_class %}page-about-privacy{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', path='/css/toc.css') }}?v={{ get_setting('version') }}">
+{% endblock head %}
+
+{% block content %}
+<h1>Privatlivspolitik</h1>
+<p>I forbindelse med din benyttelse af aarhusarkivet.dk, skal vi jf. Databeskyttelsesforordningen informere dig om en
+    række detaljer i vores håndtering af dine oplysninger og oplyse dig om dine rettigheder i den forbindelse.</p>
+
+<h3 id="visitors" class="">Alle brugere af aarhusarkivet.dk</h3>
+<p>Når du benytter hjemmesiden www.aarhusarkivet.dk, bliver der hverken sat nogle eksterne cookies eller indsamlet data,
+    som kan føres tilbage til dig. Oplysningerne om dit besøg anonymiseres og benyttes af Aarhus Stadsarkiv til
+    statistiske undersøgelser.</p>
+
+<h3 id="users" class="">Oprettede brugere på aarhusarkivet.dk</h3>
+<p>Hvis du opretter dig som bruger på aarhusarkivet.dk, behandler vi ydermere personoplysninger om dig i kategorierne
+    navn og e-mail, samt eventuelle gemte søgninger, gemte bogmærker og bestillinger. Det gør vi for at kunne tilbyde
+    selvsamme funktionaliteter.</p>
+
+<p>Oplysningerne kan også blive anvendt i Aarhus Kommunes videnskabelige og statistiske undersøgelser. Enhver
+    offentliggørelse af resultatet fra sådanne undersøgelser vil være fuldt anonymiseret.</p>
+
+<p>Oplysningerne opbevares og behandles sikkert hos vores leverandører.</p>
+
+<p>Vores behandling af personoplysningerne sker på baggrund af databeskyttelsesforordningens artikel 6, stk. 1, litra a
+    (samtykke). Samtykket trækkes tilbage ved at sende en mail til stadsarkiv@aarhus.dk.</p>
+
+<p>De oplysninger vi her behandler om dig, vil blive slettet senest efter fem års inaktivitet eller når den registrerede
+    bruger ønsker at blive slettet.</p>
+<p>Du har ret til at anmode om indsigt i oplysningerne vi har om dig. Du har også ret til at anmode om berigtigelse
+    eller sletning af oplysninger, og du kan også bede om en begrænsning af behandlingen af oplysningerne.</p>
+<p>Du har ligeledes ret til at anmode om at allerede offentliggjorde materialer på AarhusArkivet trækkes tilbage fra
+    offentliggørelse.</p>
+
+<p>Du har ret til at gøre indsigelse mod behandlingen jf. Databeskyttelsesforordningens artikel 21.</p>
+<p>Det samtykke du har givet til behandlingen kan til en hver tid trækkes tilbage, dog uden at ændrer på lovligheden af
+    den behandling der allerede måtte være foretaget.</p>
+
+<p>Den dataansvarlige er Aarhus Kommune, Magistraten for Borgerservice og Biblioteker, Aarhus Stadsarkiv, Hack Kampmanns
+    Plads 2, 8000 Aarhus C, som kan kontaktes på stadsarkiv@aarhus.dk eller 31 85 65 35. Har du spørgsmål i forbindelse
+    med Aarhus Kommunes databeskyttelse af dine oplysninger, så kan du også kontakte Aarhus Kommunes
+    databeskyttelsesrådgiver på mail databeskyttelsesraadgiver@aarhus.dk.</p>
+
+<p>Du skal slutteligt vide at det er muligt at klage til Datatilsynet over behandlingen af personoplysningerne.</p>
+{% endblock content %}

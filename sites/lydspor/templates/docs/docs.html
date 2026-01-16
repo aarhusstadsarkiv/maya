@@ -1,0 +1,15 @@
+{% extends "page_with_toc.html" %}
+
+{% block body_class %}page-docs{% endblock %}
+
+{% block content %}
+
+<div class="action-links">
+{% for doc in doc_data %}
+<a href="{{ doc.path }}">{{ doc.title }}</a>
+{% endfor %}
+</div>
+
+{{ markdown(content)|safe }}
+
+{% endblock content %}

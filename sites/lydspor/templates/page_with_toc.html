@@ -1,0 +1,104 @@
+{# base template for about and guides #}
+<!DOCTYPE html>
+<html lang="da">
+
+<head>
+    {% include "includes/head_default.html" %}
+    {% block head %}
+    <link rel="stylesheet" href="{{ url_for('static', path='/css/toc.css') }}?v={{ get_setting('version') }}">
+    {% endblock head %}
+</head>
+
+<body class="{% block body_class %}{% endblock %}">
+
+    {% include "includes/navigation.html" %}
+
+    <main class="container-small">
+        <div class="container-left">
+            <div id="toc"></div>
+        </div>
+        <div class="container-main" id="article">
+            {% block content %}
+            {% endblock content %}
+        </div>
+    </main>
+
+    <footer class="footer">
+        {% include "includes/footer.html" %}
+    </footer>
+
+    {% include "includes/flash.html" %}
+
+    <script type="module" nonce="{{ request.state.csp_nonce }}">
+
+        import { showTOC } from '/static/js/table-of-contents.js';
+        const sourceElem = document.getElementById('article');
+        const tocElem = document.getElementById('toc');
+        showTOC(sourceElem, tocElem);
+
+        /**
+         * Add copy buttons to code blocks
+         */
+        function addCopyButtons(elem) {
+
+            const codeBlocks = elem.querySelectorAll('pre code');
+
+            // Get 'content' element and add 'copy-button-container' and 'copy-button' elements
+            const contentElem = elem.querySelector('.content');
+            codeBlocks.forEach(code => {
+
+                const button = document.createElement("button");
+                button.classList.add('copy-button');
+                button.textContent = "Copy";
+                button.onclick = function () {
+                    navigator.clipboard.writeText(code.textContent).then(() => {
+                        button.textContent = "Copied!";
+
+                        setTimeout(() => {
+                            button.textContent = "Copy";
+                        }, 2000);
+
+                    }, err => {
+                        console.log('Failed to copy: ', err);
+                    });
+                };
+
+                // Wrap button in div and insert before code block
+                const buttonContainer = document.createElement('div');
+                buttonContainer.classList.add('copy-button-container');
+                buttonContainer.appendChild(button);
+
+                const parent = code.parentNode; // 'pre' element
+                parent.insertBefore(buttonContainer, code);
+            });
+        }
+
+        let copyPasteEleme = document.getElementById('article');
+        addCopyButtons(copyPasteEleme);
+
+    </script>
+    <style>
+        @media (max-width: 992px) {
+            .container-main {
+                width: 100%;
+                overflow: auto;
+            }
+        }
+
+        .copy-button {
+            cursor: pointer;
+            padding: 5px;
+            font-size: 12px;
+            cursor: pointer;
+            position: absolute;
+            margin: 5px;
+        }
+
+        .copy-button-container {
+            display: flex;
+            justify-content: flex-end;
+        }
+    </style>
+</body>
+
+</html>
