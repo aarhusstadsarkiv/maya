@@ -113,7 +113,7 @@
         {% endif %}
         {% for key in block_keys %}
 
-        {% if key == 'bookmarks' %}
+        {% if key == 'user_actions' %}
             <div class="action-links">
             {% if has_permission('user', permissions_list) and get_setting('allow_save_bookmarks') %}
             <a id="bookmark-action" data-id="{{ meta_data['id']}}" href="#"></a>

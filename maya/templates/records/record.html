@@ -23,7 +23,7 @@
 
 {{ record_macros.parse_record_pagination(record_pagination) }}
 
-{% set keys = ["collectors", "content_types", "creators", "date_normalized", "curators", "id", "original_id", "agenda_items", "bookmarks"] %}
+{% set keys = ["collectors", "content_types", "creators", "date_normalized", "curators", "id", "original_id", "agenda_items", "user_actions"] %}
 {{ record_macros.parse_block_first(keys, meta_data, record_and_types) }}
 
 {% set keys = ["title", "heading", "summary", "desc_notes", "collection", "series", "collection_tags", "subjects" ] %}
