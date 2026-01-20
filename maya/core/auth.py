@@ -65,14 +65,6 @@ class AuthExceptionJSON(Exception):
 
 
 async def _check_authentication(request: Request, permissions, message, verified, json_response):
-    """
-    Check whether the user is authenticated.
-
-    permissions: List of permissions; authentication passes if the user has one of these.
-    message: Custom error message in case the check fails
-    verified: Whether to require a verified user.
-    json_response: Whether to return the response as JSON.
-    """
     permissions = tuple(permissions)
 
     is_logged_in = await api.is_logged_in(request)
@@ -115,15 +107,21 @@ async def _check_authentication(request: Request, permissions, message, verified
 
 async def is_authenticated(request: Request, permissions=[], message=None, verified=False):
     """
-    Check if the user is authenticated and has the required permissions.
-    This version redirects to the login page if not authenticated.
+    Check whether the user is authenticated. Returns a HTML response if the check fails
+
+    permissions: List of permissions; authentication passes if the user has one of these.
+    message: Custom error message in case the check fails
+    verified: Whether to require a verified user.
     """
     await _check_authentication(request, permissions, message, verified, json_response=False)
 
 
 async def is_authenticated_json(request: Request, permissions=[], message=None, verified=False):
     """
-    Check if the user is authenticated and has the required permissions.
-    This version returns a JSON response.
+    Check whether the user is authenticated. Returns a JSON response if the check fails
+
+    permissions: List of permissions; authentication passes if the user has one of these.
+    message: Custom error message in case the check fails
+    verified: Whether to require a verified user.
     """
     await _check_authentication(request, permissions, message, verified, json_response=True)
