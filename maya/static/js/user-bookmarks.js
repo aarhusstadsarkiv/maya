@@ -5,13 +5,13 @@ import { asyncLogError } from "/static/js/error.js";
 import { config } from "/static/js/config.js";
 
 const spinner = document.querySelector('.loadingspinner');
-const bookmarkElems = document.querySelectorAll('.bookmark-delete');
+const bookmarkElems = document.querySelectorAll('.delete-bookmark');
 
 bookmarkElems.forEach((elem) => {
 
     const recordId = elem.getAttribute('data-id');
     const get_data = () => {
-        const data = { record_id: recordId, action: 'remove' };
+        const data = { record_id: recordId, action: 'delete' };
         return JSON.stringify(data);
     }
 
@@ -20,6 +20,7 @@ bookmarkElems.forEach((elem) => {
         spinner.classList.remove('hidden');
         try {
             e.preventDefault();
+            console.log("clicked")
 
             const data = get_data();
             res = await Requests.asyncPostJson('/auth/bookmarks', data, 'POST');
