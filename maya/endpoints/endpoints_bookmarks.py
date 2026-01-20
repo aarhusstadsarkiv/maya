@@ -76,7 +76,7 @@ async def auth_bookmarks_get(request: Request):
 async def auth_bookmarks_json(request: Request):
     """
     Get user bookmarks as JSON. Used for /records/{record_id} page.
-    In /static/js/bookmarks-record.js
+    In /static/js/record-bookmarks.js
     """
     message = translate("You need to be logged in as user in order to bookmark a record.")
     await is_authenticated_json(request, ["user"], message=message)
