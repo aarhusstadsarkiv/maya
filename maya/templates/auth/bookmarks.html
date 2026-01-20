@@ -32,7 +32,7 @@
 {% for bookmark in bookmarks_data %}
 
     <div class="search-result">
-        <a class="search-link" href="{{ bookmark.record_link }}">
+        <a class="search-link" href="{{ bookmark.path }}">
             <div class="search-details">
                 <div class="search-summary">{{ sub_string(bookmark.title, 75) }}</div>
                 <div class="search-summary">{{ bookmark.description }}</div>

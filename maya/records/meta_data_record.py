@@ -36,7 +36,7 @@ def get_record_meta_data_resolve(request: Request, record: dict):
     """
     meta_data = {}
     meta_data["id"] = record["id"]
-    meta_data["record_link"] = f"/records/{meta_data['id']}"
+    meta_data["path"] = f"/records/{meta_data['id']}"
     meta_data["title"] = _get_record_title(record)
     meta_data["date_normalized"] = record.get("date_normalized")
     meta_data["collection_label"] = record.get("collection", {}).get("label", "")
