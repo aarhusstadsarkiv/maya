@@ -65,7 +65,14 @@ class AuthExceptionJSON(Exception):
 
 
 async def _check_authentication(request: Request, permissions, message, verified, json_response):
-    # prevent mutation of the permissions list
+    """
+    Check whether the user is authenticated.
+
+    permissions: List of permissions; authentication passes if the user has one of these.
+    message: Custom error message in case the check fails
+    verified: Whether to require a verified user.
+    json_response: Whether to return the response as JSON.
+    """
     permissions = tuple(permissions)
 
     is_logged_in = await api.is_logged_in(request)
@@ -79,10 +86,10 @@ async def _check_authentication(request: Request, permissions, message, verified
             raise AuthExceptionJSON(message=message)
         raise AuthException(request, message=message, redirect_url=_get_redirect_url(request))
 
-    users_me_get = await api.users_me_get(request)
+    me = await api.users_me_get(request)
 
-    if verified and not users_me_get["is_verified"]:
-        _log_403_error(request, f"403 Forbidden: {request.url}. User {users_me_get['email']}. User is not verified")
+    if verified and not me["is_verified"]:
+        _log_403_error(request, f"403 Forbidden: {request.url}. User {me['email']}. User is not verified")
         message = translate("You need to verify your email address to view this page.")
         if json_response:
             # json version of message
@@ -95,7 +102,7 @@ async def _check_authentication(request: Request, permissions, message, verified
         permission_granted = any(permission in user_permissions_list for permission in permissions)
 
         if not permission_granted:
-            _log_403_error(request, f"403 Forbidden: {request.url}. User {users_me_get['email']}. Missing required permissions")
+            _log_403_error(request, f"403 Forbidden: {request.url}. User {me['email']}. Missing required permissions")
             message = translate("You do not have the required permissions to view the page.")
             if json_response:
                 raise AuthExceptionJSON(message=message)
