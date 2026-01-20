@@ -56,7 +56,7 @@ class AuthExceptionJSON(Exception):
         super().__init__(self.message)
 
 
-async def _check_authentication(request: Request, permissions, message, verified, json_response):
+async def _check_authentication(request: Request, permissions, message, require_verified, json_response):
     permissions = tuple(permissions)
 
     is_logged_in = await api.is_logged_in(request)
@@ -71,8 +71,9 @@ async def _check_authentication(request: Request, permissions, message, verified
         raise AuthException(request, message=message, redirect_url=_get_redirect_url(request))
 
     me = await api.users_me_get(request)
+    is_verified = await api.me_verified(request)
 
-    if verified and not me["is_verified"]:
+    if require_verified and not is_verified:
         _log_403_error(request, f"403 Forbidden: {request.url}. User {me['email']}. User is not verified")
         message = translate("You need to verify your email address to view this page.")
         if json_response:

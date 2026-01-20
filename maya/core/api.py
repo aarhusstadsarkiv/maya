@@ -195,16 +195,15 @@ async def auth_verify_post(request: Request):
             raise_openaws_exception(response.status_code, json_response)
 
 
-async def users_me_get(request: Request, allow_request_state=True) -> dict:
+async def users_me_get(request: Request) -> dict:
     """
     GET the current user from the api. If already found in the request state
     then return the user dict without calling the API. If not call the API
     and store the user in the request state.
     """
 
-    if allow_request_state:
-        if hasattr(request.state, "me"):
-            return request.state.me
+    if hasattr(request.state, "me"):
+        return request.state.me
 
     headers = _get_jwt_headers(request, {"Accept": "application/json"})
 
@@ -453,12 +452,12 @@ async def is_logged_in(request: Request) -> bool:
         return False
 
 
-async def me_get(request: Request, allow_request_state=True) -> dict:
+async def me_get(request: Request) -> dict:
     """
-    Check if the current user is logged in. Return True if the user is logged in.
+    GEt the current user if logged in. Or except and return an empty user dict.
     """
     try:
-        me: dict = await users_me_get(request, allow_request_state)
+        me: dict = await users_me_get(request)
         return me
 
     except Exception:
@@ -478,6 +477,17 @@ async def me_permissions(request: Request) -> list[str]:
         return user_permissions_list
     except Exception:
         return []
+
+
+async def me_verified(request: Request) -> bool:
+    try:
+        me = await users_me_get(request)
+        verified = me["is_verified"]
+        if verified:
+            return True
+    except Exception:
+        pass
+    return False
 
 
 async def has_permission(request: Request, permission: str) -> bool:
