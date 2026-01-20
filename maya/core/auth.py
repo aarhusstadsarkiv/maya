@@ -1,11 +1,6 @@
 """
 Authentication and Authorization Utilities for Request Handling
 
-This module provides utilities for verifying user authentication
-and permission levels in a the maya application. It includes mechanisms
-for redirecting unauthorized users, logging authentication/authorization errors,
-and raising exceptions suitable for both HTML and JSON responses.
-
 Functions:
 - is_authenticated: Ensures the user is authenticated and optionally checks permissions and verification status. Redirects on failure.
 - is_authenticated_json: Same as above but raises JSON-based exceptions for API responses.
@@ -13,9 +8,6 @@ Functions:
 Exceptions:
 - AuthException: Raised for authentication failures in standard (non-JSON) responses.
 - AuthExceptionJSON: Raised for authentication failures in JSON/API contexts.
-
-Logging:
-Detailed error logging is performed for both unauthorized (401) and forbidden (403) cases.
 
 """
 
