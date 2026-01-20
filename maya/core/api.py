@@ -197,8 +197,9 @@ async def auth_verify_post(request: Request):
 
 async def users_me_get(request: Request, allow_request_state=True) -> dict:
     """
-    GET the current user from the api.
-    The user is stored in the request state in order to avoid multiple api calls.
+    GET the current user from the api. If already found in the request state
+    then return the user dict without calling the API. If not call the API
+    and store the user in the request state.
     """
 
     if allow_request_state:
