@@ -30,6 +30,21 @@ ICONS = {
 }
 
 
+def get_record_meta_data_resolve(request: Request, record: dict):
+    """
+    Get meta data from record originated from 'proxies_resolve' endpoint
+    """
+    meta_data = {}
+    meta_data["id"] = record["id"]
+    meta_data["record_link"] = f"/records/{meta_data['id']}"
+    meta_data["title"] = _get_record_title(record)
+    meta_data["date_normalized"] = record.get("date_normalized")
+    meta_data["collection_label"] = record.get("collection", {}).get("label", "")
+    meta_data["content_types_label"] = _get_content_type_label(record)
+    meta_data["portrait"] = record.get("portrait")
+    return meta_data
+
+
 def get_record_meta_data(request: Request, record: dict, user_permissions=[]) -> dict:
     """
     Get usefull meta data for a record
@@ -41,7 +56,6 @@ def get_record_meta_data(request: Request, record: dict, user_permissions=[]) ->
     permssion_granted = "employee" in user_permissions
 
     meta_data["id"] = record["id"]
-    meta_data["path"] = f"/records/{meta_data['id']}"
     meta_data["real_id"] = _strip_pre_zeroes(record["id"])
     meta_data["allowed_by_ip"] = _is_allowed_by_ip(request) or permssion_granted
     meta_data["permission_granted"] = permssion_granted

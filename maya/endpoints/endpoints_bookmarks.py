@@ -12,7 +12,7 @@ from maya.core.translate import translate
 from maya.core.logging import get_log
 from maya.core.api import OpenAwsException
 from maya.core import api
-from maya.records.meta_data_record import get_record_meta_data
+from maya.records.meta_data_record import get_record_meta_data_resolve
 from maya.records import normalize_dates
 from maya.database.crud_default import database_url
 from maya.database.crud import CRUD
@@ -22,6 +22,25 @@ from maya.database.utils import DatabaseConnection
 log = get_log()
 
 
+async def _auth_bookmarks_db(request: Request, me: dict):
+
+    filters = {"user_id": me["id"]}
+    database_connection = DatabaseConnection(database_url)
+    async with database_connection.transaction_scope_async() as connection:
+        crud_default = CRUD(connection)
+        bookmarks_db = await crud_default.select(
+            table="bookmarks",
+            columns=["record_id"],
+            filters=filters,
+            order_by=[("created_at", "DESC")],
+            limit_offset=(100, 0),
+        )
+
+    record_list = [bookmark["record_id"] for bookmark in bookmarks_db]
+    records = await api.proxies_resolve(request, record_list)
+    return records
+
+
 async def auth_bookmarks_get(request: Request):
     """
     User bookmarks page.
@@ -29,43 +48,18 @@ async def auth_bookmarks_get(request: Request):
     await is_authenticated(request)
     try:
         me = await api.me_get(request)
-        filters = {"user_id": me["id"]}
-
-        database_connection = DatabaseConnection(database_url)
-        async with database_connection.transaction_scope_async() as connection:
-            crud_default = CRUD(connection)
-            bookmarks_db = await crud_default.select(
-                table="bookmarks",
-                columns=["record_id"],
-                filters=filters,
-                order_by=[("created_at", "DESC")],
-                limit_offset=(100, 0),
-            )
-
-        record_list = [bookmark["record_id"] for bookmark in bookmarks_db]
-        records = await api.proxies_resolve(request, record_list)
-
+        records = await _auth_bookmarks_db(request, me)
         bookmarks_data = []
+
         for record in records:
-
             try:
-
                 record = normalize_dates.normalize_dates(record)
-                meta_data = get_record_meta_data(request, record)
-                bookmark_data = {
-                    "record_id": meta_data["id"],
-                    "record_link": meta_data["path"],
-                    "title": meta_data.get("title"),
-                    "date_normalized": record.get("date_normalized"),
-                    "collection_label": record.get("collection", {}).get("label", ""),
-                    "content_types": meta_data.get("content_types_label"),
-                    "portrait": meta_data.get("portrait"),
-                }
+                meta_data = get_record_meta_data_resolve(request, record)
             except Exception:
                 log.exception("Error in auth_bookmarks_get")
                 continue
 
-            bookmarks_data.append(bookmark_data)
+            bookmarks_data.append(meta_data)
 
         context_values = {"title": translate("Your bookmarks"), "me": me, "bookmarks_data": bookmarks_data}
         context = await get_context(request, context_values=context_values)
