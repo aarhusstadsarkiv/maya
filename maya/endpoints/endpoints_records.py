@@ -110,6 +110,9 @@ async def _get_record_pagination(request: Request) -> typing.Optional[RecordPagi
 
 
 async def records_get(request: Request):
+    """
+    Display a single record
+    """
 
     record_id = request.path_params["record_id"]
     if not record_id.isdigit():
@@ -120,7 +123,6 @@ async def records_get(request: Request):
     record, meta_data, record_and_types = await get_record_data(request, record, permissions)
 
     context_variables = {
-        "is_employee": "employee" in permissions,
         "title": meta_data["title"],
         "meta_title": meta_data["meta_title"],
         "meta_description": meta_data["meta_description"],
