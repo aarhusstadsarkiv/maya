@@ -52,23 +52,14 @@ async def auth_bookmarks_get(request: Request):
 
                 record = normalize_dates.normalize_dates(record)
                 meta_data = get_record_meta_data(request, record)
-
-                record_id = meta_data["id"]
-                record_link = f"/records/{record_id}"
-                title = meta_data.get("title")
-                date_normalized = record.get("date_normalized")
-                collection_label = record.get("collection", {}).get("label", "")
-                content_types_label = meta_data.get("content_types_label")
-                portrait = meta_data.get("portrait")
-
                 bookmark_data = {
-                    "record_id": record_id,
-                    "record_link": record_link,
-                    "title": title,
-                    "date_normalized": date_normalized,
-                    "collection_label": collection_label,
-                    "content_types": content_types_label,
-                    "portrait": portrait,
+                    "record_id": meta_data["id"],
+                    "record_link": meta_data["path"],
+                    "title": meta_data.get("title"),
+                    "date_normalized": record.get("date_normalized"),
+                    "collection_label": record.get("collection", {}).get("label", ""),
+                    "content_types": meta_data.get("content_types_label"),
+                    "portrait": meta_data.get("portrait"),
                 }
             except Exception:
                 log.exception("Error in auth_bookmarks_get")

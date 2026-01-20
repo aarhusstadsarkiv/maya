@@ -891,6 +891,7 @@ async def proxies_auto_complete(request: Request, query_params: list = []) -> ty
 async def proxies_resolve(request: Request, ids=[]) -> typing.Any:
     """
     Resolve directly from a proxy endpoint
+    This means only getting some record data, but for multiple records
     """
 
     # zfill to 9 digits

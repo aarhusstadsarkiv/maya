@@ -41,6 +41,7 @@ def get_record_meta_data(request: Request, record: dict, user_permissions=[]) ->
     permssion_granted = "employee" in user_permissions
 
     meta_data["id"] = record["id"]
+    meta_data["path"] = f"/records/{meta_data['id']}"
     meta_data["real_id"] = _strip_pre_zeroes(record["id"])
     meta_data["allowed_by_ip"] = _is_allowed_by_ip(request) or permssion_granted
     meta_data["permission_granted"] = permssion_granted
