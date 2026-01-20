@@ -442,7 +442,7 @@ async def auth_request_verify_post(request: Request) -> None:
 
 async def is_logged_in(request: Request) -> bool:
     """
-    Check if the current user is logged in. Return True if the user is logged in.
+    Check if the current user is logged in.
     """
     try:
         await users_me_get(request)
@@ -454,7 +454,9 @@ async def is_logged_in(request: Request) -> bool:
 
 async def me_get(request: Request) -> dict:
     """
-    GEt the current user if logged in. Or except and return an empty user dict.
+    GET the user data if logged in. Or except and return an empty user dict.\n
+    This is used when we need to know if a user is logged in or not - wihtout\n
+    raising an exception\n
     """
     try:
         me: dict = await users_me_get(request)

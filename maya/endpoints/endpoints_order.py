@@ -30,7 +30,7 @@ async def orders_get_orders_user(request: Request):
     """
     GET endpoint for displaying all orders for authenticated user
     """
-    await is_authenticated(request, verified=True)
+    await is_authenticated(request, must_be_verified=True)
     try:
 
         me = await api.users_me_get(request)
@@ -61,7 +61,7 @@ async def orders_user_renew_by_order_id(request: Request):
     Checks if order can be renewed
     """
 
-    await is_authenticated_json(request, verified=True)
+    await is_authenticated_json(request, must_be_verified=True)
     me = await api.users_me_get(request)
 
     try:
@@ -91,7 +91,7 @@ async def orders_post(request: Request):
     Checks if user is authenticated and verified
     Checks if order already exists
     """
-    await is_authenticated_json(request, verified=True)
+    await is_authenticated_json(request, must_be_verified=True)
     me = await api.users_me_get(request)
     permissions = await api.me_permissions(request)
 
@@ -123,7 +123,7 @@ async def _process_order_deletion(request: Request, id_key: str):
     There are two options because the user can delete an order based on the order_id or the record_id
     This depends on the user being on the order page or the record page
     """
-    await is_authenticated_json(request, verified=True)
+    await is_authenticated_json(request, must_be_verified=True)
     me = await api.users_me_get(request)
 
     try:
@@ -189,7 +189,7 @@ async def orders_admin_patch_multiple(request: Request):
     Checks if user has employee permissions.
     """
     try:
-        await is_authenticated_json(request, verified=True, permissions=["employee"])
+        await is_authenticated_json(request, must_be_verified=True, permissions=["employee"])
         me = await api.users_me_get(request)
 
         # Mutiple orders can be updated at once
@@ -231,7 +231,7 @@ async def orders_admin_patch_single(request: Request):
     Used to update the comment on the order and complete an order
     """
     try:
-        await is_authenticated_json(request, verified=True, permissions=["employee"])
+        await is_authenticated_json(request, must_be_verified=True, permissions=["employee"])
         me = await api.users_me_get(request)
 
         order_id = request.path_params["order_id"]

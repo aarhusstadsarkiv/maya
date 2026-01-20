@@ -56,24 +56,28 @@ class AuthExceptionJSON(Exception):
         super().__init__(self.message)
 
 
-async def _check_authentication(request: Request, permissions, message, require_verified, json_response):
+async def _check_authentication(request: Request, permissions, message, must_be_verified, json_response):
+
+    # prevent mutation of the permissions list
     permissions = tuple(permissions)
 
-    is_logged_in = await api.is_logged_in(request)
-
+    # Set message
     if not message:
         message = translate("You need to be logged in to view this page.")
 
+    # Check if authenticated
+    is_logged_in = await api.is_logged_in(request)
     if not is_logged_in:
         _log_401_error(request, f"401 Unauthorized: {request.url}")
         if json_response:
             raise AuthExceptionJSON(message=message)
         raise AuthException(request, message=message, redirect_url=_get_redirect_url(request))
 
+    # Check if verified user is needed
     me = await api.users_me_get(request)
     is_verified = await api.me_verified(request)
 
-    if require_verified and not is_verified:
+    if must_be_verified and not is_verified:
         _log_403_error(request, f"403 Forbidden: {request.url}. User {me['email']}. User is not verified")
         message = translate("You need to verify your email address to view this page.")
         if json_response:
@@ -82,6 +86,7 @@ async def _check_authentication(request: Request, permissions, message, require_
             raise AuthExceptionJSON(message=message)
         raise AuthException(request, message=message, redirect_url="/auth/me")
 
+    # Check if user has the required permissions
     if permissions:
         user_permissions_list = await api.me_permissions(request)
         permission_granted = any(permission in user_permissions_list for permission in permissions)
@@ -98,7 +103,7 @@ async def _check_authentication(request: Request, permissions, message, require_
             )
 
 
-async def is_authenticated(request: Request, permissions=[], message=None, verified=False):
+async def is_authenticated(request: Request, permissions=[], message=None, must_be_verified=False):
     """
     Check whether the user is authenticated. Returns a HTML response if the check fails
 
@@ -106,10 +111,10 @@ async def is_authenticated(request: Request, permissions=[], message=None, verif
     message: Custom error message in case the check fails
     verified: Whether to require a verified user.
     """
-    await _check_authentication(request, permissions, message, verified, json_response=False)
+    await _check_authentication(request, permissions, message, must_be_verified, json_response=False)
 
 
-async def is_authenticated_json(request: Request, permissions=[], message=None, verified=False):
+async def is_authenticated_json(request: Request, permissions=[], message=None, must_be_verified=False):
     """
     Check whether the user is authenticated. Returns a JSON response if the check fails
 
@@ -117,4 +122,4 @@ async def is_authenticated_json(request: Request, permissions=[], message=None, 
     message: Custom error message in case the check fails
     verified: Whether to require a verified user.
     """
-    await _check_authentication(request, permissions, message, verified, json_response=True)
+    await _check_authentication(request, permissions, message, must_be_verified, json_response=True)
