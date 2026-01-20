@@ -177,6 +177,6 @@
     min-width: 40px;
 }
 
-.action-links a.delete-order {
+.action-links a.delete-order, .action-links a.delete-bookmark {
     background-color: var(--flash-error-color);
 }

@@ -19,12 +19,14 @@ if (bookmarkAddElem) {
         let bookmarksJSON = await Requests.asyncGetJson(url, 'GET');
         if (Object.keys(bookmarksJSON).length !== 0) {
             bookmarkAddElem.innerHTML = 'Fjern bogmærke';
-            action = 'remove';
+            action = 'delete';
             bookmarkAddElem.setAttribute('data-action', action);
+            bookmarkAddElem.classList.add('delete-bookmark')
         } else {
             bookmarkAddElem.innerHTML = 'Tilføj bogmærke';
             action = 'add';
             bookmarkAddElem.setAttribute('data-action', action);
+            bookmarkAddElem.classList.remove('delete-bookmark')
         }
     }
 
