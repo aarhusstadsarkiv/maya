@@ -5,6 +5,8 @@ from maya.core.relations import format_relations, sort_data
 from maya.endpoints.endpoints_search import get_search_context_values, set_response_cookie, get_size_sort_view
 import asyncio
 from starlette.responses import HTMLResponse
+from maya.records import record_utils
+from starlette.exceptions import HTTPException
 
 log = get_log()
 
@@ -69,6 +71,7 @@ class Hooks(HooksSpec):
 
     def __init__(self, request):
         super().__init__(request)
+        self.curator = 4
 
     async def before_get_auto_complete(self, query_params: list) -> list:
         query_params.append(("auto_group", "2"))
@@ -106,7 +109,7 @@ class Hooks(HooksSpec):
         """
         # Remove all curators from the query params and add curator (4)
         query_params = [(key, value) for key, value in query_params if key != "curators"]
-        query_params.append(("curators", "4"))
+        query_params.append(("curators", self.curator))
 
         return query_params
 
@@ -199,3 +202,8 @@ class Hooks(HooksSpec):
                 set_response_cookie(response, Hooks.search_context)
 
         return response
+
+    async def after_get_record(self, record: dict, meta_data: dict) -> tuple:
+        if not record_utils.is_curator(record, self.curator):
+            raise HTTPException(404)
+        return record, meta_data
