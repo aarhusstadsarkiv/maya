@@ -4,9 +4,9 @@
 
 {% import "macros/common_macros.html" as common_macros %}
 
+{# Set order online message based on user login and verification status #}
 {% set login_url = "<a href='/auth/login?next=/records/" ~ meta_data.id ~ "'>Log ind</a>" %}
 {% set register_url = "<a href='/auth/register'>opret bruger</a>" %}
-
 
 {% if not logged_in %}
   {% set order_online_message = """
@@ -19,7 +19,6 @@ Materialet kan bestilles hjem til læsesalen.<br>
     {% set order_online_message = order_online_message ~ "<br>Du skal %s din konto for at bestille." | format("<a href='/auth/me'>verificere</a>") %}
   {% endif %}
 {% endif %}
-
 
 {% macro parse_record_pagination(record_pagination) %}
 {% if record_pagination %}
