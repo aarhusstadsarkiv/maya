@@ -4,6 +4,23 @@
 
 {% import "macros/common_macros.html" as common_macros %}
 
+{% set login_url = "<a href='/auth/login?next=/records/" ~ meta_data.id ~ "'>Log ind</a>" %}
+{% set register_url = "<a href='/auth/register'>opret bruger</a>" %}
+
+
+{% if not logged_in %}
+  {% set order_online_message = """
+Materialet kan bestilles hjem til læsesalen.<br> 
+%s eller %s for at bestille.<br>
+""" | format(login_url, register_url) %}
+{% else %}
+  {% set order_online_message = "Materialet kan bestilles hjem til læsesalen." %}
+  {% if not is_verified %}
+    {% set order_online_message = order_online_message ~ "<br>Du skal %s din konto for at bestille." | format("<a href='/auth/me'>verificere</a>") %}
+  {% endif %}
+{% endif %}
+
+
 {% macro parse_record_pagination(record_pagination) %}
 {% if record_pagination %}
 <div class="record-pagination">
@@ -92,10 +109,8 @@
 <div class="record-representation">
     {% if meta_data["is_representations_online"] %}
     {{ _parse_representations_media(meta_data)}}
-    {% elif meta_data["availability_id"] == 3 %}
-    {{ common_macros.parse_icon('lock', translate('The material is available in the reading room.'))}}
-    {% elif meta_data["availability_id"] == 2 %}
-    {{ common_macros.parse_icon('lock', translate('The material can be order home to the reading room.'))}}
+    {% elif meta_data.orderable %}
+    {{ common_macros.parse_icon('lock', order_online_message ) }}
     {% else %}
     {{ common_macros.parse_icon(meta_data["icon"]["icon"], meta_data["icon"]["label"]) }}
     {% endif %}
