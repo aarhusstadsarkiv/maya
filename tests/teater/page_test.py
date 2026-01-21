@@ -22,7 +22,7 @@ class TestPages(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_record(self):
-        """404 based on hooks"""
+        """This record page has no 'people' key in the record_and_types dict."""
         client = TestClient(app)
         response = client.get("/records/000497604")
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, 200)

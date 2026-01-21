@@ -109,7 +109,7 @@ class Hooks(HooksSpec):
         """
         # Remove all curators from the query params and add curator (4)
         query_params = [(key, value) for key, value in query_params if key != "curators"]
-        query_params.append(("curators", self.curator))
+        query_params.append(("curators", "4"))
 
         return query_params
 
@@ -204,6 +204,6 @@ class Hooks(HooksSpec):
         return response
 
     async def after_get_record(self, record: dict, meta_data: dict) -> tuple:
-        if not record_utils.is_curator(record, self.curator):
+        if not record_utils.is_curator(record, 4):
             raise HTTPException(404)
         return record, meta_data
