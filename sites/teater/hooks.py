@@ -71,7 +71,7 @@ class Hooks(HooksSpec):
 
     def __init__(self, request):
         super().__init__(request)
-        self.curator = 4
+        self.curator = "4"
 
     async def before_get_auto_complete(self, query_params: list) -> list:
         query_params.append(("auto_group", "2"))
