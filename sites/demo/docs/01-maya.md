@@ -83,6 +83,6 @@ Install main branch:
 
 Install latest version: 
 <!-- LATEST-VERSION-UV -->
-	uv tool install git+https://github.com/aarhusstadsarkiv/maya@v1.3.873
+	uv tool install git+https://github.com/aarhusstadsarkiv/maya@v1.3.874
 
 Usage is the same as for development.
