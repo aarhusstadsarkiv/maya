@@ -46,12 +46,12 @@
 
 {% set keys = ["availability_normalized"] %}
 {{ common_macros.parse_block_common('Tilgængelighed', keys, record_and_types) }}
-
+{#
 {% if meta_data["orderable"] %}
     {% set keys = ["ordering_normalized"] %}
     {{ common_macros.parse_block_common('Bestilling', keys, record_and_types) }}
 {% endif %}
-
+#}
 {% set keys = ["admin_notes", "admin_data", "registration_id", "created_by", "created", "last_updated_by", "last_updated"] %}
 {% if is_employee %}
 {{ common_macros.parse_block_common('Administration', keys, record_and_types) }}

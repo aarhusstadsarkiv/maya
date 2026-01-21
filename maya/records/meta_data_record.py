@@ -281,13 +281,13 @@ def _is_orderable_by_form(meta_data: dict) -> bool:
     Get info describing if the record can be ordered by form
     """
     legal_id = meta_data["legal_id"]
-    # contractual_id = meta_data["contractual_id"]
+    contractual_id = meta_data["contractual_id"]
     availability_id = meta_data["availability_id"]
 
     if (
         availability_id == AVAILABILITY.IN_STORAGE
         and legal_id in [LEGAL.PERSONAL_DATA, LEGAL.ARCHIVE_LAW, LEGAL.SPECIAL_CIRCUMSTANCES]
-        # and contractual_id == CONTRACT.APPLICATION_ONLY
+        or contractual_id == CONTRACT.APPLICATION_ONLY
     ):
         return True
 
