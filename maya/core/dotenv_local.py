@@ -1,5 +1,5 @@
 """
-Load the default maya .env-dist file and override with local .env file if it exists
+Load the default maya .env file of the site running
 """
 
 from dotenv import load_dotenv

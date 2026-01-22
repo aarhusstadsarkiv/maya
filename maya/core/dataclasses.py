@@ -1,5 +1,5 @@
 """
-This module defines data structures used to manage pagination and search state within the Maya application.
+This module defines data structures used to manage pagination and search state.
 
 Classes:
     - RecordPagination: Encapsulates metadata and navigation pointers for paginated record views.

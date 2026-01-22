@@ -1,8 +1,6 @@
 """
-This module provides utility functions to retrieve and process search-related
-cookie data from HTTP requests in a Starlette-based application.
+This module provides cookie utility functions:
 
-Functions included:
 - get_search_cookie: Parses the 'search' cookie from the request and returns a
   SearchCookie dataclass instance, applying any dynamic settings adjustments.
 - get_search_query_params: Extracts the search query parameters from the cookie
@@ -10,9 +8,6 @@ Functions included:
 - get_search_query_str: Retrieves a query string representation of the search
   parameters, formatted as a standard query string.
 
-These functions rely on the dynamic settings from `maya.core.dynamic_settings`
-to optionally modify the behavior of cookie handling, particularly whether
-search results should be retained or cleared.
 """
 
 import json

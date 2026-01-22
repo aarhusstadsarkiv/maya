@@ -1,13 +1,10 @@
 """
-This module provides utility functions for working with dates and times, with a focus on formatting
-and timezone conversions. It uses the `arrow` library for datetime manipulation and supports Danish
-locale formatting where applicable.
+This module provides utility functions for working with dates and times
 
 Functions included:
 - timezone_alter: Converts a UTC timestamp string to a specified timezone (default is Europe/Copenhagen).
 - date_format: Formats a datetime string into Danish date-time format (e.g., "19. november 2024 13:45").
 - date_format_day: Formats a date string into Danish date-only format (e.g., "19. november 2024").
-- _sanitize_date_string: Internal helper to strip microseconds from ISO datetime strings for parsing.
 """
 
 import arrow
