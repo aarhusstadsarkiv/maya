@@ -1,31 +1,34 @@
 """
 Default settings for maya
-These settings can be overridden by creating a local settings file.
+These settings can be overridden by creating a site settings file.
 """
 
 import logging
 import os
 from maya.core.dotenv_local import load
-import typing
+from maya.settings_types import Settings
 import maya
+import secrets
 
 load()
 
+# ENV variables
+api_key: str = os.getenv("API_KEY", "")
+environment: str = os.getenv("ENVIRONMENT", "production")
+session_secret: str = os.getenv("SESSION_SECRET", secrets.token_hex(32))
+
+# Log level
 log_level = logging.DEBUG
-cookie_httponly = False
-cookie_secure = False
 debug = True
 
-if os.getenv("ENVIRONMENT") == "production":
+if environment == "production":
     log_level = logging.INFO
-    cookie_httponly = True
-    cookie_secure = True
     debug = False
 
-settings: dict[str, typing.Any] = {
-    "api_key": os.getenv("API_KEY"),
-    "session_secret": os.getenv("SESSION_SECRET"),
-    "environment": os.getenv("ENVIRONMENT"),
+settings: Settings = {
+    "api_key": api_key,
+    "session_secret": session_secret,
+    "environment": environment,
     "client_name": "development",
     "client_url": "https://demo.openaws.dk",
     "debug": debug,
@@ -38,8 +41,8 @@ settings: dict[str, typing.Any] = {
     "cookie": {
         "name": "session",
         "lifetime": 3600 * 24,  # seconds
-        "httponly": cookie_httponly,
-        "secure": cookie_secure,
+        "httponly": True,
+        "secure": True,
         "samesite": "lax",
     },
     "custom_error": "Der skete en system fejl. Prøv igen lidt senere!",

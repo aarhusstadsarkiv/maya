@@ -1,7 +1,7 @@
-import typing
+from maya.settings_types import Settings
 
 
-settings: dict[str, typing.Any] = {
+settings: Settings = {
     "client_name": "Aarhus Stadsarkiv",
     "client_url": "https://www.aarhusarkivet.dk",
     "client_email": "stadsarkivet@aarhusarkivet.dk",

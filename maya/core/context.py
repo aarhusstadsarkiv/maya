@@ -13,6 +13,7 @@ from maya.core import api
 from maya.core.hooks import get_hooks
 from maya.core import cookie
 from maya.core.logging import get_log
+from maya.settings_types import PageSettings
 import urllib.parse
 
 log = get_log()
@@ -147,7 +148,7 @@ def _get_title(request: Request) -> str:
     """
 
     title = ""
-    pages: list[dict] = settings["pages"]
+    pages: list[PageSettings] = settings["pages"]
 
     for page in pages:
         if page["url"] == request.url.path:
