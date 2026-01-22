@@ -43,19 +43,24 @@ async def get_context(request: Request, context_values: dict = {}, identifier: s
     main_menu_system = _generate_menu_urls(request, main_menu_system, query_str_display)
     main_menu_top = _generate_menu_urls(request, settings["main_menu_top"], query_str_display)
 
+    # default context variables available
     context = {
-        "query_str_display": query_str_display,
-        "identifier": identifier,
-        "permissions_list": permissions_list,
+        "request": request,
+        # user information
+        "is_logged_in": is_logged_in,
         "is_verified": is_verified,
         "is_employee": is_employee,
+        "permissions_list": permissions_list,
+        # misc
+        "query_str_display": query_str_display,
+        "identifier": identifier,
         "flash_messages": get_messages(request),
-        "request": request,
         "title": _get_title(request),
+        # Menus
         "main_menu_top": main_menu_top,
         "main_menu_system": main_menu_system,
         "main_menu_sections": settings["main_menu_sections"],
-        "is_logged_in": is_logged_in,
+        # Theme
         "dark_theme": request.cookies.get("dark_theme", False),
     }
 
