@@ -4,7 +4,6 @@ Load the default maya .env-dist file and override with local .env file if it exi
 
 from dotenv import load_dotenv
 import os
-from pathlib import Path
 from maya.core.logging_handlers import get_init_logger
 from maya.core.paths import get_base_dir_path
 
@@ -17,11 +16,6 @@ def load():
     Load the .env-dist included with the source code of maya
     Override with "local" .env file if it exists
     """
-    dir_path = Path(__file__).resolve().parent.parent
-    env_dist = dir_path / ".env.dist"
-    load_dotenv(env_dist)
-    log.info("Loaded .env.dist file")
-
     local_dot_env = get_base_dir_path(".env")
 
     if os.path.exists(local_dot_env):
