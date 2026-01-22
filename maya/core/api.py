@@ -1,17 +1,5 @@
 """
 This module provides all API interactions with the external web service used by the application.
-
-It defines asynchronous HTTP operations for common functionalities such as authentication, user
-management, schema and entity handling, and proxy-related actions. These interactions are primarily
-performed using the `httpx` library with custom event hooks for enhanced request monitoring, logging,
-and header management.
-
-Main functionalities covered include:
-- Authentication: login, registration, password reset, email verification
-- User management: retrieve, update, delete users and permissions
-- Schema and entity CRUD operations
-- Proxy endpoints for search, autocomplete, relations, and resource resolution
-- Internal utilities for time tracking and JWT header management
 """
 
 from starlette.requests import Request
@@ -201,7 +189,6 @@ async def users_me_get(request: Request) -> dict:
     then return the user dict without calling the API. If not call the API
     and store the user in the request state.
     """
-
     if hasattr(request.state, "me"):
         return request.state.me
 
