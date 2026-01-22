@@ -33,7 +33,7 @@ async def auth_login_get(request: Request):
         encoded_next_url = urllib.parse.quote_plus(next_url)
         post_url = f"/auth/login?next={encoded_next_url}"
     else:
-        next_url = f"/search?{cookie.get_query_str_display(request)}"
+        next_url = f"/search?{cookie.get_search_query_str(request)}"
         encoded_next_url = urllib.parse.quote_plus(next_url)
         post_url = f"/auth/login?next={encoded_next_url}"
 

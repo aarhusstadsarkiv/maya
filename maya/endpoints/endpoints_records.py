@@ -62,7 +62,7 @@ async def _get_record_pagination(request: Request) -> typing.Optional[RecordPagi
 
     # Create a record pagination dict
     record_pagination: dict = {}
-    record_pagination["query_str_display"] = search_cookie.query_str_display
+    record_pagination["search_query_str"] = search_cookie.search_query_str
     record_pagination["total"] = search_cookie.total
     record_pagination["next_page"] = next_page
     record_pagination["prev_page"] = prev_page

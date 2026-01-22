@@ -7,7 +7,7 @@ Functions included:
   SearchCookie dataclass instance, applying any dynamic settings adjustments.
 - get_search_query_params: Extracts the search query parameters from the cookie
   as a list of (key, value) tuples.
-- get_query_str_display: Retrieves a query string representation of the search
+- get_search_query_str: Retrieves a query string representation of the search
   parameters, formatted as a standard query string.
 
 These functions rely on the dynamic settings from `maya.core.dynamic_settings`
@@ -43,7 +43,7 @@ def get_search_cookie(request: Request) -> SearchCookie:
 
         # If the search results should not be kept then remove the query string
         if not settings["search_keep_results"]:
-            search_cookie["query_str_display"] = ""
+            search_cookie["search_query_str"] = ""
 
         # return search_cookie
         return SearchCookie(**search_cookie)
@@ -61,10 +61,10 @@ def get_search_query_params(request: Request) -> list:
     return search_cookie.query_params
 
 
-def get_query_str_display(request: Request) -> str:
+def get_search_query_str(request: Request) -> str:
     """
     Get query string from search cookie and return it as a string.
     E.g. 'content_types=96&content_types=97&'
     """
     search_cookie = get_search_cookie(request)
-    return search_cookie.query_str_display
+    return search_cookie.search_query_str

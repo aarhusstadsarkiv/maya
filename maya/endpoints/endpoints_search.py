@@ -232,7 +232,7 @@ def set_response_cookie(response: Response, context: dict):
     pagination_data = context.get("pagination_data", {})
     search_cookie_value = {
         # Use site specific query params set before search
-        "query_str_display": context.get("query_str_display"),
+        "search_query_str": context.get("search_query_str"),
         "query_params": context.get("query_params_before_search"),
         "total": pagination_data["total"],
         "q": context.get("q"),
@@ -324,17 +324,17 @@ async def get_search_context_values(request: Request, extra_query_params: list =
     # Alter query params after search
     # You may want to remove all curators except one after search results are obtained
     query_params_after_search = await hooks.after_get_search(query_params=query_params_before_search)
-    query_str_display = query.get_str_from_list(query_params_after_search, remove_keys=["start"])
+    search_query_str = query.get_str_from_list(query_params_after_search, remove_keys=["start"])
 
     # Get facets and filters
     facets, facets_filters = _get_facets_and_filters(
         request,
         search_result,
         query_params=query_params_after_search,
-        query_str=query_str_display,
+        query_str=search_query_str,
     )
 
-    pagination_data = _get_search_pagination_data(request, query_str_display, search_result["total"])
+    pagination_data = _get_search_pagination_data(request, search_query_str, search_result["total"])
 
     context_values = {
         "q": q,
@@ -343,7 +343,7 @@ async def get_search_context_values(request: Request, extra_query_params: list =
         "query_params_before_search": query_params_before_search,
         "query_params": query_params_after_search,
         "query_str_search": query_str_search,
-        "query_str_display": query_str_display,
+        "search_query_str": search_query_str,
         "sort": sort,
         "size": size,
         "view": view,

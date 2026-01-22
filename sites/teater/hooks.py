@@ -19,7 +19,7 @@ def _alter_people(context: dict) -> dict:
     try:
         people_id = context["request"].path_params["id"]
         people_id = people_id.lstrip("0")
-        context["query_str_display"] = "people=" + people_id
+        context["search_query_str"] = "people=" + people_id
 
     except KeyError:
         log.exception("KeyError")
@@ -37,7 +37,7 @@ def _alter_events(context: dict) -> dict:
     try:
         event_id = context["request"].path_params["id"]
         event_id = event_id.lstrip("0")
-        context["query_str_display"] = "events=" + event_id
+        context["search_query_str"] = "events=" + event_id
 
     except KeyError:
         log.exception("KeyError")
@@ -67,7 +67,7 @@ def _alter_record(context: dict) -> dict:
 class Hooks(HooksSpec):
 
     search_context = {}
-    query_str_display = ""
+    search_query_str = ""
 
     def __init__(self, request):
         super().__init__(request)

@@ -32,16 +32,16 @@ async def get_context(request: Request, context_values: dict = {}, identifier: s
     is_verified = await api.me_verified(request)
     is_employee = "employee" in permissions_list
 
-    # query_str_display is used to display the last search query
+    # search_query_str is used to display the last search query
     # it is already present in the context_values if the client is requesting the search page
     # if it is not present, we need to add it to the context_values
-    query_str_display = context_values.get("query_str_display", "")
-    if "query_str_display" not in context_values:
-        query_str_display = cookie.get_query_str_display(request)
+    search_query_str = context_values.get("search_query_str", "")
+    if "search_query_str" not in context_values:
+        search_query_str = cookie.get_search_query_str(request)
 
     main_menu_system = _get_main_menu_system(is_logged_in, permissions_list)
-    main_menu_system = _generate_menu_urls(request, main_menu_system, query_str_display)
-    main_menu_top = _generate_menu_urls(request, settings["main_menu_top"], query_str_display)
+    main_menu_system = _generate_menu_urls(request, main_menu_system, search_query_str)
+    main_menu_top = _generate_menu_urls(request, settings["main_menu_top"], search_query_str)
 
     # default context variables available
     context = {
@@ -52,7 +52,7 @@ async def get_context(request: Request, context_values: dict = {}, identifier: s
         "is_employee": is_employee,
         "permissions_list": permissions_list,
         # misc
-        "query_str_display": query_str_display,
+        "search_query_str": search_query_str,
         "identifier": identifier,
         "flash_messages": get_messages(request),
         "title": _get_title(request),
@@ -76,7 +76,7 @@ async def get_context(request: Request, context_values: dict = {}, identifier: s
     return context
 
 
-def _generate_menu_urls(request: Request, menu_items: list, query_str_display):
+def _generate_menu_urls(request: Request, menu_items: list, search_query_str):
     """
     Generate URLs for the main menu items.
     In order to ease the process of using the items on the frontend.
@@ -86,8 +86,8 @@ def _generate_menu_urls(request: Request, menu_items: list, query_str_display):
         url = str(request.url_for(menu_item["name"]))
         if menu_item["name"] == "search_get":
 
-            # Add query_str_display to search url
-            menu_item["url"] = f"{url}?{query_str_display}"
+            # Add search_query_str to search url
+            menu_item["url"] = f"{url}?{search_query_str}"
         elif menu_item["name"] == "auth_login_get":
 
             # Add next parameter to login url
