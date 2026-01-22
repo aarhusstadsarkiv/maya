@@ -33,8 +33,8 @@ async def get_context(request: Request, context_values: dict = {}, identifier: s
     is_employee = "employee" in permissions_list
 
     # search_query_str is used to display the last search query
-    # it is already present in the context_values if the client is requesting the search page
-    # if it is not present, we need to add it to the context_values
+    # it is e.g. present in the context_values if the request url is the search page
+    # if it is not present, we check if it is set in cookies
     search_query_str = context_values.get("search_query_str", "")
     if "search_query_str" not in context_values:
         search_query_str = cookie.get_search_query_str(request)
