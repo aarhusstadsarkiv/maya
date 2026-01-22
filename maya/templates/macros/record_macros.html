@@ -8,7 +8,7 @@
 {% set login_url = "<a href='/auth/login?next=/records/" ~ meta_data.id ~ "'>Log ind</a>" %}
 {% set register_url = "<a href='/auth/register'>opret bruger</a>" %}
 
-{% if not logged_in %}
+{% if not is_logged_in %}
   {% set order_online_message = """
 Materialet kan bestilles hjem til læsesalen.<br> 
 %s eller %s for at bestille.<br>

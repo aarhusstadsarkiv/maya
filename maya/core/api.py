@@ -785,8 +785,6 @@ async def proxies_get_relations(request: Request, type: str, id: str) -> typing.
     GET relations from the api
     """
 
-    # headers = _get_jwt_headers(request, {"Accept": "application/json"})
-
     async with _get_async_client() as client:
         url = base_url + f"/proxy/{type}/{id}/relations"
         response = await client.get(url)

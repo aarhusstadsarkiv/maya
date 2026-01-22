@@ -27,6 +27,7 @@ async def relations_post(request: Request):
 
 
 async def relations_get(request: Request):
+
     type = request.path_params.get("type", "")
     id = request.path_params.get("id", "")
     try:
