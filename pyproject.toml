@@ -41,7 +41,7 @@ dependencies = [
     "pyflakes==3.3.2",
     "python-dateutil==2.9.0.post0",
     "python-dotenv==0.21.1",
-    "python-multipart==0.0.18",
+    "python-multipart==0.0.22",
     "pyyaml==6.0.2",
     "rfc3986==1.5.0",
     "six==1.17.0",
