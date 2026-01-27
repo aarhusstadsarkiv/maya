@@ -108,7 +108,7 @@ Materialet kan bestilles hjem til læsesalen.<br>
 <div class="record-representation">
     {% if meta_data["is_representations_online"] %}
     {{ _parse_representations_media(meta_data)}}
-    {% elif meta_data.orderable %}
+    {% elif meta_data.orderable and allow_online_ordering %}
     {{ common_macros.parse_icon('lock', order_online_message ) }}
     {% else %}
     {{ common_macros.parse_icon(meta_data["icon"]["icon"], meta_data["icon"]["label"]) }}
