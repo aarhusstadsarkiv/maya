@@ -11,8 +11,13 @@ The following describes how to install and use `maya`.
 
     git clone git@github.com:aarhusstadsarkiv/maya.git maya
     cd maya
-    uv venv # Python >= 3.10.6 should work
+    uv venv # Python >= 3.12 should work
     source .venv/bin/activate
+
+In case you don't have a python >= 3.12 you should install a python an appropriate version.
+Then do something like this when generating the `.venv`
+
+    uv venv --python /usr/bin/python3.12 .venv
 
 Sync project:
 
