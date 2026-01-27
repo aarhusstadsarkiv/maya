@@ -32,11 +32,11 @@ fi
 echo "Upgrading to the latest tag: $install_tag"
 
 # Upgrade the repo and checkout the latest tag
-git checkout main
+git checkout -f main
 git pull
 git checkout $install_tag
 
 # Activate virtual environment and install requirements
-.venv/bin/uv pip install -r pyproject.toml
+.venv/bin/uv sync
 
 echo "Maya has been successfully upgraded to the latest tag."
