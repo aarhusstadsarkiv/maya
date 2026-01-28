@@ -183,13 +183,10 @@ def _build_representations(record: dict) -> dict:
 def _is_allowed_by_ip(request: Request) -> bool:
     try:
         ip = request["client"][0]
-    except KeyError:
-        return False
-    except TypeError:
-        return False
-
-    if ip in IP_ALLOW:
-        return True
+        if ip in IP_ALLOW:
+            return True
+    except Exception:
+        pass
     return False
 
 
