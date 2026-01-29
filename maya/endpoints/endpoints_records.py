@@ -119,8 +119,9 @@ async def records_get(request: Request):
         raise HTTPException(404)
 
     permissions = await api.me_permissions(request)
+    verified = await api.me_verified(request)
     record_pagination, record = await asyncio.gather(_get_record_pagination(request), api.proxies_record_get_by_id(record_id))
-    record, meta_data, record_and_types = await get_record_data(request, record, permissions)
+    record, meta_data, record_and_types = await get_record_data(request, record, permissions, verified)
 
     context_variables = {
         "title": meta_data["title"],
@@ -147,10 +148,11 @@ async def records_get_misc(request: Request):
         type = request.path_params["type"]
 
         permissions = await api.me_permissions(request)
+        verified = await api.me_verified(request)
         record = await api.proxies_record_get_by_id(record_id)
         record_original = copy.deepcopy(record)
 
-        record, meta_data, record_and_types = await get_record_data(request, record, permissions)
+        record, meta_data, record_and_types = await get_record_data(request, record, permissions, verified)
 
         if type == "record_original":
             record_original_json = json.dumps(record_original, indent=4, ensure_ascii=False)

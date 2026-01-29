@@ -45,7 +45,12 @@ def get_record_meta_data_resolve(request: Request, record: dict):
     return meta_data
 
 
-def get_record_meta_data(request: Request, record: dict, user_permissions=[]) -> dict:
+def get_record_meta_data(
+    request: Request,
+    record: dict,
+    user_permissions: list = [],
+    verified: bool = False,
+) -> dict:
     """
     Get usefull meta data for a record
     """

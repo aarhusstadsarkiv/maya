@@ -15,7 +15,7 @@ import typing
 log = get_log()
 
 
-async def get_record_data(request: Request, record, permissions) -> typing.Tuple[dict, dict, dict]:
+async def get_record_data(request: Request, record: dict, permissions: list, verified: bool) -> typing.Tuple[dict, dict, dict]:
     """
     A mutated record is returned. In order to keep the original record make a copy before using this function.
     """
@@ -24,7 +24,7 @@ async def get_record_data(request: Request, record, permissions) -> typing.Tuple
     if settings.get("boto3_presigned_urls", False):
         record = await set_presigned_urls_record(record)
 
-    meta_data = get_record_meta_data(request, record, permissions)
+    meta_data = get_record_meta_data(request, record, permissions, verified)
     record, meta_data = await hooks.after_get_record(record, meta_data)
 
     record_altered = record_alter.record_alter(request, record, meta_data)
