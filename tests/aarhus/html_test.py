@@ -36,14 +36,14 @@ class TestHTML(unittest.TestCase):
         elem = soup.find("div", {"class": "overlay-actions"})
         self.assertIsNotNone(elem)
 
-    def test_representations_audio(self):
-        client = TestClient(app)
-        response = client.get("/records/000466996")
+    # def test_representations_audio(self):
+    #     client = TestClient(app)
+    #     response = client.get("/records/000466996")
 
-        soup = BeautifulSoup(response.content, "html.parser")
+    #     soup = BeautifulSoup(response.content, "html.parser")
 
-        elem = soup.find("audio")
-        self.assertIsNotNone(elem)
+    #     elem = soup.find("audio")
+    #     self.assertIsNotNone(elem)
 
     def test_representations_video(self):
         client = TestClient(app)

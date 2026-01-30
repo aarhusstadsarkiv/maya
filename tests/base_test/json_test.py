@@ -21,8 +21,8 @@ class TestJSON(unittest.TestCase):
 {
     "id": "000309478",
     "real_id": "309478",
-    "allowed_by_ip": false,
-    "permission_granted": false,
+    "_allowed_by_ip": false,
+    "_permission_granted": false,
     "title": "Aarhus Vejviser 1997",
     "meta_title": "Aarhus Vejviser 1997",
     "summary": "",
@@ -41,6 +41,7 @@ class TestJSON(unittest.TestCase):
     "orderable": true,
     "orderable_online": true,
     "orderable_by_form": false,
+    "order_message": "",
     "resources": {
         "digital_size": "8469.218 MB",
         "mimetype": "application/zip",
@@ -51,7 +52,7 @@ class TestJSON(unittest.TestCase):
         "last_checksum_date": "2019-02-25 07:41:27",
         "type": "digital"
     },
-    "is_representations_online": false,
+    "record_type": "icon",
     "is_downloadable": false
 }
     """
@@ -69,8 +70,8 @@ class TestJSON(unittest.TestCase):
 {
     "id": "000182391",
     "real_id": "182391",
-    "allowed_by_ip": false,
-    "permission_granted": false,
+    "_allowed_by_ip": false,
+    "_permission_granted": false,
     "title": "Salgsbrochure for kampagne Byg og bo i Aarhus.",
     "meta_title": "Salgsbrochure for kampagne Byg og bo i Aarhus.",
     "summary": "",
@@ -89,6 +90,7 @@ class TestJSON(unittest.TestCase):
     "orderable": false,
     "orderable_online": false,
     "orderable_by_form": false,
+    "order_message": "",
     "resources": {
         "Fysisk omfang": "1",
         "type": "analog",
@@ -96,7 +98,6 @@ class TestJSON(unittest.TestCase):
             "91+00239-1"
         ]
     },
-    "is_representations_online": true,
     "record_type": "web_document",
     "representations": {
         "record_type": "web_document",
@@ -105,7 +106,8 @@ class TestJSON(unittest.TestCase):
         "large_image": "https://acastorage.blob.core.windows.net/sam-access/000182391/000182391_m.jpg"
     },
     "portrait": "https://acastorage.blob.core.windows.net/sam-access/000182391/000182391_m.jpg",
-    "is_downloadable": true
+    "is_representations_online": true,
+    "is_downloadable": false
 }
 """
 
@@ -124,8 +126,8 @@ class TestJSON(unittest.TestCase):
 {
     "id": "000313141",
     "real_id": "313141",
-    "allowed_by_ip": false,
-    "permission_granted": false,
+    "_allowed_by_ip": false,
+    "_permission_granted": false,
     "title": "En køretur med sporvogn",
     "meta_title": "En køretur med sporvogn",
     "summary": "Filmens første 38 sekunder er fra Clemens Bro i 1902 \n\nDen 7. juli 1904 blev den første sporvognsrute indviet i Aarhus. Ruten gik fra Dalgas Avenue gennem Hans Broges Gade, Skt. Pauls Kirkeplads, M.P. Bruuns Gade forbi hovedbanegården, videre ad den velkendte omnibusrute til Østbanetorvet og derfra til Skovvejen og til sidst Trøjborgvej. Længe var dette den eneste rute, men da kommunen overtog driften blev den eksisterende rute i 1930 udvidet og en ny blev tilføjet. Sporvognskørslen i Aarhus fortsatte op til 1971.\n\nFilmene viser sporvognene køre gennem Aarhus i 1905.",
@@ -144,6 +146,7 @@ class TestJSON(unittest.TestCase):
     "orderable": false,
     "orderable_online": false,
     "orderable_by_form": false,
+    "order_message": "",
     "resources": {
         "digital_size": "45.107 MB",
         "checksum_algorithm": "MD5",
@@ -153,7 +156,6 @@ class TestJSON(unittest.TestCase):
         "last_checksum_date": "2019-01-30 10:17:10",
         "type": "digital"
     },
-    "is_representations_online": true,
     "record_type": "video",
     "representations": {
         "record_type": "video",
@@ -163,6 +165,7 @@ class TestJSON(unittest.TestCase):
         "large_image": "https://acastorage.blob.core.windows.net/sam-access/000313141/000313141_m.jpg"
     },
     "portrait": "https://acastorage.blob.core.windows.net/sam-access/000313141/000313141_m.jpg",
+    "is_representations_online": true,
     "is_downloadable": false
 }
         """
@@ -181,8 +184,8 @@ class TestJSON(unittest.TestCase):
 {
     "id": "000472462",
     "real_id": "472462",
-    "allowed_by_ip": false,
-    "permission_granted": false,
+    "_allowed_by_ip": false,
+    "_permission_granted": false,
     "title": "Børneværnsudvalget. Dagsordener, udvalgsmøder",
     "meta_title": "Børneværnsudvalget. Dagsordener, udvalgsmøder",
     "summary": "",
@@ -201,6 +204,7 @@ class TestJSON(unittest.TestCase):
     "orderable": true,
     "orderable_online": false,
     "orderable_by_form": true,
+    "order_message": "",
     "resources": {
         "barcode": "8037309941",
         "type": "analog",
@@ -209,7 +213,6 @@ class TestJSON(unittest.TestCase):
             "91+01295-98"
         ]
     },
-    "is_representations_online": true,
     "record_type": "icon",
     "is_downloadable": false
 }
