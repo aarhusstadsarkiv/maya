@@ -6,6 +6,8 @@ from maya.core.logging import get_log
 from starlette.requests import Request
 from maya.records import record_utils
 from maya.records.constants import LEGAL, CONTRACT, AVAILABILITY, USABILITY
+from maya.core import api
+from maya.core.dynamic_settings import settings
 
 
 log = get_log()
@@ -45,25 +47,25 @@ def get_record_meta_data_resolve(request: Request, record: dict):
     return meta_data
 
 
-def get_record_meta_data(
+async def get_record_meta_data(
     request: Request,
     record: dict,
-    user_permissions: list = [],
-    verified: bool = False,
 ) -> dict:
     """
     Get usefull meta data for a record
     """
+    is_logged_in = await api.is_logged_in(request)
+    verified = await api.me_verified(request)
+    is_employee = await api.has_permission(request, "employee")
+
     meta_data = {}
 
     _fix_missing_representation(request, record)
 
-    permssion_granted = "employee" in user_permissions
-
     meta_data["id"] = record["id"]
     meta_data["real_id"] = _strip_pre_zeroes(record["id"])
-    meta_data["allowed_by_ip"] = _is_allowed_by_ip(request) or permssion_granted
-    meta_data["permission_granted"] = permssion_granted
+    meta_data["_allowed_by_ip"] = _is_allowed_by_ip(request)
+    meta_data["_permission_granted"] = is_employee
 
     meta_data["title"] = _get_record_title(record)
     meta_data["meta_title"] = _get_meta_title(record)
@@ -81,24 +83,26 @@ def get_record_meta_data(
     meta_data["orderable"] = _is_orderable(meta_data)
     meta_data["orderable_online"] = _is_orderable_online(meta_data)
     meta_data["orderable_by_form"] = _is_orderable_by_form(meta_data)
+
+    order_message = get_order_message(meta_data, is_logged_in, verified)
+    meta_data["order_message"] = order_message
     meta_data["resources"] = _get_order_resources(record)
-    meta_data["is_representations_online"] = _is_representation_online(record, meta_data)
 
-    if not _has_representation_restrictions(meta_data):
-        meta_data["record_type"] = "icon"
-
-    elif _has_representation_permission(meta_data) and "representations" in record:
+    if _has_representation_permission(meta_data) and _has_representation(record):
         meta_data["record_type"] = record["representations"].get("record_type")
         meta_data["representations"] = _build_representations(record)
         meta_data["portrait"] = record.get("portrait")
+        meta_data["is_representations_online"] = True
 
-    if _is_sejrs_collection(record):
+    elif _is_sejrs_collection(record):
         meta_data["record_type"] = "sejrs_sedler"
         meta_data["representations"] = _build_representations(record)
         meta_data["is_representations_online"] = True
 
-    meta_data["is_downloadable"] = _is_downloadable(meta_data)
+    else:
+        meta_data["record_type"] = "icon"
 
+    meta_data["is_downloadable"] = _is_downloadable(meta_data)
     return meta_data
 
 
@@ -107,6 +111,10 @@ def _fix_missing_representation(request: Request, record: dict) -> None:
         extra = {"error_code": 499, "error_url": request.url}
         log.error(f"Record {record['id']}. Representations but no record_type", extra=extra)
         del record["representations"]
+
+
+def _has_representation(record: dict) -> bool:
+    return "representations" in record
 
 
 def _get_icon(record: dict) -> dict:
@@ -118,8 +126,31 @@ def _get_icon(record: dict) -> dict:
         content_type = record["content_types"][0][0]
         content_type_id = str(content_type["id"])
         return ICONS[content_type_id]
-    except (KeyError, IndexError, TypeError):
+    except Exception:
         return ICONS["99"]
+
+
+def get_order_message(meta_data: dict, is_logged_in: bool, is_verified: bool) -> str:
+    """
+    Get message for ordering online
+    """
+    if not settings.get("allow_online_ordering", False):
+        return ""
+
+    id = meta_data["id"]
+
+    login_url = f"<a href='/auth/login?next=/records/{id}'>Log ind</a>"
+    register_url = "<a href='/auth/register'>opret bruger</a>"
+
+    if is_logged_in and is_verified:
+        return "<p>Materialet kan bestilles hjem til læsesalen.</p>"
+
+    elif not is_verified:
+        verify_url = "<a href='/auth/me'>verificere</a>"
+        return f"<p>Du skal {verify_url} din konto for at bestille.</p>"
+
+    else:
+        return "<p>Materialet kan bestilles hjem til læsesalen.<br>" f" {login_url} eller {register_url} for at bestille.</p>"
 
 
 def _strip_pre_zeroes(value: str) -> str:
@@ -129,41 +160,45 @@ def _strip_pre_zeroes(value: str) -> str:
     return value.lstrip("0")
 
 
-def _is_representation_online(record: dict, meta_data: dict) -> bool:
-    """
-    This indicates if the record has representations online
-    (images, audio, video, pdf, sejrs_sedler).
-    """
-    # Collection 1 (sejrs_sedler) always have online representations
-    if _is_sejrs_collection(record):
-        return True
-
-    # No restrictions
-    if not _has_representation_restrictions(meta_data):
-        return True
-
-    # Allow by IP or permission with actual representations
-    if _has_representation_permission(meta_data) and "representations" in record:
-        return True
-
-    return False
+def _allow_all(meta_data: dict) -> bool:
+    return (
+        meta_data["legal_id"] == LEGAL.NO_OTHER_RESTRICTIONS
+        and meta_data["contractual_id"] in [CONTRACT.INTERNET, CONTRACT.NO_CLAUSES]
+        and meta_data["availability_id"] == AVAILABILITY.ONLINE_ACCESS
+        and meta_data["usability_id"] not in [USABILITY.ALL_RIGHTS_RESERVED]
+    )
 
 
-def _has_representation_restrictions(meta_data: dict) -> bool:
-    """
-    Restricted material
-    """
-    return meta_data["legal_id"] == LEGAL.NO_OTHER_RESTRICTIONS and meta_data["contractual_id"] not in [
-        CONTRACT.UNAVAILABLE,
-        CONTRACT.APPLICATION_ONLY,
-    ]
+def _allow_employee(meta_data: dict) -> bool:
+    return meta_data["_permission_granted"] and meta_data["legal_id"] == LEGAL.NO_OTHER_RESTRICTIONS
+
+
+def _allow_reading_room(meta_data: dict) -> bool:
+    return (
+        meta_data["_allowed_by_ip"]
+        and meta_data["legal_id"] == LEGAL.NO_OTHER_RESTRICTIONS
+        and meta_data["availability_id"] in [AVAILABILITY.IN_READING_ROOM]
+    )
+
+
+def _is_downloadable(meta_data: dict) -> bool:
+    return meta_data["record_type"] == "image" and _has_representation_permission(meta_data)
 
 
 def _has_representation_permission(meta_data: dict) -> bool:
     """
     Check if representation permission is granted
     """
-    return meta_data["availability_id"] == AVAILABILITY.ONLINE_ACCESS or meta_data["permission_granted"] or meta_data["allowed_by_ip"]
+    if _allow_all(meta_data):
+        return True
+
+    if _allow_employee(meta_data):
+        return True
+
+    if _allow_reading_room(meta_data):
+        return True
+
+    return False
 
 
 def _is_sejrs_collection(record: dict) -> bool:
@@ -193,17 +228,6 @@ def _is_allowed_by_ip(request: Request) -> bool:
     except Exception:
         pass
     return False
-
-
-def _is_downloadable(meta_data: dict) -> bool:
-
-    return (
-        meta_data.get("representations", False)
-        and meta_data["legal_id"] == LEGAL.NO_OTHER_RESTRICTIONS
-        and meta_data["contractual_id"] in [CONTRACT.INTERNET, CONTRACT.NO_CLAUSES]
-        and meta_data["usability_id"] not in [USABILITY.ALL_RIGHTS_RESERVED]
-        and meta_data["record_type"] != "video"
-    )
 
 
 def _get_record_title(record: dict) -> str:

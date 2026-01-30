@@ -51,6 +51,11 @@
     text-align: center;
 }
 
+.record-icon-label p {
+  margin-top: 2px;
+  margin-bottom: 2px;
+}
+
 .record-image {
     cursor: pointer;
 }

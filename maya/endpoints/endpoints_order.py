@@ -93,14 +93,12 @@ async def orders_post(request: Request):
     """
     await is_authenticated_json(request, must_be_verified=True)
     me = await api.users_me_get(request)
-    permissions = await api.me_permissions(request)
-    verified = await api.me_verified(request)
 
     try:
         record_id = request.path_params["record_id"]
 
         record = await api.proxies_record_get_by_id(record_id)
-        record, meta_data, record_and_types = await get_record_data(request, record, permissions, verified)
+        record, meta_data, record_and_types = await get_record_data(request, record)
 
         is_ordered = await crud_orders.has_active_order(
             user_id=me["id"],
@@ -330,11 +328,9 @@ async def orders_record_get(request: Request):
     await is_authenticated(request, permissions=["employee"])
 
     record_id = request.path_params["record_id"]
-    permissions = await api.me_permissions(request)
-    verified = await api.me_verified(request)
     record = await api.proxies_record_get_by_id(record_id)
 
-    record, meta_data, record_and_types = await get_record_data(request, record, permissions, verified)
+    record, meta_data, record_and_types = await get_record_data(request, record)
 
     all_keys = list(record_and_types.keys())
     all_keys = ["collectors", "resources", "subjects", "date_normalized", "desc_notes", "admin_data"]
@@ -394,11 +390,9 @@ async def _get_print_data(request: Request, order_id: int = 0) -> dict:
     order = await crud_orders.get_order(order_id)
     record_id = order["record_id"]
 
-    permissions = await api.me_permissions(request)
-    verified = await api.me_verified(request)
     record = await api.proxies_record_get_by_id(record_id)
 
-    record, meta_data, record_and_types = await get_record_data(request, record, permissions, verified)
+    record, meta_data, record_and_types = await get_record_data(request, record)
 
     # Get the order data and title
     record_keys = ["id", "collectors", "date_normalized"]
