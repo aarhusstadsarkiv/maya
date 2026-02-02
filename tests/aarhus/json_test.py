@@ -45,7 +45,7 @@ class TestJSON(unittest.TestCase):
     "orderable": false,
     "orderable_online": false,
     "orderable_by_form": false,
-    "order_message": "<p>Du skal <a href='/auth/me'>verificere</a> din konto for at bestille.</p>",
+    "order_message": "<p>Materialet kan bestilles hjem til læsesalen.<br> <a href='/auth/login?next=/records/000109399'>Log ind</a> eller <a href='/auth/register'>opret bruger</a> for at bestille.</p>",
     "resources": {},
     "record_type": "sejrs_sedler",
     "representations": {},
