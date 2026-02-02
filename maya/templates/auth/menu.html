@@ -1,6 +1,6 @@
 <div class="action-links">
     <a href="/auth/me">Profil</a>
-    {% if get_setting('allow_online_ordering') and has_permission('employee', permissions_list) %}
+    {% if get_setting('allow_online_ordering') and is_verified %}
         <a data-path="/auth/orders" href="/auth/orders/active">Bestillinger</a>
     {% endif %}
     {% if get_setting('allow_save_bookmarks') %}
