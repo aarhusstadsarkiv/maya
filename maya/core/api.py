@@ -72,7 +72,7 @@ def _get_async_client() -> httpx.AsyncClient:
 
 def _set_time_used(name: str, elapsed: float) -> None:
     """
-    Set response time as a state on the request in order to
+    Set response time as a state on the request in order to\n
     be able to show the time spend on each httpx request (api call).
     """
     # check if name is already in dict
@@ -84,7 +84,7 @@ def _set_time_used(name: str, elapsed: float) -> None:
 
 def get_time_used(request: Request) -> typing.Any:
     """
-    Get some statistics about the time spend on the request.
+    Get some statistics about the time spend on the request.\n
     This meassures time spend in a single request. Excluded is docorators to the endpoints.
     """
     time_begin = request.state.time_begin
@@ -185,8 +185,8 @@ async def auth_verify_post(request: Request):
 
 async def users_me_get(request: Request) -> dict:
     """
-    GET the current user from the api. If already found in the request state
-    then return the user dict without calling the API. If not call the API
+    GET the current user from the api. If already found in the request state\n
+    then return the user dict without calling the API. If not call the API\n
     and store the user in the request state.
     """
     if hasattr(request.state, "me"):
@@ -314,7 +314,7 @@ async def user_get_by_uuid(request: Request, uuid: str) -> dict:
 
 async def user_permissions_subset(request: Request):
     """ "
-    Only a subset of permissions are editable. This function returns the editable permissions as a list.
+    Only a subset of permissions are editable. This function returns the editable permissions as a list.\n
      [{'name': 'read', 'grant_id': 7, 'entity_id': None}, {'name': 'hard_delete', 'grant_id': 9, 'entity_id': None}]
     """
     permissions = await users_permissions(request)
@@ -443,7 +443,7 @@ async def me_get(request: Request) -> dict:
     """
     GET the user data if logged in. Or except and return an empty user dict.\n
     This is used when we need to know if a user is logged in or not - wihtout\n
-    raising an exception\n
+    raising an exception
     """
     try:
         me: dict = await users_me_get(request)
@@ -455,8 +455,8 @@ async def me_get(request: Request) -> dict:
 
 async def me_permissions(request: Request) -> list[str]:
     """
-    GET a list of permissions that the current user has.
-    ['root', 'admin', 'employee', 'user', 'guest'] and
+    GET a list of permissions that the current user has.\n
+    ['root', 'admin', 'employee', 'user', 'guest'] and\n
     ['soft_delete', 'researcher', 'hard_delete', 'read', 'update', 'create', 'restore', 'scoped_read',]
     """
     try:
@@ -868,7 +868,7 @@ async def _get_server_url(request):
 
 async def proxies_auto_complete(request: Request, query_params: list = []) -> typing.Any:
     """
-    Fetch auto complete data from the api
+    Fetch auto complete data from the api\n
     Test data is used for now
     """
 
@@ -888,7 +888,7 @@ async def proxies_auto_complete(request: Request, query_params: list = []) -> ty
 
 async def proxies_resolve(request: Request, ids=[]) -> typing.Any:
     """
-    Resolve directly from a proxy endpoint
+    Resolve directly from a proxy endpoint\n
     This means only getting some record data, but for multiple records
     """
 
