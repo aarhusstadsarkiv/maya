@@ -65,6 +65,7 @@ ORDER_STATUS_USER_HUMAN = {
 
 DEADLINE_DAYS_RENEWAL = 5
 DEADLINE_DAYS = 30
+MAX_ACTIVE_ORDERS_PER_USER = 100
 
 
 def get_single_order_message(order: dict) -> str:

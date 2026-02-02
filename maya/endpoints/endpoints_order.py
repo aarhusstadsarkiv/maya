@@ -100,10 +100,12 @@ async def orders_post(request: Request):
         record = await api.proxies_record_get_by_id(record_id)
         record, meta_data, record_and_types = await get_record_data(request, record)
 
-        is_ordered = await crud_orders.has_active_order(
-            user_id=me["id"],
-            record_id=meta_data["id"],
-        )
+        is_ordered = await crud_orders.has_active_order(user_id=me["id"], record_id=meta_data["id"])
+        orders_user_count = await crud_orders.get_orders_user_count(user_id=me["id"])
+        if orders_user_count >= utils_orders.MAX_ACTIVE_ORDERS_PER_USER:
+            return JSONResponse(
+                {"message": f"Du kan maksimalt have {utils_orders.MAX_ACTIVE_ORDERS_PER_USER} aktive bestillinger ad gangen", "error": True}
+            )
 
         if is_ordered:
             return JSONResponse({"message": "Bestilling på dette materiale eksisterer allerede", "error": True})

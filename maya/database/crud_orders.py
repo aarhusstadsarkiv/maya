@@ -439,6 +439,38 @@ ORDER BY queued_count DESC;
     return queued_orders_dict
 
 
+async def get_orders_user_count(user_id: str) -> int:
+    """
+    Count a user's orders that are either ORDERED or QUEUED.
+    """
+    statuses = [
+        utils_orders.ORDER_STATUS.ORDERED,
+        utils_orders.ORDER_STATUS.QUEUED,
+    ]
+
+    database_connection = DatabaseConnection(orders_url)
+    async with database_connection.transaction_scope_async() as connection:
+        crud = CRUD(connection)
+
+        query = """
+        SELECT COUNT(*) AS num_rows
+        FROM orders
+        WHERE user_id = :user_id
+          AND order_status IN (:status_ordered, :status_queued)
+        """
+
+        row = await crud.query_one(
+            query,
+            {
+                "user_id": user_id,
+                "status_ordered": statuses[0],
+                "status_queued": statuses[1],
+            },
+        )
+
+        return row["num_rows"]
+
+
 async def get_orders_user(user_id: str, status: str = "active") -> list:
     """
     Get all orders for a user. Exclude orders with specific statuses.
