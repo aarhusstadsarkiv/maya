@@ -223,6 +223,9 @@ def run_tests(base_dir: str = "", tests_path_pattern: str = ""):
     if test_files:
         for test_file in test_files:
             logger.info(f"Running tests in {test_file}")
+            if not os.getenv("API_KEY"):
+                logger.error("API_KEY environment variable is not set. Aborting tests. export API_KEY='your_api_key'")
+                exit(1)
 
             # Run with sys.executable in order use the same python version as the current process
             subprocess.run([sys.executable, "-m", "unittest", test_file], check=True)
