@@ -8,7 +8,7 @@
 {% if record_pagination %}
 <div class="record-pagination">
     <div class="record-search-link">
-        <a href="/search?{{ record_pagination['query_str_display'] }}">{{translate('Latest search') }}</a>
+        <a href="/search?{{ record_pagination['search_query_str'] }}">{{translate('Latest search') }}</a>
     </div>
     <div class="record-pages-info">
         {{ record_pagination["current_page"] }} / {{ record_pagination["total"] }}
