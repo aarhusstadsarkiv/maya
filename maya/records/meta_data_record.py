@@ -5,7 +5,7 @@ Get some usefull meta data for a record
 from maya.core.logging import get_log
 from starlette.requests import Request
 from maya.records import record_utils
-from maya.records.constants import LEGAL, CONTRACT, AVAILABILITY, USABILITY
+from maya.records.constants import LEGAL, CONTRACT, AVAILABILITY
 from maya.core import api
 from maya.core.dynamic_settings import settings
 
@@ -142,15 +142,15 @@ def get_order_message(meta_data: dict, is_logged_in: bool, is_verified: bool) ->
     login_url = f"<a href='/auth/login?next=/records/{id}'>Log ind</a>"
     register_url = "<a href='/auth/register'>opret bruger</a>"
 
-    if is_logged_in and is_verified:
-        return "<p>Materialet kan bestilles hjem til læsesalen.</p>"
+    if not is_logged_in:
+        return "<p>Materialet kan bestilles hjem til læsesalen.<br>" f" {login_url} eller {register_url} for at bestille.</p>"
 
-    elif not is_verified:
+    elif is_logged_in and not is_verified:
         verify_url = "<a href='/auth/me'>verificere</a>"
         return f"<p>Du skal {verify_url} din konto for at bestille.</p>"
 
     else:
-        return "<p>Materialet kan bestilles hjem til læsesalen.<br>" f" {login_url} eller {register_url} for at bestille.</p>"
+        return "<p>Materialet kan bestilles hjem til læsesalen.</p>"
 
 
 def _strip_pre_zeroes(value: str) -> str:
@@ -165,7 +165,6 @@ def _allow_all(meta_data: dict) -> bool:
         meta_data["legal_id"] == LEGAL.NO_OTHER_RESTRICTIONS
         and meta_data["contractual_id"] in [CONTRACT.INTERNET, CONTRACT.NO_CLAUSES]
         and meta_data["availability_id"] == AVAILABILITY.ONLINE_ACCESS
-        and meta_data["usability_id"] not in [USABILITY.ALL_RIGHTS_RESERVED]
     )
 
 
