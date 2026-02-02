@@ -92,7 +92,11 @@
     {% if meta_data.is_representations_online %}
     {{ _parse_representations_media(meta_data)}}
     {% elif meta_data.orderable and get_setting('allow_online_ordering') %}
-    {{ common_macros.parse_icon(meta_data["icon"]["icon"], "<p>" ~ meta_data["icon"]["label"] ~ "</p>" ~ meta_data.order_message ) }}
+    {{ common_macros.parse_icon(meta_data["icon"]["icon"], meta_data["icon"]["label"] ) }}
+    <div class="record-order-message">
+         {{ meta_data.order_message | safe }}
+    </div>
+
     {% else %}
     {{ common_macros.parse_icon(meta_data["icon"]["icon"], meta_data["icon"]["label"]) }}
     {% endif %}

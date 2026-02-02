@@ -38,6 +38,7 @@
 
 .record-icon {
     text-align: center;
+    line-height: 0;
 }
 
 .record-icon svg {
@@ -45,15 +46,22 @@
     height: 200px;
     color: var(--svg-color);
     stroke-width: 1;
+        
+}
+
+.record-icon-label, .record-order-message {
+    text-align: center;
 }
 
 .record-icon-label {
     text-align: center;
+    font-weight: 500;
+
 }
 
-.record-icon-label p {
-  margin-top: 2px;
-  margin-bottom: 2px;
+.record-icon-label p, .record-order-message p {
+  margin-top: 0px;
+  margin-bottom: 15px;
 }
 
 .record-image {
