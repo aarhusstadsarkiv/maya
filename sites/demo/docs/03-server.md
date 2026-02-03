@@ -94,3 +94,15 @@ sudo service maya-client-demo-2 restart
 You can see the logs of the service with:
 
     sudo journalctl -u maya.service
+
+## Cronjobs
+
+aarhusarkivet has a running cronjob:
+
+Login to the `client` server: 
+
+    sudo crontab -u www-data -e
+
+Existing cronline:
+
+    0 2 * * * cd /var/www/aarhus-client && .venv/bin/maya cron local
