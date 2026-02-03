@@ -50,12 +50,14 @@
             <div class="content">{{ order.order_status_human }}</div>
         </div>
 
+        <!--
         <div class="record-content">
             <div class="label">Placering</div>
             <div class="content">
                 <span>{{ order.location_human }}</span>
             </div>
         </div>
+        -->
 
         {% if order.deadline_human and order.days_remaining >= 0 %}
         <div class="record-content">
