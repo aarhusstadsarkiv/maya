@@ -80,7 +80,7 @@
                 <th title="Antal brugere som står i kø">I Kø</th>
                 <th>Lokation</th>
                 <th></th><!-- has note indicator -->
-                <th>Print</th>
+                <th><a href="#" title="Vælg alle til print" class="action-link print-select-all">Alle</a> </th>
                 <th>Handling</th>
             </tr>
         </thead>
@@ -440,6 +440,20 @@
             hideFrame.style.display = "none"; // hide iframe
             hideFrame.src = url;
             document.body.appendChild(hideFrame);
+        });
+    }
+
+    const printSelectAll = document.querySelector('.print-select-all');
+    if (printSelectAll) {
+        printSelectAll.addEventListener('click', function (event) {
+            event.preventDefault();
+
+            const checkboxes = document.querySelectorAll('.print-checkbox');
+            const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+
+            checkboxes.forEach(cb => {
+                cb.checked = !allChecked;
+            });
         });
     }
 
