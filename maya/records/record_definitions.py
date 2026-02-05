@@ -24,6 +24,7 @@ _record_definitions = {
     "id": {"type": "string"},
     "other_legal_restrictions": {"type": "label_dict"},
     "subjects": {"type": "link_list_hierarchy"},
+    "admin_tags": {"type": "key_value_dicts"},
     "admin_data": {"type": "key_value_dicts"},
     "type": {"type": "string"},
     "rights_notes": {"type": "string"},
