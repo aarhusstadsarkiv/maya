@@ -22,6 +22,7 @@
 
 {# Select active, completed, order_history #}
 <form class="filters" method="GET" action="/admin/orders">
+
     <select name="filter_status" id="filter_status">
         <option title="Aktive bestillinger" value="active" {% if filters.filter_status=='active' %}selected{% endif %}>
             Aktive
@@ -31,6 +32,7 @@
         <option title="Historik over afsluttede bestillinger" value="order_history" {% if
             filters.filter_status=='order_history' %}selected{% endif %}>Historik</option>
     </select>
+
     <select name="filter_location" id="filter_location">
         <option value="" {% if filters.filter_location=='' %}selected{% endif %}>Alle lokationer</option>
         {% for key, value in locations.items() %}
@@ -39,10 +41,19 @@
     </select>
     <input type="text" name="filter_email" placeholder="E-mail" value="{{ filters.filter_email }}">
     <input type="text" name="filter_user" placeholder="Brugernavn" value="{{ filters.filter_user }}">
+
+    Per side: 
+    <select name="filter_limit" id="filter_limit">
+        <option value="50" {% if filters.filter_limit == 50 %}selected{% endif %}>50</option>
+        <option value="100" {% if filters.filter_limit == 100 %}selected{% endif %}>100</option>
+        <option value="200" {% if filters.filter_limit == 200 %}selected{% endif %}>200</option>
+    </select>
+
     {% if filters.filter_status == 'active' %}
     Vis bestillinger i kø: <input type="checkbox" name="filter_show_queued" id="filter_show_queued" {% if
         filters.filter_show_queued %}checked{% endif %}>
     {% endif %}
+
     <a href="#" class="clear-search-filters action-link">Ryd filtre</a>
     {% if filters.filter_has_prev %}
     <a id="filter-prev" class="action-link" href="#" data-prev="{{ filters.filter_prev_offset }}">&lt;&lt; Forrige</a>
