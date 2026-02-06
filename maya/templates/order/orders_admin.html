@@ -411,17 +411,27 @@
      * Section that handles printing multiple orders in a hidden iframe
      */
     function setPrint() {
-        const closePrint = () => {
-            document.body.removeChild(this);
+        const iframe = this;
+
+        const cleanup = () => {
+            printMultiple.style.pointerEvents = '';
+            printMultiple.classList.remove('disabled');
+            spinner.classList.add('hidden');
+            
+            if (iframe.parentNode) iframe.parentNode.removeChild(iframe);
         };
-        this.contentWindow.onbeforeunload = closePrint;
-        this.contentWindow.onafterprint = closePrint;
-        this.contentWindow.print();
+
+        // May be flaky on safari.
+        iframe.contentWindow.onafterprint = cleanup;
+        iframe.contentWindow.onbeforeunload = cleanup;
+
+        // Start printing
+        iframe.contentWindow.print();
     }
 
     const printMultiple = document.querySelector('.print-multiple');
     if (printMultiple) {
-        printMultiple.addEventListener('click', function (event) {
+        printMultiple.addEventListener('click', async function (event) {
             event.preventDefault();
 
             const checked = Array.from(document.querySelectorAll('.print-checkbox:checked'));
@@ -430,16 +440,26 @@
                 return;
             }
 
+            // Show spinner and yield to the browser so it can paint
+            console.log('Starting print process for', checked.length, 'orders'); 
+            printMultiple.classList.add('disabled');
+            printMultiple.style.pointerEvents = 'none';
+            
+            spinner.classList.remove('hidden');
+            
+            // Reliable wait for UI updating before continuing. 
+            await new Promise(requestAnimationFrame);
+
             const params = new URLSearchParams();
             checked.forEach(cb => params.append('order_id', cb.dataset.orderId));
 
             const url = '/admin/orders/print?' + params.toString();
+            const iframe = document.createElement("iframe");
 
-            const hideFrame = document.createElement("iframe");
-            hideFrame.onload = setPrint;
-            hideFrame.style.display = "none"; // hide iframe
-            hideFrame.src = url;
-            document.body.appendChild(hideFrame);
+            iframe.onload = setPrint;
+            iframe.style.display = "none";
+            iframe.src = url;
+            document.body.appendChild(iframe);
         });
     }
 
