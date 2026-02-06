@@ -274,6 +274,7 @@ label_accumulation_range: label_accumulation_range
 label_addr_nr: label_addr_nr
 label_admin_data: Admin Data
 label_admin_notes: label_admin_notes
+label_admin_tags: Admin Tags
 label_agenda_items: label_agenda_items
 label_alt_names: label_alt_names
 label_availability: Availability

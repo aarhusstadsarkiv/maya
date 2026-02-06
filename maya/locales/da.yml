@@ -35,7 +35,8 @@ Download large size: Download stor størrelse
 Download medium size: Download mellem størrelse
 E-mail: E-mail
 Email: E-mail
-Email and password are required to login.: E-mail og password skal udfyldes for at logge ind.
+Email and password are required to login.: E-mail og password skal udfyldes for at
+  logge ind.
 Email needs to be correct.: E-mail skal være korrekt.
 Email needs to be correct. Password needs to be at least 8 characters long.: Email
   er ikke korrekt. Password skal være mindst 8 tegn langt.
@@ -249,6 +250,7 @@ label_accumulation_range: Indsamlingsår
 label_addr_nr: Husnummer
 label_admin_data: Admin Data
 label_admin_notes: Admin. note
+label_admin_tags: label_admin_tags
 label_agenda_items: Sagen behandles på følgende byrådsmøder
 label_alt_names: Alternative navne
 label_availability: Tilgængelighed
