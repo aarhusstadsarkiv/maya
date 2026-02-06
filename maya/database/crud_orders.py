@@ -55,7 +55,7 @@ class OrderFilter:
     filter_email: Optional[str] = ""
     filter_user: Optional[str] = ""
     filter_show_queued: Optional[str] = ""
-    filter_limit: int = 50
+    filter_limit: int = 100
     filter_offset: int = 0
 
     # Pagination
