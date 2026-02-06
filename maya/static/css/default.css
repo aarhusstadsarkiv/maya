@@ -193,9 +193,9 @@ h6 {
 }
 
 /** 
- * The .active link is current the same as .disabled
- * It is possible all linke inside .action-links can be set to active.
- * Without .action-links div it is also possible to set a single .action-link to active 
+ * The .active link currently has the same background-color as .disabled
+ * Any link inside .action-links can be set to active without being a .action-link.
+ * Without an .action-links container div it is also possible to set a single .action-link to active 
  */
 .action-links>.active, .action-link.active {
     background-color: rgba(var(--navigation-background-rgb), 0.75);
