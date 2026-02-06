@@ -194,9 +194,22 @@ h6 {
 
 /** 
  * The .active link is current the same as .disabled
+ * It is possible all linke inside .action-links can be set to active.
+ * Without .action-links div it is also possible to set a single .action-link to active 
  */
-.action-links>.active {
+.action-links>.active, .action-link.active {
     background-color: rgba(var(--navigation-background-rgb), 0.75);
+}
+
+/**
+ * The disabled attribute is used to disable the link
+ */
+.action-links>a[disabled], .action-link.disabled {
+    background-color: var(--background-disabled);
+    color: var(--text-disabled);
+    border-radius: 5px;
+    cursor: not-allowed;
+    opacity: .5;
 }
 
 .action-link {
@@ -213,17 +226,6 @@ h6 {
 .action-link:hover {
     background-color: rgba(var(--navigation-background-rgb), 0.75);
     text-decoration: none;
-}
-
-/**
- * The disabled attribute is used to disable the link
- */
-.action-links>a[disabled] {
-    background-color: var(--background-disabled);
-    color: var(--text-disabled);
-    border-radius: 5px;
-    cursor: not-allowed;
-    opacity: .5;
 }
 
 .sub-menu a {
