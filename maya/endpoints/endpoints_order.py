@@ -282,6 +282,7 @@ async def orders_admin_get(request: Request):
         filter_user=request.query_params.get("filter_user", ""),
         filter_show_queued=request.query_params.get("filter_show_queued", ""),
         filter_offset=int(request.query_params.get("filter_offset", 0)),
+        filter_limit=int(request.query_params.get("filter_limit", 50)),
     )
 
     # Pagination if added to filters
