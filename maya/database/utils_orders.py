@@ -246,7 +246,7 @@ def get_lb_number(record_and_types: dict) -> str:
 def get_expire_at_date() -> str:
     """
     Get an 'expire_at' date.\n
-    Set this on an order when the order is status is ORDERED and location is READING_ROOM.\n
+    Set this on an order when the order status is ORDERED and location is READING_ROOM.\n
     'expire_at' will look like this: 2025-02-08 00:00:00\n
     The extra day is added to ensure that the order is valid at least DEADLINE_DAYS days\n
     As the order may be made available for the user at any time during the day.
