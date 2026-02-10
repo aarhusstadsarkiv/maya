@@ -344,6 +344,7 @@ async def _update_location(crud: "CRUD", user_id: str, order_id: int, new_locati
     if new_location == utils_orders.RECORD_LOCATION.READING_ROOM:
         order_update_values["expire_at"] = utils_orders.get_expire_at_date()
 
+        # Ensure only one order message is sent
         if not order.get("message_sent"):
             await utils_orders.send_order_message(MAIL_MESSAGE_ORDER_READY_TITLE, MAIL_MESSAGE_ORDER_READY, order)
             order_update_values["message_sent"] = 1
@@ -356,6 +357,7 @@ async def _update_location(crud: "CRUD", user_id: str, order_id: int, new_locati
         filters={"order_id": order_id},
     )
 
+    # Insert log message for location change
     updated_order = await _get_orders_one(crud, order_id=order_id)
     await _insert_log_message(
         crud,
@@ -419,7 +421,7 @@ async def update_order(
 
 async def _get_queued_orders_length(crud: "CRUD", orders: list[dict]) -> dict:
     """
-    From a list of order get the count of queued orders for each record in the list
+    From a list of orders get the count of queued orders for each record in the list
     """
     records_ids = [order["record_id"] for order in orders]
     list_of_record_ids = ", ".join([f"'{record_id}'" for record_id in records_ids])
@@ -442,12 +444,8 @@ ORDER BY queued_count DESC;
 async def get_orders_user_count(user_id: str) -> int:
     """
     Count a user's orders that are either ORDERED or QUEUED.
+    Used to prevent users from ordering too many materials at once.
     """
-    statuses = [
-        utils_orders.ORDER_STATUS.ORDERED,
-        utils_orders.ORDER_STATUS.QUEUED,
-    ]
-
     database_connection = DatabaseConnection(orders_url)
     async with database_connection.transaction_scope_async() as connection:
         crud = CRUD(connection)
@@ -463,8 +461,8 @@ async def get_orders_user_count(user_id: str) -> int:
             query,
             {
                 "user_id": user_id,
-                "status_ordered": statuses[0],
-                "status_queued": statuses[1],
+                "status_ordered": utils_orders.ORDER_STATUS.ORDERED,
+                "status_queued": utils_orders.ORDER_STATUS.QUEUED,
             },
         )
 
@@ -479,6 +477,7 @@ async def get_orders_user(user_id: str, status: str = "active") -> list:
     async with database_connection.transaction_scope_async() as connection:
         crud = CRUD(connection)
 
+        # active orders are orders that are either ORDERED or QUEUED
         if status == "active":
             query = f"""
             SELECT o.*, r.*, u.*
@@ -491,6 +490,7 @@ AND o.user_id = :user_id
 ORDER BY o.order_id DESC
             """
 
+        # reserved orders are orders that are either ORDERED or QUEUED but not in the reading room
         elif status == "reserved":
             query = f"""
             SELECT o.*, r.*, u.*

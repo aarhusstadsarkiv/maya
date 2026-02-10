@@ -87,8 +87,8 @@ async def orders_user_renew_by_order_id(request: Request):
 
 async def orders_post(request: Request):
     """
-    POST endpoint for creating an order
-    Checks if user is authenticated and verified
+    POST endpoint for creating an order\n
+    Checks if user is authenticated and verified\n
     Checks if order already exists
     """
     await is_authenticated_json(request, must_be_verified=True)
@@ -120,8 +120,8 @@ async def orders_post(request: Request):
 
 async def _process_order_deletion(request: Request, id_key: str):
     """
-    This method is used to delete an order based on the provided key (e.g., "order_id" or "record_id")
-    There are two options because the user can delete an order based on the order_id or the record_id
+    This method is used to delete an order based on the provided key (e.g., "order_id" or "record_id")\n
+    There are two options because the user can delete an order based on the order_id or the record_id.\n
     This depends on the user being on the order page or the record page
     """
     await is_authenticated_json(request, must_be_verified=True)

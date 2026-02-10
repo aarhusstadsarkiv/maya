@@ -36,8 +36,9 @@ RECORD_LOCATION_HUMAN = {
 @dataclasses.dataclass
 class OrderStatus:
     """
-    Possible user statuses for an order
-    NOTICE: In /static/js/orders.js the statuses are copied from here
+    Possible user statuses for an order\n
+    NOTICE: In /static/js/orders.js the statuses are copied from here\n
+    So if you change these, also change them in the js file.
     """
 
     ORDERED: int = 1
@@ -70,7 +71,7 @@ MAX_ACTIVE_ORDERS_PER_USER = 100
 
 def get_single_order_message(order: dict) -> str:
     """
-    Get a single line message to display on a single material that the user has ordered.
+    Get a single line message to display on a single material that the user has ordered.\n
     Only these options. "På vej", "I kø", "Tilgængeligt på læsesal"
     """
     message = ""
@@ -184,16 +185,16 @@ def get_days_until_expire(order: dict) -> int:
     """
     days_remaining = 0
     if order["order_status"] == ORDER_STATUS.ORDERED and order["expire_at"]:
-        expire_ = arrow.get(order["expire_at"], "YYYY-MM-DD")
-        days_remaining = (expire_ - arrow.utcnow()).days
+        expire_at = arrow.get(order["expire_at"], "YYYY-MM-DD")
+        days_remaining = (expire_at - arrow.utcnow()).days
 
     return days_remaining
 
 
 def get_date_indicating_renewal_mail() -> str:
     """
-    This def gets a date string DEADLINE_DAYS_RENEWAL days into the future.
-    If this date corresponds to the expire_at of an order a mail can be sent to the user
+    This def gets a date string DEADLINE_DAYS_RENEWAL days into the future.\n
+    If this date corresponds to the expire_at of an order a mail can be sent to the user\n
     so they can renew the order.
     """
     # deadline is the last day the order is valid. Therefor we add one extra day which is the day it expires
@@ -244,12 +245,13 @@ def get_lb_number(record_and_types: dict) -> str:
 
 def get_expire_at_date() -> str:
     """
-    Get a expire_at date
-    Set this on a order when the order is status is ORDERED and location is READING_ROOM
+    Get an 'expire_at' date.\n
+    Set this on an order when the order is status is ORDERED and location is READING_ROOM.\n
+    'expire_at' will look like this: 2025-02-08 00:00:00\n
+    The extra day is added to ensure that the order is valid at least DEADLINE_DAYS days\n
+    As the order may be made available for the user at any time during the day.
     """
     utc_now = arrow.utcnow()
-    # expire_at will look like this: 2025-02-08 00:00:00
-    # The extra day is added to make sure at least one full day is available
     expire_at = utc_now.floor("day").shift(days=DEADLINE_DAYS + 1)
     return expire_at.format("YYYY-MM-DD HH:mm:ss")
 
@@ -262,7 +264,6 @@ async def send_order_message(title: str, message: str, order: dict):
     """
     Send a mail to the user when the order is ready for review
     """
-
     template_values = {
         "title": title,
         "message": message,
