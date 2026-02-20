@@ -5,6 +5,13 @@
 {% block head %}
 <link rel="stylesheet" href="{{ url_for('static', path='/css/search.css') }}?v={{ get_setting('version') }}">
 <link rel="stylesheet" href="{{ url_for('static', path='/css/home.css') }}?v={{ get_setting('version') }}">
+<style>
+    .home-search-container {
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: cover;
+    }
+</style>
 {% endblock head %}
 
 {% block content %}
@@ -28,6 +35,14 @@
 <script type="module" nonce="{{ request.state.csp_nonce }}">
 
     import { autoCompleteInit } from '/static/js/auto-complete-instance.js';
+
+    const homeSearchContainer = document.querySelector('.home-search-container');
+    const frontpageImages = [
+        '/static/frontpage/image_1.jpg',
+        '/static/frontpage/image_2.jpg',
+    ];
+    const randomIndex = Math.floor(Math.random() * frontpageImages.length);
+    homeSearchContainer.style.backgroundImage = `url("${frontpageImages[randomIndex]}")`;
 
     const searchBaseUrl = '/search?';
     window.addEventListener("pageshow", function(event) {
