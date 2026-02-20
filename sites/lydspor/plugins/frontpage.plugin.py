@@ -11,14 +11,7 @@ base_dir = os.path.dirname(os.path.abspath(__file__))
 
 def get_routes() -> list:
 
-    routes = [
-        Route("/", endpoint=docs_endpoint, name="homepage", methods=["GET"]),
-        Route("/docs/{page:str}", endpoint=docs_endpoint, name="docs", methods=["GET"]),
-        Route("/about", endpoint=about_endpoint, name="about", methods=["GET"]),
-        Route("/contact", endpoint=contact_endpoint, name="contact", methods=["GET"]),
-    ]
-
-    return routes
+    return []
 
 
 async def docs_endpoint(request: Request):

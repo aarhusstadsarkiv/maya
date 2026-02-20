@@ -2,6 +2,7 @@ import typing
 
 
 settings: dict[str, typing.Any] = {
+
     "client_name": "development",
     "client_url": "https://www.lydsporaarhus.dk",
     "client_email": "stadsarkivet@aarhusarkivet.dk",
@@ -12,7 +13,14 @@ settings: dict[str, typing.Any] = {
         {"name": "search_get", "title": "Søg", "type": "icon", "icon": "search"},
     ],
     "main_menu_system": [
-        {"name": "about", "title": "About"},
+        {"name": "home", "title": "Forside"},
     ],
     "show_version": True,
 }
+
+
+pages: list = [
+    {"name": "home", "title": "Forside", "template": "pages/home.html", "url": "/"},
+]
+
+settings["pages"] = pages

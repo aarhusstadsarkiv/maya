@@ -1,0 +1,49 @@
+{% extends "empty.html" %}
+
+{% block body_class %}page-home{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', path='/css/search.css') }}?v={{ get_setting('version') }}">
+<link rel="stylesheet" href="{{ url_for('static', path='/css/home.css') }}?v={{ get_setting('version') }}">
+{% endblock head %}
+
+{% block content %}
+
+{% include "includes/navigation.html" %}
+
+<main>
+    <div class="container-fluid" >
+        <div class="home-search-container">
+            <div class="home-search-form">
+                <form id="search" method="get" action="{{ url_for('search_get')}}" role="search">
+                    <input id="q" type="text" name="q" placeholder="{{ translate('Search') }}" value="{{ q }}" autocomplete="off">
+                    <button id="submit" type="submit" class="search-button">{{ translate('Search') }}</button>
+                </form>
+                <div class="search-suggestions"></div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script type="module" nonce="{{ request.state.csp_nonce }}">
+
+    import { autoCompleteInit } from '/static/js/auto-complete-instance.js';
+
+    const searchBaseUrl = '/search?';
+    window.addEventListener("pageshow", function(event) {
+        if (!event.persisted) {
+            autoCompleteInit(searchBaseUrl);
+        }
+    });
+
+    document.getElementById('q').focus();
+</script>
+
+<footer class="footer">
+    {% include "includes/footer.html" %}
+</footer>
+
+{% include "includes/flash.html" %}
+
+
+{% endblock content %}

@@ -1,0 +1,136 @@
+.home-search-container {
+    display: flex;
+    background-size: contain;
+    align-items: center;
+    justify-content: center;
+    aspect-ratio: 1920 / 630;
+}
+
+.home-search-form {
+    padding: 25px;
+
+}
+
+#q {
+    width: 400px;
+}
+
+.search-suggestions {
+    width: 400px;
+}
+
+/**
+ * hide search button when screen is small
+ */
+@media (max-width: 768px) {
+    /* center search form */
+    .home-search-form {
+        flex: 1;
+    }
+
+    /* hide search button */
+    .search-button {
+        display: none !important;
+    }
+
+    /* full width search input */
+    #q {
+        width: 100%;
+    }
+
+    .search-suggestions {
+        /* calculate same width as #q */
+        width: calc(100% - 50px);
+    }
+}
+
+
+.home-search-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 25px;
+    padding-top: 15px;
+    margin: 0 auto;
+    max-width: 1400px;
+}
+
+.home-search-link {
+    flex: 1 0 21%;
+    /* Four columns */
+    margin: 5px;
+    box-sizing: border-box;
+}
+
+@media (max-width: 1024px) {
+    .home-search-link {
+        flex: 1 0 46%;
+        /* Two columns */
+    }
+}
+
+@media (max-width: 480px) {
+    .home-search-link {
+        flex: 1 0 96%;
+        /* One column */
+    }
+}
+
+.search-text p {
+    font-size: 0.9em;
+}
+
+.search-text h3 {
+    font-size: 1.2em;
+    text-decoration: uppercase;
+}
+
+.home-collections-background {
+    background-color: var(--background-alt);
+}
+
+.home-collections-background h3 {
+    padding: 25px;
+    margin: 0 auto;
+    max-width: 1400px;
+    padding-bottom: 0;
+}
+
+.home-collections {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 25px;
+    margin: 0 auto;
+    max-width: 1400px;
+}
+
+.home-collection img {
+    width: 100%;
+}
+
+.home-collection {
+    flex: 1 0 46%;
+    /* Four columns */
+    margin: 5px;
+    box-sizing: border-box;
+    padding-bottom: 25px;
+}
+
+@media (max-width: 1024px) {
+    .home-collection {
+        flex: 1 0 46%;
+        /* Two columns */
+    }
+}
+
+@media (max-width: 480px) {
+    .home-collection {
+        flex: 1 0 96%;
+        /* One column */
+    }
+}
+
+.footer {
+    margin-top: 0;
+}
