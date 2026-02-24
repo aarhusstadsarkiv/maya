@@ -9,6 +9,7 @@ settings: dict[str, typing.Any] = {
     "language": "da",
     "log_handlers": ["rotating_file"],
     "api_base_url": "https://api.openaws.dk/v1",
+    "canonical_url": "https://www.aarhusarkivet.dk",
     "main_menu_top": [
         {"name": "search_get", "title": "Søg", "type": "icon", "icon": "search"},
     ],
