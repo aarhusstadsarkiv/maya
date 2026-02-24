@@ -168,18 +168,19 @@ async def validate_passwords(request: Request):
         )
 
 
-async def validate_display_name(request: Request):
+async def validate_user_name(request: Request):
     """
     Validate that the display name is at least 3 characters long.
     """
 
     form = await request.form()
-    display_name = str(form.get("display_name"))
+    first_name = str(form.get("first_name")).strip()
+    last_name = str(form.get("last_name")).strip()
 
-    if len(display_name) < 3:
+    if len(first_name) < 2 or len(last_name) < 2:
         raise OpenAwsException(
             400,
-            translate("Display name should be at least 3 characters long"),
+            translate("First name and last name should be at least 2 characters long"),
         )
 
 

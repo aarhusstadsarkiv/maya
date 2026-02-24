@@ -7,7 +7,7 @@ from starlette.exceptions import HTTPException
 from maya.core.api_error import (
     OpenAwsException,
     validate_passwords,
-    validate_display_name,
+    validate_user_name,
     validate_captcha,
     raise_openaws_exception,
 )
@@ -143,16 +143,22 @@ async def auth_jwt_login_post(request: Request):
             raise_openaws_exception(response.status_code, json_response)
 
 
+def _get_display_name(form) -> str:
+    first_name = str(form.get("first_name")).strip()
+    last_name = str(form.get("last_name")).strip()
+    return first_name + " " + last_name
+
+
 async def auth_register_post(request: Request):
     """
     POST an email and password to the api in order to register a new user
     """
     await validate_captcha(request)
-    await validate_display_name(request)
+    await validate_user_name(request)
     await validate_passwords(request)
 
     form = await request.form()
-    display_name = str(form.get("display_name"))
+    display_name = _get_display_name(form)
     email = str(form.get("email"))
     password = str(form.get("password"))
 

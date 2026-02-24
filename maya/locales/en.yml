@@ -52,6 +52,9 @@ Error. Request Error: Error. Request Error
 Error. Request Timeout: Error. Request Timeout
 Error. Server Error: Error. Server Error
 Failed to get schemas: Failed to get schemas
+First Name: First Name
+First name and last name should be at least 2 characters long: First name and last
+  name should be at least 2 characters long
 First page: First page
 Forgot your password: Forgot your password
 Gallery view: Gallery view
@@ -64,6 +67,7 @@ Image: Image
 Invalid JSON in data.: Invalid JSON in data.
 Invalid JSON.: Invalid JSON.
 Large Image: Large Image
+Last Name: Last Name
 Last page: Last page
 Latest search: Latest search
 Latest updated: Latest updated
