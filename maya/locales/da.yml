@@ -50,7 +50,7 @@ Error. Request Error: Der var et problem med din forespørgsel.
 Error. Request Timeout: Error. Request Timeout
 Error. Server Error: Der skete en system fejl.
 Failed to get schemas: Det var ikke muligt at hente skemaer
-First Name: First Name
+First Name: Fornavn
 First name and last name should be at least 2 characters long: Fornavn og efternavn skal være mindst 2 tegn langt
 First page: Første
 Forgot your password: Glemt password
@@ -61,7 +61,7 @@ Image: Billede
 Invalid JSON in data.: Invalid JSON i data.
 Invalid JSON.: Ugyldig JSON.
 Large Image: Stort Billede
-Last Name: Last Name
+Last Name: Efternavn
 Last page: Sidste
 Latest search: Seneste søgning
 Latest updated: Senest opdateret
