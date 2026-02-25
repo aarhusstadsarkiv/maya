@@ -200,16 +200,19 @@ async def insert_order(meta_data: dict, record_and_types: dict, me: dict) -> dic
         user_data = utils_orders.get_insert_user_data(me)
         await crud.replace("users", user_data, {"user_id": me["id"]})
 
-        # Fetch or prepare record data
+        # Update record details or insert if it doesn't exist
+        # A single record can only exist once in the records table
         record_db = await crud.select_one("records", filters={"record_id": meta_data["id"]})
         if record_db:
+            # Already existing. Use existing location
             record_data = utils_orders.get_insert_record_data(meta_data, record_and_types, record_db["location"])
         else:
+            # New record, use default location
             record_data = utils_orders.get_insert_record_data(meta_data, record_and_types)
 
         await crud.replace("records", record_data, {"record_id": meta_data["id"]})
 
-        # Determine user status based on active orders for the record
+        # Get a single active order for the same record to determine the status of the new order.
         active_order = await _get_orders_one(crud, [utils_orders.ORDER_STATUS.ORDERED], meta_data["id"])
         order_status = utils_orders.ORDER_STATUS.QUEUED if active_order else utils_orders.ORDER_STATUS.ORDERED
 
@@ -227,7 +230,7 @@ async def insert_order(meta_data: dict, record_and_types: dict, me: dict) -> dic
         inserted_order = await _get_orders_one(crud, order_id=last_order_id)
         log_messages = [LOG_MESSAGES.ORDER_CREATED]
 
-        # Handle special cases for orders already in the reading room and ordered
+        # Handle special case where record is already in the reading room and the new order is immediately ORDERED
         if record_data["location"] == utils_orders.RECORD_LOCATION.READING_ROOM and order_status == utils_orders.ORDER_STATUS.ORDERED:
 
             expire_at = utils_orders.get_expire_at_date()
@@ -302,7 +305,6 @@ async def _update_status(crud: "CRUD", user_id: str, order_id: int, new_status: 
                     update_values={"expire_at": expire_at, "message_sent": 1},
                     filters={"order_id": next_queued_order["order_id"]},
                 )
-
                 next_queued_order = await _get_orders_one(crud, order_id=next_queued_order["order_id"])
                 await utils_orders.send_order_message(MAIL_MESSAGE_ORDER_READY_TITLE, MAIL_MESSAGE_ORDER_READY, next_queued_order)
                 log_messages.append(LOG_MESSAGES.MAIL_SENT)
@@ -781,7 +783,8 @@ async def get_order_by_record_id(user_id: str, record_id: str):
 async def cron_orders_expire() -> int:
     """
     Check if expire has passed and update user status to COMPLETED
-    Returns number of orders expired
+    Returns number of orders expired. Will also update the next queued order
+    to ordered and send mail if the location is the reading room
     """
     # Get orders where expire_at has passed
     cron_log.info("Starting cron_orders_expire")
