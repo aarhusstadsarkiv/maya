@@ -84,8 +84,12 @@ def get_single_order_message(order: dict) -> str:
     elif order["order_status"] == ORDER_STATUS.QUEUED:
         message = "Din bestilling er i kø. Du modtager en e-mail fra os, når materialet er klar til gennemsyn."
     elif order["order_status"] == ORDER_STATUS.APPLICATION:
-        message = "Du har ansøgt om at få adgang til materialet. Vi behandler din ansøgning og vender tilbage hurtigst muligt."
-
+        message = """
+Du skal 
+<a target="_blank" href="https://stadsarkiv.aarhus.dk/brug-arkivet/soeg-adgang-til-arkivmateriale">
+søge om tilladelse til materialet via MitID</a>.
+Når vi har behandlet og godkendt din ansøgning modtager du et svar per e-mail.
+"""
     return message
 
 

@@ -136,7 +136,7 @@
 
             {% endif %}
             </div>
-            <div class="order-message">{{ meta_data.get('active_order_message', '') }}</div>
+            <div class="order-message">{{ meta_data.get('active_order_message', '') | safe }}</div>
         {% endif %}
 
         {% if key in record_and_types %}

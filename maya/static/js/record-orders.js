@@ -54,9 +54,9 @@ if (orderElem) {
                     Flash.setMessage(res.message, 'success');
                     orderElem.innerText = 'Afslut bestilling';
                     orderElem.setAttribute('data-action', 'delete');
-                    // Seet class to 'delete-order'
+                    // Set class to 'delete-order'
                     orderElem.className = 'delete-order';
-                    orderMessageElem.innerText = res.order_message;
+                    orderMessageElem.innerHTML = res.order_message;
                 }
             }
 
