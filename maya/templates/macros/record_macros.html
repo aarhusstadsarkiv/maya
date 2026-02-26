@@ -120,28 +120,20 @@
             {% endif %}
             
             {% if is_verified and meta_data.orderable and get_setting('allow_online_ordering')  %}
-                {% if meta_data.orderable_online %}
-                    {% if meta_data.has_active_order %}
-                    <a  id="record-order"
-                        class="delete-order"
-                        data-action="delete"
-                        data-id="{{ record_and_types.id.value }}" 
-                        href="/order/{{ record_and_types.id.value }}">{{ translate('Delete order') }}</a>
-                    {% else %}
-                    <a  id="record-order"
-                        data-action="create" 
-                        data-id="{{ record_and_types.id.value }}" 
-                        href="/order/{{ record_and_types.id.value }}">{{ translate('Order online') }}</a>
-                    {% endif %}
-                {% elif meta_data.orderable_by_form %}
-                <a href="https://stadsarkiv.aarhus.dk/brug-arkivet/soeg-adgang-til-arkivmateriale" target="_blank" rel="noopener">
-                    Ansøg om tilladelse til at se materialet
-                </a>
+
+                {% if meta_data.has_active_order %}
+                <a  id="record-order"
+                    class="delete-order"
+                    data-action="delete"
+                    data-id="{{ record_and_types.id.value }}" 
+                    href="/order/{{ record_and_types.id.value }}">{{ translate('Delete order') }}</a>
+                {% else %}
+                <a  id="record-order"
+                    data-action="create" 
+                    data-id="{{ record_and_types.id.value }}" 
+                    href="/order/{{ record_and_types.id.value }}">{{ translate('Order online') }}</a>
                 {% endif %}
-            {% else %}
-                <!--
-                    <a href="/auth/login?next=/records/{{ record_and_types.id.value }}">{{ translate('Login to order online') }}</a>
-                -->
+
             {% endif %}
             </div>
             <div class="order-message">{{ meta_data.get('active_order_message', '') }}</div>

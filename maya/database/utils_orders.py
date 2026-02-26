@@ -45,6 +45,7 @@ class OrderStatus:
     COMPLETED: int = 2
     QUEUED: int = 3
     DELETED: int = 4
+    APPLICATION: int = 5
 
 
 ORDER_STATUS = OrderStatus()
@@ -53,6 +54,7 @@ ORDER_STATUS_HUMAN = {
     2: "Afsluttet",
     3: "I kø",
     4: "Slettet",
+    5: "Ansøgning",
 }
 
 ORDER_STATUS_USER = OrderStatus()
@@ -61,6 +63,7 @@ ORDER_STATUS_USER_HUMAN = {
     2: "Afsluttet",
     3: "I kø",
     4: "Slettet",
+    5: "Ansøgning",
 }
 
 
@@ -71,8 +74,7 @@ MAX_ACTIVE_ORDERS_PER_USER = 100
 
 def get_single_order_message(order: dict) -> str:
     """
-    Get a single line message to display on a single material that the user has ordered.\n
-    Only these options. "På vej", "I kø", "Tilgængeligt på læsesal"
+    Get a single line message to display on a single material that the user has ordered.
     """
     message = ""
     if order["order_status"] == ORDER_STATUS.ORDERED:
@@ -81,6 +83,8 @@ def get_single_order_message(order: dict) -> str:
             message = "Det bestilte materialle er tilgængeligt. Du kan gennemse det på læsesalen."
     elif order["order_status"] == ORDER_STATUS.QUEUED:
         message = "Din bestilling er i kø. Du modtager en e-mail fra os, når materialet er klar til gennemsyn."
+    elif order["order_status"] == ORDER_STATUS.APPLICATION:
+        message = "Du har ansøgt om at få adgang til materialet. Vi behandler din ansøgning og vender tilbage hurtigst muligt."
 
     return message
 

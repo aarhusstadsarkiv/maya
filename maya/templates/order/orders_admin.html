@@ -109,7 +109,13 @@
                         href="/admin/orders/{{order.record_id}}/html">{{order.record_id}}</a>
                 </td>
                 <td class="width-300" title="{{ order.collectors }}">{{ order.collectors }} </td>
+                {% if order.order_status == 5 %}
+                <td class="width-300" title="KUN via skiftlig ansøgning: {{ order.label }}">
+                    <span class="has-comment">{{ get_icon('counter_1')|safe }} {{ order.label }} </span>
+                </td>
+                {% else %}
                 <td class="width-300" title="{{ order.label }}">{{ order.label }} </td>
+                {% endif %}
                 <td>{{ order.lb_number }}</td>
                 <td title="{{ order.user_email }}">{{ order.user_display_name }}</td>
                 <td class="width-100">{{ order.order_status_human }}</td>
@@ -127,8 +133,8 @@
                     {% else %}
                     {% set location_change_disabled = "disabled" %}
                     {% set title = "
-                    Du kan ikke ændre lokation, da materialet er i Læsesalen og en bruger har rettighed til
-                    at benytte det. Du må først afslutte den aktive bestilling, før du kan ændre lokation."
+Du kan ikke ændre lokation, da materialet er i Læsesalen og en bruger har rettighed til
+at benytte det. Du må først afslutte den aktive bestilling, før du kan ændre lokation."
                     %}
                     {% endif %}
 
@@ -167,6 +173,12 @@
                         <a class="action-link" data-id="{{order.order_id}}" data-action="completed"
                             title="Brugeren er færdig med bestillingen" href="#">Afslut</a>
                     </span>
+                        {% if order.order_status == 5 %}
+                        <span class="complete-order">
+                            <a class="action-link" data-id="{{order.order_id}}" data-action="promote_application"
+                                title="Ansøgning er godkendt" href="#">Godkend</a>
+                        </span>
+                        {% endif %}
                     {% endif %}
                     <span>
                         <a class="action-link" href="/admin/orders/logs?order_id={{order.order_id}}"
@@ -217,7 +229,7 @@
     const spinner = document.querySelector('.loadingspinner');
 
     /**
-     * Section that handles FINISHED (afsluttet) and DELETED (slettet) clicks
+     * Section that handles FINISHED (afsluttet) and PROMOTE_APPLICATION (godkend ansøgning) actions for orders
      */
     async function handleUserStatusClick(event) {
 
@@ -229,30 +241,31 @@
             const element = event.target;
             const action = element.dataset.action;
 
-            if (action == 'completed') {
+            let data = {};
+            let url = '';
+
+            if (action === 'completed') {
                 if (!confirm('Er du sikker på at brugeren har afsluttet denne bestilling?')) {
                     return;
                 }
-            } else {
-                if (!confirm('Er du sikker på at du vil slette denne bestilling?')) {
+                data = {
+                    'order_status': OrderStatus.COMPLETED,
+                }
+                url = '/admin/orders/patch/' + element.dataset.id;
+            }
+
+            if (action === 'promote_application') {
+                if (!confirm('Er du sikker på at du vil godkende denne ansøgning?')) {
                     return;
                 }
+
+                data = {
+                    'promote_application': true,
+                }
+                url = '/admin/orders/patch/' + element.dataset.id + '/promote';
             }
 
-            let data = {};
-            if (action === 'completed') {
-                data = {
-                    'order_status': OrderStatus.COMPLETED
-                }
-            } else {
-                data = {
-                    'order_status': OrderStatus.DELETED
-                }
-            }
-
-            const url = '/admin/orders/patch/' + element.dataset.id;
             const res = await Requests.asyncPostJson(url, data);
-
             if (res.error) {
                 Flash.setMessage(res.message, 'error');
             } else {

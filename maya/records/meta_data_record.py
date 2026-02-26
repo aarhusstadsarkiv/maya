@@ -82,7 +82,7 @@ async def get_record_meta_data(
     meta_data["content_types_label"] = _get_content_type_label(record)
     meta_data["orderable"] = _is_orderable(meta_data)
     meta_data["orderable_online"] = _is_orderable_online(meta_data)
-    meta_data["orderable_by_form"] = _is_orderable_by_form(meta_data)
+    meta_data["orderable_by_form"] = is_orderable_by_form(meta_data)
 
     order_message = get_order_message(meta_data, is_logged_in, verified)
     meta_data["order_message"] = order_message
@@ -301,7 +301,7 @@ def _is_orderable_online(meta_data: dict) -> bool:
     return False
 
 
-def _is_orderable_by_form(meta_data: dict) -> bool:
+def is_orderable_by_form(meta_data: dict) -> bool:
     """
     Get info describing if the record can be ordered by form
     """
@@ -323,7 +323,7 @@ def _is_orderable(meta_data: dict) -> bool:
     """
     Get info describing if the record can be ordered
     """
-    return _is_orderable_online(meta_data) or _is_orderable_by_form(meta_data)
+    return _is_orderable_online(meta_data) or is_orderable_by_form(meta_data)
 
 
 def _get_order_resources(record: dict):

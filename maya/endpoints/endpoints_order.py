@@ -87,9 +87,9 @@ async def orders_user_renew_by_order_id(request: Request):
 
 async def orders_post(request: Request):
     """
-    POST endpoint for creating an order\n
-    Checks if user is authenticated and verified\n
-    Checks if order already exists
+    POST endpoint for creating an order.
+    Checks if user is authenticated and verified.
+    Checks if order already exists.
     """
     await is_authenticated_json(request, must_be_verified=True)
     me = await api.users_me_get(request)
@@ -238,6 +238,8 @@ async def orders_admin_patch_single(request: Request):
         order_id = request.path_params["order_id"]
         update_values: dict = await request.json()
 
+        log.debug(f"Updating order {order_id} with values {update_values}")
+
         await crud_orders.update_order(
             user_id=me["id"],
             order_id=order_id,
@@ -262,6 +264,42 @@ async def orders_admin_patch_single(request: Request):
             {
                 "error": True,
                 "message": "Der opstod en fejl. Bestilling kunne ikke opdateres.",
+            }
+        )
+
+
+async def orders_admin_patch_promote_application(request: Request):
+    """
+    Patch a single order as admin to promote an application to an order
+    This is used to promote a queued application to an active order
+    """
+    try:
+        await is_authenticated_json(request, must_be_verified=True, permissions=["employee"])
+        me = await api.users_me_get(request)
+
+        order_id = request.path_params["order_id"]
+
+        await crud_orders.promote_application_order(
+            user_id=me["id"],
+            order_id=order_id,
+        )
+
+        log.debug(f"Promoted application order {order_id} to active order")
+        message = "Ansøgningen er blevet godkendt og er nu en aktiv bestilling"
+
+        flash.set_message(request, message, type="success")
+        return JSONResponse(
+            {
+                "error": False,
+                "message": message,
+            }
+        )
+    except Exception:
+        log.exception("Error in orders_admin_patch_promote_application")
+        return JSONResponse(
+            {
+                "error": True,
+                "message": "Der opstod en fejl. Ansøgningen kunne ikke godkendes.",
             }
         )
 

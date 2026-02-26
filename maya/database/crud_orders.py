@@ -10,6 +10,7 @@ from maya.core.logging import get_log, get_custom_log
 from dataclasses import dataclass
 from typing import Optional
 import json
+from maya.records.meta_data_record import is_orderable_by_form
 
 
 log = get_log()
@@ -107,7 +108,7 @@ async def _has_active_order(crud: "CRUD", user_id: str, record_id: str):
     """
     Check if user has an active order on a record
     """
-    statuses = [utils_orders.ORDER_STATUS.ORDERED, utils_orders.ORDER_STATUS.QUEUED]
+    statuses = [utils_orders.ORDER_STATUS.ORDERED, utils_orders.ORDER_STATUS.QUEUED, utils_orders.ORDER_STATUS.APPLICATION]
     order = await _get_orders_one(crud, statuses, record_id, user_id)
     return order
 
@@ -117,7 +118,7 @@ async def _is_renew_possible(crud: "CRUD", order: dict):
     Check if an order can be renewed
     """
 
-    # only orders that the user has loaned can be renewed
+    # only orders that the user has access to in the reading room renewed
     # expire_at is only set when the order is eligible in the reading room
     if not order["expire_at"]:
         return False
@@ -169,19 +170,54 @@ async def renew_order(user_id: str, order_id: int):
         )
 
 
-async def _save_data(meta_data: dict, record_and_types: dict, me: dict):
+async def _update_user_record_data(crud: "CRUD", meta_data: dict, record_and_types: dict, me: dict):
+    """
+    Update the users and records table with latest data.
+    """
+    # Insert or update user details
+    user_data = utils_orders.get_insert_user_data(me)
+    await crud.replace("users", user_data, {"user_id": me["id"]})
 
-    # save meta_data, and record_and_types, me as JSON
-    base_path = "tests/data"
+    # Update record details or insert if it doesn't exist
+    # A single record can only exist once in the records table
+    record_db = await crud.select_one("records", filters={"record_id": meta_data["id"]})
+    if record_db:
+        # Already existing. Use existing location
+        record_data = utils_orders.get_insert_record_data(meta_data, record_and_types, record_db["location"])
+    else:
+        # New record, use default location
+        record_data = utils_orders.get_insert_record_data(meta_data, record_and_types)
 
-    with open(f"{base_path}/meta_data_000495102.json", "w") as f:
-        json.dump(meta_data, f, ensure_ascii=False)
+    await crud.replace("records", record_data, {"record_id": meta_data["id"]})
 
-    with open(f"{base_path}/record_and_types_000495102.json", "w") as f:
-        json.dump(record_and_types, f, ensure_ascii=False)
 
-    with open(f"{base_path}/me.json", "w") as f:
-        json.dump(me, f, ensure_ascii=False)
+async def _get_insert_order_status(crud: "CRUD", meta_data: dict) -> int:
+
+    # Check if the status will be APPLICATION, QUEUED or ORDERED
+    active_order = await _get_orders_one(crud, [utils_orders.ORDER_STATUS.ORDERED], meta_data["id"])
+    if is_orderable_by_form(meta_data):
+        order_status = utils_orders.ORDER_STATUS.APPLICATION
+    elif active_order:
+        order_status = utils_orders.ORDER_STATUS.QUEUED
+    else:
+        order_status = utils_orders.ORDER_STATUS.ORDERED
+
+    return order_status
+
+
+async def _send_order_message_on_insert(crud: "CRUD", inserted_order: dict):
+    expire_at = utils_orders.get_expire_at_date()
+    inserted_order["expire_at"] = expire_at
+
+    # Update order with expire_at and message status
+    await crud.update(
+        table="orders",
+        update_values={"expire_at": expire_at, "message_sent": 1},
+        filters={"order_id": inserted_order["order_id"]},
+    )
+
+    # updated_order = await _get_orders_one(crud, order_id=inserted_order["order_id"])
+    await utils_orders.send_order_message(MAIL_MESSAGE_ORDER_READY_TITLE, MAIL_MESSAGE_ORDER_READY, inserted_order)
 
 
 async def insert_order(meta_data: dict, record_and_types: dict, me: dict) -> dict:
@@ -192,34 +228,17 @@ async def insert_order(meta_data: dict, record_and_types: dict, me: dict) -> dic
     async with database_connection.transaction_scope_async() as connection:
         crud = CRUD(connection)
 
-        # Check for active order by the user on the same record
+        # Check is user has an existing order on the record
         if await _has_active_order(crud, me["id"], meta_data["id"]):
             raise Exception("User is already active on this record")
 
-        # Insert or update user details
-        user_data = utils_orders.get_insert_user_data(me)
-        await crud.replace("users", user_data, {"user_id": me["id"]})
+        await _update_user_record_data(crud, meta_data, record_and_types, me)
 
-        # Update record details or insert if it doesn't exist
-        # A single record can only exist once in the records table
-        record_db = await crud.select_one("records", filters={"record_id": meta_data["id"]})
-        if record_db:
-            # Already existing. Use existing location
-            record_data = utils_orders.get_insert_record_data(meta_data, record_and_types, record_db["location"])
-        else:
-            # New record, use default location
-            record_data = utils_orders.get_insert_record_data(meta_data, record_and_types)
-
-        await crud.replace("records", record_data, {"record_id": meta_data["id"]})
-
-        # Get a single active order for the same record to determine the status of the new order.
-        active_order = await _get_orders_one(crud, [utils_orders.ORDER_STATUS.ORDERED], meta_data["id"])
-        order_status = utils_orders.ORDER_STATUS.QUEUED if active_order else utils_orders.ORDER_STATUS.ORDERED
-
-        # Create new order data
+        # Insert new order
+        order_status = await _get_insert_order_status(crud, meta_data)
         order_data = utils_orders.get_order_data(
-            user_data["user_id"],
-            record_data["record_id"],
+            me["id"],
+            meta_data["id"],
             order_status,
         )
 
@@ -227,45 +246,69 @@ async def insert_order(meta_data: dict, record_and_types: dict, me: dict) -> dic
 
         # Retrieve the newly created order and log the creation
         last_order_id = await crud.last_insert_id()
-        inserted_order = await _get_orders_one(crud, order_id=last_order_id)
+        last_inserted_order = await _get_orders_one(crud, order_id=last_order_id)
         log_messages = [LOG_MESSAGES.ORDER_CREATED]
 
         # Handle special case where record is already in the reading room and the new order is immediately ORDERED
-        if record_data["location"] == utils_orders.RECORD_LOCATION.READING_ROOM and order_status == utils_orders.ORDER_STATUS.ORDERED:
-
-            expire_at = utils_orders.get_expire_at_date()
-            inserted_order["expire_at"] = expire_at
-
-            # Update order with expire_at and message status
-            await crud.update(
-                table="orders",
-                update_values={"expire_at": expire_at, "message_sent": 1},
-                filters={"order_id": inserted_order["order_id"]},
-            )
-
-            updated_order = await _get_orders_one(crud, order_id=inserted_order["order_id"])
-            await utils_orders.send_order_message(MAIL_MESSAGE_ORDER_READY_TITLE, MAIL_MESSAGE_ORDER_READY, updated_order)
+        if (
+            last_inserted_order["location"] == utils_orders.RECORD_LOCATION.READING_ROOM
+            and order_status == utils_orders.ORDER_STATUS.ORDERED
+        ):
+            await _send_order_message_on_insert(crud, last_inserted_order)
             log_messages.append(LOG_MESSAGES.MAIL_SENT)
 
         await _insert_log_message(
             crud,
-            user_id=inserted_order["user_id"],
-            order=inserted_order,
+            user_id=last_inserted_order["user_id"],
+            order=last_inserted_order,
             message=". ".join(log_messages),
         )
 
         # get the final inserted order
-        inserted_order = await _get_orders_one(crud, order_id=last_order_id)
+        last_inserted_order = await _get_orders_one(crud, order_id=last_order_id)
+        return last_inserted_order
 
-        return inserted_order
+
+async def _update_next_queued_order(crud: "CRUD", user_id: str, record_id: str):
+    next_queued_order = await _get_orders_one(crud, statuses=[utils_orders.ORDER_STATUS.QUEUED], record_id=record_id)
+    if next_queued_order:
+        # Update the status of the next queued order to ORDERED
+        await crud.update(
+            table="orders",
+            update_values={"order_status": utils_orders.ORDER_STATUS.ORDERED},
+            filters={"order_id": next_queued_order["order_id"]},
+        )
+
+        log_messages = [LOG_MESSAGES.STATUS_CHANGED]
+        if next_queued_order["location"] == utils_orders.RECORD_LOCATION.READING_ROOM:
+
+            expire_at = utils_orders.get_expire_at_date()
+            await crud.update(
+                table="orders",
+                update_values={"expire_at": expire_at, "message_sent": 1},
+                filters={"order_id": next_queued_order["order_id"]},
+            )
+            next_queued_order = await _get_orders_one(crud, order_id=next_queued_order["order_id"])
+            await utils_orders.send_order_message(MAIL_MESSAGE_ORDER_READY_TITLE, MAIL_MESSAGE_ORDER_READY, next_queued_order)
+            log_messages.append(LOG_MESSAGES.MAIL_SENT)
+
+        # Log the status change
+        await _insert_log_message(
+            crud,
+            user_id=user_id,
+            order=next_queued_order,
+            message=". ".join(log_messages),
+        )
 
 
-async def _update_status(crud: "CRUD", user_id: str, order_id: int, new_status: int):
+async def _update_status_completed_deleted(crud: "CRUD", user_id: str, order_id: int, new_status: int):
     """
     Updates the user status of an order. If the order's status is COMPLETED or DELETED, it checks for QUEUED orders
     on the same record. If found, updates the first QUEUED order to ORDERED and processes further actions.
     """
     order = await _get_orders_one(crud, order_id=order_id)
+
+    # Guard clause to check if the new status is the same as the current status
     if new_status == order["order_status"]:
         return
 
@@ -277,45 +320,14 @@ async def _update_status(crud: "CRUD", user_id: str, order_id: int, new_status: 
 
     # Get the updated order
     order = await _get_orders_one(crud, order_id=order_id)
-    if new_status in [utils_orders.ORDER_STATUS.COMPLETED, utils_orders.ORDER_STATUS.DELETED]:
-        await _insert_log_message(
-            crud,
-            user_id,
-            order,
-            LOG_MESSAGES.STATUS_CHANGED,
-        )
+    await _insert_log_message(
+        crud,
+        user_id,
+        order,
+        LOG_MESSAGES.STATUS_CHANGED,
+    )
 
-        next_queued_order = await _get_orders_one(crud, statuses=[utils_orders.ORDER_STATUS.QUEUED], record_id=order["record_id"])
-        if next_queued_order:
-            # Update the status of the next queued order to ORDERED
-            await crud.update(
-                table="orders",
-                update_values={"order_status": utils_orders.ORDER_STATUS.ORDERED},
-                filters={"order_id": next_queued_order["order_id"]},
-            )
-            log_messages = [LOG_MESSAGES.STATUS_CHANGED]
-
-            if next_queued_order["location"] == utils_orders.RECORD_LOCATION.READING_ROOM:
-                # Update the expire and send a message if the order is in the reading room
-                log.info(f"Order {next_queued_order['order_id']} moved to READING_ROOM.")
-
-                expire_at = utils_orders.get_expire_at_date()
-                await crud.update(
-                    table="orders",
-                    update_values={"expire_at": expire_at, "message_sent": 1},
-                    filters={"order_id": next_queued_order["order_id"]},
-                )
-                next_queued_order = await _get_orders_one(crud, order_id=next_queued_order["order_id"])
-                await utils_orders.send_order_message(MAIL_MESSAGE_ORDER_READY_TITLE, MAIL_MESSAGE_ORDER_READY, next_queued_order)
-                log_messages.append(LOG_MESSAGES.MAIL_SENT)
-
-            # Log the status change
-            await _insert_log_message(
-                crud,
-                user_id=user_id,
-                order=next_queued_order,
-                message=". ".join(log_messages),
-            )
+    await _update_next_queued_order(crud, user_id, order["record_id"])
 
 
 async def _update_location(crud: "CRUD", user_id: str, order_id: int, new_location: int):
@@ -381,6 +393,78 @@ async def _update_comment(crud: "CRUD", user_id: str, order_id: int, new_comment
     )
 
 
+async def _update_status_ordered_queued(crud: "CRUD", user_id: str, order_id: int):
+    """
+    Promote an order from APPLICATION to ORDERED or QUEUED.
+
+    - If another ORDERED order exists for the same record -> promote to QUEUED
+    - Else -> promote to ORDERED
+    - If promoted to ORDERED and record is in READING_ROOM:
+        - set expire_at
+        - send "ready" mail once (message_sent)
+    - Always log STATUS_CHANGED (+ MAIL_SENT if applicable)
+    """
+
+    order = await _get_orders_one(crud, order_id=order_id)
+
+    # Only handle APPLICATION orders
+    if order["order_status"] != utils_orders.ORDER_STATUS.APPLICATION:
+        return
+
+    # Determine promotion target based on current ORDERED orders on the same record
+    existing_ordered = await _get_orders_one(
+        crud,
+        statuses=[utils_orders.ORDER_STATUS.ORDERED],
+        record_id=order["record_id"],
+    )
+
+    target_status = utils_orders.ORDER_STATUS.QUEUED if existing_ordered else utils_orders.ORDER_STATUS.ORDERED
+
+    update_values: dict = {
+        "order_status": target_status,
+        "updated_at": utils_orders.get_current_date_time(),
+    }
+    log_messages = [LOG_MESSAGES.STATUS_CHANGED]
+
+    # If it becomes ORDERED and the material is already in the reading room,
+    # set expire and notify (once).
+    if target_status == utils_orders.ORDER_STATUS.ORDERED and order["location"] == utils_orders.RECORD_LOCATION.READING_ROOM:
+        update_values["expire_at"] = utils_orders.get_expire_at_date()
+
+        if not order.get("message_sent"):
+            await utils_orders.send_order_message(
+                MAIL_MESSAGE_ORDER_READY_TITLE,
+                MAIL_MESSAGE_ORDER_READY,
+                order,
+            )
+            update_values["message_sent"] = 1
+            log_messages.append(LOG_MESSAGES.MAIL_SENT)
+
+    await crud.update(
+        table="orders",
+        update_values=update_values,
+        filters={"order_id": order_id},
+    )
+
+    updated_order = await _get_orders_one(crud, order_id=order_id)
+    await _insert_log_message(
+        crud,
+        user_id=user_id,
+        order=updated_order,
+        message=". ".join(log_messages),
+    )
+
+
+async def promote_application_order(user_id: str, order_id: int):
+    """
+    Promote an order from APPLICATION to ORDERED or QUEUED based on existing ORDERED orders for the same record.
+    """
+    database_connection = DatabaseConnection(orders_url)
+    async with database_connection.transaction_scope_async() as connection:
+        crud = CRUD(connection)
+        await _update_status_ordered_queued(crud, user_id, order_id)
+
+
 async def update_order(
     user_id: str,
     order_id: int,
@@ -406,8 +490,8 @@ async def update_order(
         if location:
             await _update_location(crud, user_id, order_id, location)
 
-        if order_status:
-            await _update_status(crud, user_id, order_id, order_status)
+        if order_status in [utils_orders.ORDER_STATUS.COMPLETED, utils_orders.ORDER_STATUS.DELETED]:
+            await _update_status_completed_deleted(crud, user_id, order_id, order_status)
 
         if expire_at:
             """
@@ -456,7 +540,7 @@ async def get_orders_user_count(user_id: str) -> int:
         SELECT COUNT(*) AS num_rows
         FROM orders
         WHERE user_id = :user_id
-          AND order_status IN (:status_ordered, :status_queued)
+          AND order_status IN (:status_ordered, :status_queued, :status_application)
         """
 
         row = await crud.query_one(
@@ -465,6 +549,7 @@ async def get_orders_user_count(user_id: str) -> int:
                 "user_id": user_id,
                 "status_ordered": utils_orders.ORDER_STATUS.ORDERED,
                 "status_queued": utils_orders.ORDER_STATUS.QUEUED,
+                "status_application": utils_orders.ORDER_STATUS.APPLICATION,
             },
         )
 
@@ -500,7 +585,7 @@ FROM orders o
 LEFT JOIN records r ON o.record_id = r.record_id
 LEFT JOIN users u ON o.user_id = u.user_id
 WHERE
-    (o.order_status IN ({utils_orders.ORDER_STATUS.QUEUED})) OR
+    (o.order_status IN ({utils_orders.ORDER_STATUS.QUEUED}, {utils_orders.ORDER_STATUS.APPLICATION})) OR
     (o.order_status IN ({utils_orders.ORDER_STATUS.ORDERED}) AND r.location <> {utils_orders.RECORD_LOCATION.READING_ROOM})
 AND o.user_id = :user_id
 ORDER BY o.order_id DESC
@@ -554,14 +639,14 @@ def _get_and_filters_str_and_values(filters: OrderFilter) -> tuple:
 
 async def _get_active_orders(crud: "CRUD", filters: OrderFilter, offset: int = 0) -> list:
     """
-    Get active orders (ORDERED and optionally QUEUED)
+    Get active orders (ORDERED, APPLICATION and optionally QUEUED)
     """
     search_filters_as_str, placeholder_values = _get_and_filters_str_and_values(filters)
 
     if filters.filter_show_queued:
-        order_statuses = f"{utils_orders.ORDER_STATUS.ORDERED}, {utils_orders.ORDER_STATUS.QUEUED}"
+        order_statuses = f"{utils_orders.ORDER_STATUS.ORDERED}, {utils_orders.ORDER_STATUS.QUEUED}, {utils_orders.ORDER_STATUS.APPLICATION}"
     else:
-        order_statuses = f"{utils_orders.ORDER_STATUS.ORDERED}"
+        order_statuses = f"{utils_orders.ORDER_STATUS.ORDERED}, {utils_orders.ORDER_STATUS.APPLICATION}"
 
     query = f"""
 SELECT o.*, r.*, u.*
@@ -815,7 +900,7 @@ async def cron_orders_expire() -> int:
             async with database_connection.transaction_scope_async() as connection:
                 crud = CRUD(connection)
                 log.info(f"Order {order['order_id']} has passed expire_at. Setting status to COMPLETED")
-                await _update_status(
+                await _update_status_completed_deleted(
                     crud,
                     SYSTEM_USER_ID,
                     order["order_id"],
