@@ -9,7 +9,6 @@ from maya.database.utils import DatabaseConnection
 from maya.core.logging import get_log, get_custom_log
 from dataclasses import dataclass
 from typing import Optional
-import json
 from maya.records.meta_data_record import is_orderable_by_form
 
 

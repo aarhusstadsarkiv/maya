@@ -182,14 +182,12 @@ if settings["allow_online_ordering"]:
             name="orders_admin_patch_single",
             methods=["POST"],
         ),
-
         Route(
             "/admin/orders/patch/{order_id:int}/promote",
             endpoint=endpoints_order.orders_admin_patch_promote_application,
             name="orders_admin_patch_promote_application",
             methods=["POST"],
         ),
-
         Route(
             "/admin/orders/patch",
             endpoint=endpoints_order.orders_admin_patch_multiple,

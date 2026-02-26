@@ -2,7 +2,6 @@ import typing
 
 
 settings: dict[str, typing.Any] = {
-
     "client_name": "development",
     "client_url": "https://www.lydsporaarhus.dk",
     "client_email": "stadsarkivet@aarhusarkivet.dk",

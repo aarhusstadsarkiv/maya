@@ -1,4 +1,3 @@
-from starlette.routing import Route
 from starlette.requests import Request
 from starlette.exceptions import HTTPException
 from maya.core.templates import templates
