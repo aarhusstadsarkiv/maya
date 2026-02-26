@@ -4,6 +4,10 @@ Set an API key:
 
     export API_KEY=your-api-key
 
+Indicate it is a test:
+
+    export TEST=TRUE
+
 ## Run all tests
 
     maya source-test

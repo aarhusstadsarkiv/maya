@@ -34,14 +34,6 @@ class TestDB(unittest.TestCase):
         with open(record_and_types_file) as f:
             record_and_types = json.load(f)
 
-        # meta_data_file = "tests/data/meta_data_000495102.json"
-        # with open(meta_data_file) as f:
-        #     meta_data = json.load(f)
-
-        # record_and_types_file = "tests/data/record_and_types_000495102.json"
-        # with open(record_and_types_file) as f:
-        #     record_and_types = json.load(f)
-
         return me, me_2, meta_data, record_and_types
 
     def test_insert_order(self):
