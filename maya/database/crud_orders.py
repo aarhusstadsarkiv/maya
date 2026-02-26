@@ -354,7 +354,7 @@ async def _update_location(crud: "CRUD", user_id: str, order_id: int, new_locati
     order_update_values["updated_at"] = utils_orders.get_current_date_time()
 
     # If the order is in the reading room, set the expire_at and send a message
-    if new_location == utils_orders.RECORD_LOCATION.READING_ROOM:
+    if new_location == utils_orders.RECORD_LOCATION.READING_ROOM and order["order_status"] == utils_orders.ORDER_STATUS.ORDERED:
         order_update_values["expire_at"] = utils_orders.get_expire_at_date()
 
         # Ensure only one order message is sent
@@ -824,6 +824,7 @@ async def get_order(order_id: int):
 async def get_logs(order_id: int = 0) -> list:
     """
     Get a single joined order by order_id for display on the admin edit order page
+    Latest logs are returned first.
     """
     database_connection = DatabaseConnection(orders_url)
     async with database_connection.transaction_scope_async() as connection:
