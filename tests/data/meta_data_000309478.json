@@ -1,0 +1,47 @@
+{
+    "id": "000309478",
+    "real_id": "309478",
+    "_allowed_by_ip": false,
+    "_permission_granted": true,
+    "title": "Aarhus Vejviser 1997",
+    "meta_title": "Aarhus Vejviser 1997",
+    "summary": "",
+    "meta_description": "Aarhus Vejviser 1997",
+    "icon": {
+        "icon": "article",
+        "label": "Publikationer"
+    },
+    "copyright_id": 7,
+    "legal_id": 1,
+    "contractual_id": 5,
+    "availability_id": 3,
+    "usability_id": 4,
+    "collection_id": 204,
+    "content_types_label": "",
+    "orderable": true,
+    "orderable_online": true,
+    "orderable_by_form": false,
+    "order_message": "<p>Materialet kan bestilles hjem til læsesalen.</p>",
+    "resources": {
+        "digital_size": "8469.218 MB",
+        "mimetype": "application/zip",
+        "checksum_algorithm": "MD5",
+        "filename": "000309478.zip",
+        "original_filename": "Aarhus Vejviser 1997.zip",
+        "checksum": "3479d47c09595cb5854233681bc39ce7",
+        "last_checksum_date": "2019-02-25 07:41:27",
+        "type": "digital"
+    },
+    "record_type": "web_document",
+    "representations": {
+        "record_type": "web_document",
+        "web_document_url": "https://storage.googleapis.com/openaws-webonly/000309478_c.pdf",
+        "record_image": "https://storage.googleapis.com/openaws-access/000309478_m.jpg",
+        "large_image": "https://storage.googleapis.com/openaws-access/000309478_m.jpg"
+    },
+    "portrait": "https://storage.googleapis.com/openaws-access/000309478_m.jpg",
+    "is_representations_online": true,
+    "is_downloadable": false,
+    "has_active_order": true,
+    "active_order_message": "Det bestilte materialle er tilgængeligt. Du kan gennemse det på læsesalen."
+}

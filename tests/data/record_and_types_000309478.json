@@ -1,0 +1,213 @@
+{
+    "last_updated": {
+        "value": "2019-05-09T11:38:26.571000",
+        "name": "last_updated",
+        "type": "date",
+        "label": "Senest opdateret"
+    },
+    "id": {
+        "value": "000309478",
+        "name": "id",
+        "type": "string",
+        "label": "Arkiv ID"
+    },
+    "registration_id": {
+        "value": 1639,
+        "name": "registration_id",
+        "type": "string",
+        "label": "Registrations ID"
+    },
+    "title": {
+        "value": "Aarhus Vejviser 1997",
+        "name": "title",
+        "type": "string",
+        "label": "Titel"
+    },
+    "date_from": {
+        "value": "1997",
+        "name": "date_from",
+        "type": "string",
+        "label": "Dato fra"
+    },
+    "created_by": {
+        "value": "Claus Juhl Knudsen",
+        "name": "created_by",
+        "type": "string",
+        "label": "Oprettet af"
+    },
+    "availability": {
+        "value": {
+            "label": "På læsesalen",
+            "id": 3
+        },
+        "name": "availability",
+        "type": "label_dict",
+        "label": "Tilgængelighed"
+    },
+    "other_legal_restrictions": {
+        "value": {
+            "id": 1,
+            "label": "Ingen andre juridiske begrænsninger"
+        },
+        "name": "other_legal_restrictions",
+        "type": "label_dict",
+        "label": "Lovgivning"
+    },
+    "type": {
+        "value": "record",
+        "name": "type",
+        "type": "string",
+        "label": "Type"
+    },
+    "thumbnail": {
+        "value": "https://storage.googleapis.com/openaws-access/000309478_s.jpg",
+        "name": "thumbnail",
+        "type": "url",
+        "label": "Thumbnail"
+    },
+    "resources": {
+        "value": [
+            {
+                "type": "digital",
+                "digital_size": "8469.218 MB",
+                "mimetype": "application/zip",
+                "checksum_algorithm": "MD5",
+                "filename": "000309478.zip",
+                "original_filename": "Aarhus Vejviser 1997.zip",
+                "checksum": "3479d47c09595cb5854233681bc39ce7",
+                "last_checksum_date": "2019-02-25 07:41:27"
+            }
+        ],
+        "name": "resources",
+        "type": "key_value_dicts",
+        "label": "Ressourcer"
+    },
+    "schema": {
+        "value": "oas_v1.0",
+        "name": "schema",
+        "type": "string",
+        "label": "Skema"
+    },
+    "curators": {
+        "value": [
+            {
+                "id": 1,
+                "label": "Aarhus Stadsarkiv",
+                "search_query": "/search?curators=1",
+                "display_as_link": true
+            }
+        ],
+        "name": "curators",
+        "type": "link_list",
+        "label": "Kurator"
+    },
+    "copyright_status": {
+        "value": {
+            "id": 7,
+            "label": "Alle rettigheder forbeholdes. Aftaler mangler"
+        },
+        "name": "copyright_status",
+        "type": "label_dict",
+        "label": "Ophavsret"
+    },
+    "collection": {
+        "value": {
+            "label": "Aarhus Vejvisere (1859-2007)",
+            "id": 204,
+            "search_query": "/search?collection=204",
+            "display_as_link": true
+        },
+        "name": "collection",
+        "type": "link_dict",
+        "label": "Samling"
+    },
+    "last_updated_by": {
+        "value": "Thomas Norskov Kristensen",
+        "name": "last_updated_by",
+        "type": "string",
+        "label": "Senest opdateret af"
+    },
+    "date_to": {
+        "value": "1997",
+        "name": "date_to",
+        "type": "string",
+        "label": "Datering"
+    },
+    "created": {
+        "value": "2019-02-25T07:57:40.788000",
+        "name": "created",
+        "type": "date",
+        "label": "Oprettet"
+    },
+    "content_types": {
+        "value": [
+            [
+                {
+                    "id": 36,
+                    "label": "Publikationer",
+                    "search_query": "/search?content_types=36",
+                    "display_as_link": true
+                },
+                {
+                    "id": 46,
+                    "label": "Fortegnelser",
+                    "search_query": "/search?content_types=46",
+                    "display_as_link": true
+                }
+            ]
+        ],
+        "name": "content_types",
+        "type": "link_list_hierarchy",
+        "label": "Materialetype"
+    },
+    "usability": {
+        "value": {
+            "label": "Alle rettigheder forbeholdes",
+            "id": 4
+        },
+        "name": "usability",
+        "type": "label_dict",
+        "label": "Ophavsret"
+    },
+    "date_normalized": {
+        "value": "1997",
+        "name": "date_normalized",
+        "type": "string",
+        "label": "Datering"
+    },
+    "copyright_status_normalized": {
+        "value": [
+            "Alle rettigheder forbeholdes. Aftaler mangler",
+            "En eller flere nødvendige ophavsretsaftaler mangler, ofte på grund af ukendte skabere eller rettighedshavere. Materialet må derfor hverken gengives eller publiceres andetsteds. "
+        ],
+        "name": "copyright_status_normalized",
+        "type": "string_list",
+        "label": "Ophavsret"
+    },
+    "contractual_status_normalized": {
+        "value": "Materialet er ikke begrænset af kontraktuelle klausuler.",
+        "name": "contractual_status_normalized",
+        "type": "string",
+        "label": "Aftaleforhold"
+    },
+    "other_legal_restrictions_normalized": {
+        "value": "Materialet er ikke underlagt andre juridiske begrænsninger af tilgængeligheden.",
+        "name": "other_legal_restrictions_normalized",
+        "type": "string",
+        "label": "Lovgivning"
+    },
+    "availability_normalized": {
+        "value": "Materialet er tilgængeligt på læsesalen. Der kræves ikke forudgående bestilling for at se materialet på læsesalen. Man skal blot møde op i åbningstiderne.",
+        "name": "availability_normalized",
+        "type": "string",
+        "label": "Tilgængelighed"
+    },
+    "ordering_normalized": {
+        "value": [
+            "Du kan bestille materialet ved at sende en mail til bestil.stadsarkiv@aarhus.dk, hvori du angiver materialets arkiv-ID, som kan ses øverst på siden."
+        ],
+        "name": "ordering_normalized",
+        "type": "ordering_normalized",
+        "label": "Bestilling"
+    }
+}
