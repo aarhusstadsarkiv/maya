@@ -332,6 +332,7 @@ async def orders_admin_get(request: Request):
         "orders": orders,
         "filters": filters,
         "locations": utils_orders.RECORD_LOCATION_HUMAN,
+        "ORDER_STATUS": utils_orders.ORDER_STATUS,
     }
     context = await get_context(request, context_values=context_values)
 

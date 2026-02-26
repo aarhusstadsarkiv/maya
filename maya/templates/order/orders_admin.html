@@ -109,7 +109,7 @@
                         href="/admin/orders/{{order.record_id}}/html">{{order.record_id}}</a>
                 </td>
                 <td class="width-300" title="{{ order.collectors }}">{{ order.collectors }} </td>
-                {% if order.order_status == 5 %}
+                {% if order.order_status == ORDER_STATUS.APPLICATION %}
                 <td class="width-300" title="KUN via skiftlig ansøgning: {{ order.label }}">
                     <span class="has-comment">{{ get_icon('counter_1')|safe }} {{ order.label }} </span>
                 </td>
@@ -173,7 +173,7 @@ at benytte det. Du må først afslutte den aktive bestilling, før du kan ændre
                         <a class="action-link" data-id="{{order.order_id}}" data-action="completed"
                             title="Brugeren er færdig med bestillingen" href="#">Afslut</a>
                     </span>
-                        {% if order.order_status == 5 %}
+                        {% if order.order_status == ORDER_STATUS.APPLICATION %}
                         <span class="complete-order">
                             <a class="action-link" data-id="{{order.order_id}}" data-action="promote_application"
                                 title="Ansøgning er godkendt" href="#">Godkend</a>
