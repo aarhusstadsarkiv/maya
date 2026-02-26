@@ -205,8 +205,6 @@ async def orders_admin_patch_multiple(request: Request):
             location = order_location["location"]
             assert isinstance(location, int)
 
-            log.info(f"Updating order {order_id} to location {location}")
-
             await crud_orders.update_order(
                 user_id=me["id"],
                 order_id=order_id,
@@ -238,8 +236,6 @@ async def orders_admin_patch_single(request: Request):
         order_id = request.path_params["order_id"]
         update_values: dict = await request.json()
 
-        log.debug(f"Updating order {order_id} with values {update_values}")
-
         await crud_orders.update_order(
             user_id=me["id"],
             order_id=order_id,
@@ -268,7 +264,7 @@ async def orders_admin_patch_single(request: Request):
         )
 
 
-async def orders_admin_patch_promote_application(request: Request):
+async def orders_admin_promote_application(request: Request):
     """
     Patch a single order as admin to promote an application to an order
     This is used to promote a queued application to an active order
@@ -284,7 +280,6 @@ async def orders_admin_patch_promote_application(request: Request):
             order_id=order_id,
         )
 
-        log.debug(f"Promoted application order {order_id} to active order")
         message = "Ansøgningen er blevet godkendt og er nu en aktiv bestilling"
 
         flash.set_message(request, message, type="success")
