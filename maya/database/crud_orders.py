@@ -252,7 +252,7 @@ async def insert_order(meta_data: dict, record_and_types: dict, me: dict) -> dic
         return last_inserted_order
 
 
-async def _update_status_completed_deleted(crud: "CRUD", user_id: str, order_id: int, new_status: int):
+async def _update_order_status(crud: "CRUD", user_id: str, order_id: int, new_status: int):
     """
     Updates the order_status of an order. If the order's status is COMPLETED or DELETED, it checks for QUEUED orders
     on the same record. If found, updates the first QUEUED order to ORDERED and processes further actions.
@@ -354,7 +354,7 @@ async def _promote_order_status(crud: "CRUD", user_id: str, order_id: int):
     Promote an order from APPLICATION to ORDERED or QUEUED.
 
     - If another ORDERED order exists for the same record -> promote to QUEUED
-    - Else -> promote to ORDERED
+    - Else > promote to ORDERED
     - If promoted to ORDERED and record is in READING_ROOM:
         - set expire_at
         - send "ready" mail once (message_sent)
@@ -375,7 +375,6 @@ async def _promote_order_status(crud: "CRUD", user_id: str, order_id: int):
     )
 
     target_status = utils_orders.ORDER_STATUS.QUEUED if existing_ordered else utils_orders.ORDER_STATUS.ORDERED
-
     update_values: dict = {
         "order_status": target_status,
         "updated_at": utils_orders.get_current_date_time(),
@@ -433,7 +432,7 @@ async def update_order(
             await _update_location(crud, user_id, order_id, location)
 
         if order_status in [utils_orders.ORDER_STATUS.COMPLETED, utils_orders.ORDER_STATUS.DELETED]:
-            await _update_status_completed_deleted(crud, user_id, order_id, order_status)
+            await _update_order_status(crud, user_id, order_id, order_status)
 
         if expire_at:
             """
@@ -766,7 +765,7 @@ async def get_order(order_id: int):
 
 async def get_logs(order_id: int = 0) -> list:
     """
-    Get a single joined order by order_id for display on the admin edit order page
+    Get logs for an order. If order_id is provided, get logs for that order, otherwise get the latest 100 logs.
     Latest logs are returned first.
     """
     database_connection = DatabaseConnection(orders_url)
@@ -843,7 +842,7 @@ async def cron_orders_expire() -> int:
             async with database_connection.transaction_scope_async() as connection:
                 crud = CRUD(connection)
                 log.info(f"Order {order['order_id']} has passed expire_at. Setting status to COMPLETED")
-                await _update_status_completed_deleted(
+                await _update_order_status(
                     crud,
                     SYSTEM_USER_ID,
                     order["order_id"],
