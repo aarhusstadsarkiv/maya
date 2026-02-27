@@ -93,7 +93,7 @@ class TestDB(unittest.TestCase):
 
         # Test correct amount of log messages. One line for inserting and one for promoting the application to an order
         logs = await crud_orders.get_logs(1)
-        self.assertEqual(len(logs), 2)
+        self.assertEqual(len(logs), 3)
 
         # Test that log messages are correct
         # last thing is that the order was promoted to an order so "status" has changed

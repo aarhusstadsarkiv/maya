@@ -72,7 +72,7 @@ async def has_active_order(user_id: str, record_id: str):
     database_connection = DatabaseConnection(orders_url)
     async with database_connection.transaction_scope_async() as connection:
         crud = CRUD(connection)
-        active_order = await _has_active_order(crud, user_id, record_id)
+        active_order = await _has_active_order_on_record(crud, user_id, record_id)
         return active_order
 
 
@@ -103,7 +103,7 @@ async def replace_employee(me: dict):
         await crud.replace("users", user_data, {"user_id": me["id"]})
 
 
-async def _has_active_order(crud: "CRUD", user_id: str, record_id: str):
+async def _has_active_order_on_record(crud: "CRUD", user_id: str, record_id: str):
     """
     Check if user has an active order on a record
     """
@@ -112,12 +112,12 @@ async def _has_active_order(crud: "CRUD", user_id: str, record_id: str):
     return order
 
 
-async def _is_renew_possible(crud: "CRUD", order: dict):
+async def _is_order_renew_possible(crud: "CRUD", order: dict):
     """
     Check if an order can be renewed
     """
 
-    # only orders that the user has access to in the reading room renewed
+    # only orders that the user has access to in the reading room can be renewed
     # expire_at is only set when the order is eligible in the reading room
     if not order["expire_at"]:
         return False
@@ -128,11 +128,7 @@ async def _is_renew_possible(crud: "CRUD", order: dict):
         return False
 
     # if there is a queued order for the same record, renewal is not possible
-    queued = await _get_orders_one(
-        crud,
-        record_id=order["record_id"],
-        statuses=[utils_orders.ORDER_STATUS.QUEUED],
-    )
+    queued = await _get_orders_one(crud, record_id=order["record_id"], statuses=[utils_orders.ORDER_STATUS.QUEUED])
 
     if queued:
         return False
@@ -149,24 +145,15 @@ async def renew_order(user_id: str, order_id: int):
         crud = CRUD(connection)
         order = await _get_orders_one(crud, order_id=order_id)
 
-        renew_possible = await _is_renew_possible(crud, order)
+        renew_possible = await _is_order_renew_possible(crud, order)
         if not renew_possible:
             raise Exception(f"Bestilling {order_id} kan ikke fornyes")
 
         expire_at_date = utils_orders.get_expire_at_date()
-        await crud.update(
-            table="orders",
-            update_values={"expire_at": expire_at_date},
-            filters={"order_id": order_id},
-        )
+        await crud.update(table="orders", update_values={"expire_at": expire_at_date}, filters={"order_id": order_id})
 
         # Log the renewal
-        await _insert_log_message(
-            crud,
-            user_id=user_id,
-            order=order,
-            message=LOG_MESSAGES.ORDER_RENEWED,
-        )
+        await _insert_log_message(crud, user_id=user_id, order=order, message=LOG_MESSAGES.ORDER_RENEWED)
 
 
 async def _update_user_record_data(crud: "CRUD", meta_data: dict, record_and_types: dict, me: dict):
@@ -191,8 +178,10 @@ async def _update_user_record_data(crud: "CRUD", meta_data: dict, record_and_typ
 
 
 async def _get_insert_order_status(crud: "CRUD", meta_data: dict) -> int:
+    """
+    Determine the initial order status for a new order based on the record's metadata and existing orders.
+    """
 
-    # Check if the status will be APPLICATION, QUEUED or ORDERED
     active_order = await _get_orders_one(crud, [utils_orders.ORDER_STATUS.ORDERED], meta_data["id"])
     if is_orderable_by_form(meta_data):
         order_status = utils_orders.ORDER_STATUS.APPLICATION
@@ -204,21 +193,6 @@ async def _get_insert_order_status(crud: "CRUD", meta_data: dict) -> int:
     return order_status
 
 
-async def _send_order_message_on_insert(crud: "CRUD", inserted_order: dict):
-    expire_at = utils_orders.get_expire_at_date()
-    inserted_order["expire_at"] = expire_at
-
-    # Update order with expire_at and message status
-    await crud.update(
-        table="orders",
-        update_values={"expire_at": expire_at, "message_sent": 1},
-        filters={"order_id": inserted_order["order_id"]},
-    )
-
-    # updated_order = await _get_orders_one(crud, order_id=inserted_order["order_id"])
-    await utils_orders.send_order_message(MAIL_MESSAGE_ORDER_READY_TITLE, MAIL_MESSAGE_ORDER_READY, inserted_order)
-
-
 async def insert_order(meta_data: dict, record_and_types: dict, me: dict) -> dict:
     """
     Insert an order into the database with proper validations and updates.
@@ -227,8 +201,7 @@ async def insert_order(meta_data: dict, record_and_types: dict, me: dict) -> dic
     async with database_connection.transaction_scope_async() as connection:
         crud = CRUD(connection)
 
-        # Check is user has an existing order on the record
-        if await _has_active_order(crud, me["id"], meta_data["id"]):
+        if await _has_active_order_on_record(crud, me["id"], meta_data["id"]):
             raise Exception("User is already active on this record")
 
         await _update_user_record_data(crud, meta_data, record_and_types, me)
@@ -240,7 +213,6 @@ async def insert_order(meta_data: dict, record_and_types: dict, me: dict) -> dic
             meta_data["id"],
             order_status,
         )
-
         await crud.insert("orders", order_data)
 
         # Retrieve the newly created order and log the creation
@@ -253,7 +225,19 @@ async def insert_order(meta_data: dict, record_and_types: dict, me: dict) -> dic
             last_inserted_order["location"] == utils_orders.RECORD_LOCATION.READING_ROOM
             and order_status == utils_orders.ORDER_STATUS.ORDERED
         ):
-            await _send_order_message_on_insert(crud, last_inserted_order)
+
+            expire_at = utils_orders.get_expire_at_date()
+            last_inserted_order["expire_at"] = expire_at
+
+            # Update order with expire_at and message status
+            await crud.update(
+                table="orders",
+                update_values={"expire_at": expire_at, "message_sent": 1},
+                filters={"order_id": last_inserted_order["order_id"]},
+            )
+
+            # No chance that message_sent is already 1 here since the order was just created.
+            await utils_orders.send_order_message(MAIL_MESSAGE_ORDER_READY_TITLE, MAIL_MESSAGE_ORDER_READY, last_inserted_order)
             log_messages.append(LOG_MESSAGES.MAIL_SENT)
 
         await _insert_log_message(
@@ -268,10 +252,27 @@ async def insert_order(meta_data: dict, record_and_types: dict, me: dict) -> dic
         return last_inserted_order
 
 
-async def _update_next_queued_order(crud: "CRUD", user_id: str, record_id: str):
-    next_queued_order = await _get_orders_one(crud, statuses=[utils_orders.ORDER_STATUS.QUEUED], record_id=record_id)
+async def _update_status_completed_deleted(crud: "CRUD", user_id: str, order_id: int, new_status: int):
+    """
+    Updates the order_status of an order. If the order's status is COMPLETED or DELETED, it checks for QUEUED orders
+    on the same record. If found, updates the first QUEUED order to ORDERED and processes further actions.
+    """
+    order = await _get_orders_one(crud, order_id=order_id)
+
+    # Guard clause to check if the new status is the same as the current status
+    if new_status == order["order_status"]:
+        return
+
+    await crud.update(table="orders", update_values={"order_status": new_status}, filters={"order_id": order_id})
+
+    # Get the updated order
+    order = await _get_orders_one(crud, order_id=order_id)
+    await _insert_log_message(crud, user_id, order, LOG_MESSAGES.STATUS_CHANGED)
+
+    # Updates the next queued order if any
+    next_queued_order = await _get_orders_one(crud, statuses=[utils_orders.ORDER_STATUS.QUEUED], record_id=order["record_id"])
     if next_queued_order:
-        # Update the status of the next queued order to ORDERED
+
         await crud.update(
             table="orders",
             update_values={"order_status": utils_orders.ORDER_STATUS.ORDERED},
@@ -292,47 +293,13 @@ async def _update_next_queued_order(crud: "CRUD", user_id: str, record_id: str):
             log_messages.append(LOG_MESSAGES.MAIL_SENT)
 
         # Log the status change
-        await _insert_log_message(
-            crud,
-            user_id=user_id,
-            order=next_queued_order,
-            message=". ".join(log_messages),
-        )
-
-
-async def _update_status_completed_deleted(crud: "CRUD", user_id: str, order_id: int, new_status: int):
-    """
-    Updates the user status of an order. If the order's status is COMPLETED or DELETED, it checks for QUEUED orders
-    on the same record. If found, updates the first QUEUED order to ORDERED and processes further actions.
-    """
-    order = await _get_orders_one(crud, order_id=order_id)
-
-    # Guard clause to check if the new status is the same as the current status
-    if new_status == order["order_status"]:
-        return
-
-    await crud.update(
-        table="orders",
-        update_values={"order_status": new_status},
-        filters={"order_id": order_id},
-    )
-
-    # Get the updated order
-    order = await _get_orders_one(crud, order_id=order_id)
-    await _insert_log_message(
-        crud,
-        user_id,
-        order,
-        LOG_MESSAGES.STATUS_CHANGED,
-    )
-
-    await _update_next_queued_order(crud, user_id, order["record_id"])
+        await _insert_log_message(crud, user_id=user_id, order=next_queued_order, message=". ".join(log_messages))
 
 
 async def _update_location(crud: "CRUD", user_id: str, order_id: int, new_location: int):
     """
     Updates the location of a record.
-    If the location changes to READING_ROOM, set the expire_at and sends a message.
+    If the location changes to READING_ROOM and the order is ORDERED, set the expire_at and sends a message.
     """
     order = await _get_orders_one(crud, order_id=order_id)
     if order["location"] == new_location:
@@ -340,12 +307,7 @@ async def _update_location(crud: "CRUD", user_id: str, order_id: int, new_locati
 
     # Update record location
     await _allow_location_change(crud, order["record_id"], raise_exception=True)
-    record_update_values = {"location": new_location}
-    await crud.update(
-        table="records",
-        update_values=record_update_values,
-        filters={"record_id": order["record_id"]},
-    )
+    await crud.update(table="records", update_values={"location": new_location}, filters={"record_id": order["record_id"]})
 
     log_messages = [LOG_MESSAGES.LOCATION_CHANGED]
 
@@ -357,27 +319,16 @@ async def _update_location(crud: "CRUD", user_id: str, order_id: int, new_locati
     if new_location == utils_orders.RECORD_LOCATION.READING_ROOM and order["order_status"] == utils_orders.ORDER_STATUS.ORDERED:
         order_update_values["expire_at"] = utils_orders.get_expire_at_date()
 
-        # Ensure only one order message is sent
+        # Guard that ensures only one order message is sent.
         if not order.get("message_sent"):
             await utils_orders.send_order_message(MAIL_MESSAGE_ORDER_READY_TITLE, MAIL_MESSAGE_ORDER_READY, order)
             order_update_values["message_sent"] = 1
             log_messages.append(LOG_MESSAGES.MAIL_SENT)
 
     # Perform update on the order
-    await crud.update(
-        table="orders",
-        update_values=order_update_values,
-        filters={"order_id": order_id},
-    )
-
-    # Insert log message for location change
+    await crud.update(table="orders", update_values=order_update_values, filters={"order_id": order_id})
     updated_order = await _get_orders_one(crud, order_id=order_id)
-    await _insert_log_message(
-        crud,
-        user_id=user_id,
-        order=updated_order,
-        message=". ".join(log_messages),
-    )
+    await _insert_log_message(crud, user_id=user_id, order=updated_order, message=". ".join(log_messages))
 
 
 async def _update_comment(crud: "CRUD", user_id: str, order_id: int, new_comment: str):
@@ -385,14 +336,20 @@ async def _update_comment(crud: "CRUD", user_id: str, order_id: int, new_comment
         "comment": new_comment,
         "updated_at": utils_orders.get_current_date_time(),
     }
-    await crud.update(
-        table="orders",
-        update_values=update_values,
-        filters={"order_id": order_id},
-    )
+    await crud.update(table="orders", update_values=update_values, filters={"order_id": order_id})
 
 
-async def _update_status_ordered_queued(crud: "CRUD", user_id: str, order_id: int):
+async def promote_application_order(user_id: str, order_id: int):
+    """
+    Promote an order from APPLICATION to ORDERED or QUEUED based on existing ORDERED orders for the same record.
+    """
+    database_connection = DatabaseConnection(orders_url)
+    async with database_connection.transaction_scope_async() as connection:
+        crud = CRUD(connection)
+        await _promote_order_status(crud, user_id, order_id)
+
+
+async def _promote_order_status(crud: "CRUD", user_id: str, order_id: int):
     """
     Promote an order from APPLICATION to ORDERED or QUEUED.
 
@@ -431,11 +388,7 @@ async def _update_status_ordered_queued(crud: "CRUD", user_id: str, order_id: in
         update_values["expire_at"] = utils_orders.get_expire_at_date()
 
         if not order.get("message_sent"):
-            await utils_orders.send_order_message(
-                MAIL_MESSAGE_ORDER_READY_TITLE,
-                MAIL_MESSAGE_ORDER_READY,
-                order,
-            )
+            await utils_orders.send_order_message(MAIL_MESSAGE_ORDER_READY_TITLE, MAIL_MESSAGE_ORDER_READY, order)
             update_values["message_sent"] = 1
             log_messages.append(LOG_MESSAGES.MAIL_SENT)
 
@@ -452,16 +405,6 @@ async def _update_status_ordered_queued(crud: "CRUD", user_id: str, order_id: in
         order=updated_order,
         message=". ".join(log_messages),
     )
-
-
-async def promote_application_order(user_id: str, order_id: int):
-    """
-    Promote an order from APPLICATION to ORDERED or QUEUED based on existing ORDERED orders for the same record.
-    """
-    database_connection = DatabaseConnection(orders_url)
-    async with database_connection.transaction_scope_async() as connection:
-        crud = CRUD(connection)
-        await _update_status_ordered_queued(crud, user_id, order_id)
 
 
 async def update_order(
@@ -563,7 +506,7 @@ async def get_orders_user(user_id: str, status: str = "active") -> list:
     async with database_connection.transaction_scope_async() as connection:
         crud = CRUD(connection)
 
-        # active orders are orders that are either ORDERED or QUEUED
+        # Active orders are orders that are either ORDERED or QUEUED
         if status == "active":
             query = f"""
             SELECT o.*, r.*, u.*
@@ -576,7 +519,7 @@ AND o.user_id = :user_id
 ORDER BY o.order_id DESC
             """
 
-        # reserved orders are orders that are either ORDERED or QUEUED but not in the reading room
+        # Reserved orders are orders that are either ORDERED or QUEUED but not in the reading room
         elif status == "reserved":
             query = f"""
             SELECT o.*, r.*, u.*
@@ -595,7 +538,7 @@ ORDER BY o.order_id DESC
 
         # Add renewal_possible and days_remaining to each order (utils_orders.)
         for order in orders:
-            order["renewal_possible"] = await _is_renew_possible(
+            order["renewal_possible"] = await _is_order_renew_possible(
                 crud,
                 order=order,
             )
@@ -950,7 +893,7 @@ AND o.order_status = {utils_orders.ORDER_STATUS.ORDERED}
             async with database_connection.transaction_scope_async() as connection:
                 crud = CRUD(connection)
 
-                if not await _is_renew_possible(crud, order):
+                if not await _is_order_renew_possible(crud, order):
                     cron_log.info(f"Order {order['order_id']} could not be renewed")
                     continue
 
