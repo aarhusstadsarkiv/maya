@@ -54,12 +54,19 @@ class TestDB(unittest.TestCase):
         migration.run_migrations()
 
         me, me_2, meta_data, record_and_types = self.get_test_data_application()
-        # Test insert_order
+
+        # Test insert_order application order
         await crud_orders.insert_order(meta_data, record_and_types, me)
 
         order = await crud_orders.get_order(1)
         self.assertEqual(order["order_status"], utils_orders.ORDER_STATUS.APPLICATION)
 
+        # application are displayed as active orders
+        orders_filter = crud_orders.OrderFilter(filter_status="active")
+        orders, _ = await crud_orders.get_orders_admin(filters=orders_filter)
+        self.assertEqual(len(orders), 1)
+
+        # Set location to reading room
         update_values = {"location": utils_orders.RECORD_LOCATION.READING_ROOM}
         await crud_orders.update_order(
             me["id"],
@@ -67,29 +74,25 @@ class TestDB(unittest.TestCase):
             update_values,
         )
 
-        # Order should now have an expire_at
+        # Order should NOT have an expire_at date when it's an application order
         order = await crud_orders.get_order(1)
         self.assertIsNone(order["expire_at"])
 
         # promote application to order
         await crud_orders.promote_application_order(me["id"], order["order_id"])
+
+        # Order should now have status "ordered"
         order = await crud_orders.get_order(1)
         self.assertEqual(order["order_status"], utils_orders.ORDER_STATUS.ORDERED)
 
+        # Check that the user cannot add another order for the same record. 
         with self.assertRaises(Exception) as cm:
             await crud_orders.insert_order(meta_data, record_and_types, me)
-
         self.assertIn("User is already active on this record", str(cm.exception))
-        # Test that application order can be updated to ordered
 
         # Test has_active_order again with the new order
         has_active_order = await crud_orders.has_active_order(me["id"], meta_data["id"])
         self.assertTrue(has_active_order)
-
-        # application are displayed as active orders
-        orders_filter = crud_orders.OrderFilter(filter_status="active")
-        orders, _ = await crud_orders.get_orders_admin(filters=orders_filter)
-        self.assertEqual(len(orders), 1)
 
         # Test correct amount of log messages. One line for inserting and one for promoting the application to an order
         logs = await crud_orders.get_logs(1)
@@ -98,6 +101,10 @@ class TestDB(unittest.TestCase):
         # Test that log messages are correct
         # last thing is that the order was promoted to an order so "status" has changed
         self.assertIn("Bruger status ændret", logs[0]["message"])
+
+        # print all logs message
+        for log_entry in logs:
+            print(log_entry["message"])
 
         # Update location to reading room
 

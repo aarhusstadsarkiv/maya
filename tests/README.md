@@ -20,7 +20,7 @@ Set a config directory to use for your tests:
 
 Run the test:
 
-    python -m unittest tests/config-aarhus/html_test.py
+    python -m unittest tests/core/orders_workflow_application.py
 
 ## Run tests when .env site in sites/*
 
