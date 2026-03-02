@@ -182,17 +182,17 @@ class TestDB(unittest.TestCase):
             update_values,
         )
 
-        # Only 1 active orders in search filters even with queued on (though it doesn't matter as order 1 is order_history now)
+        # Now 0 active orders in search filters even with queued on
         orders_filter = crud_orders.OrderFilter(filter_status="active", filter_show_queued="on")
         orders, _ = await crud_orders.get_orders_admin(filters=orders_filter)
         self.assertEqual(len(orders), 0)
 
-        # Completed (records) should still be 0.
+        # Completed (records) should still be 1
         orders_filter = crud_orders.OrderFilter(filter_status="completed")
         orders, _ = await crud_orders.get_orders_admin(filters=orders_filter)
         self.assertEqual(len(orders), 1)
 
-        # order_history should now be 1
+        # order_history should now be 2
         orders_filter = crud_orders.OrderFilter(filter_status="order_history")
         orders, _ = await crud_orders.get_orders_admin(filters=orders_filter)
         self.assertEqual(len(orders), 2)
