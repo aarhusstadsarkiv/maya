@@ -82,21 +82,25 @@ class TestDB(unittest.TestCase):
         logs = await crud_orders.get_logs(1)
         self.assertIn("Lokation ændret", logs[0]["message"])
 
-        # Order should NOT have an expire_at date when it's an application order
+        # Order should NOT have an expire_at date when the application is not promoted to an order
         order = await crud_orders.get_order(1)
         self.assertIsNone(order["expire_at"])
 
-        # promote application to order
+        # promote application to an order
         await crud_orders.promote_application_order(me["id"], order["order_id"])
 
         # Order should now have status "ordered"
         order = await crud_orders.get_order(1)
         self.assertEqual(order["order_status"], utils_orders.ORDER_STATUS.ORDERED)
 
+        # Check that expire_at is set when promoting an application to an order
+        self.assertIsNotNone(order["expire_at"])
+
+        # Check that mail is sent to the user when promoting the application to an order
         logs = await crud_orders.get_logs(1)
         self.assertIn("Bruger status ændret. Mail sendt", logs[0]["message"])
 
-        # Test correct amount of log messages. One line for inserting and one for promoting the application to an order
+        # Test correct amount of log messages. Insert, promate, location change and mail sent. 
         logs = await crud_orders.get_logs(1)
         self.assertEqual(len(logs), 3)
 
@@ -109,8 +113,9 @@ class TestDB(unittest.TestCase):
         has_active_order = await crud_orders.has_active_order(me["id"], meta_data["id"])
         self.assertTrue(has_active_order)
 
-        logs = await crud_orders.get_logs(2)
-        self.assertIn("Bestilling oprettet", logs[0]["message"])
+        # Logs for order 2
+        logs_2 = await crud_orders.get_logs(2)
+        self.assertIn("Bestilling oprettet", logs_2[0]["message"])
 
         # promte second application to order
         order_2 = await crud_orders.get_order(2)
@@ -119,6 +124,16 @@ class TestDB(unittest.TestCase):
         # order_2 should now have status "queued"
         order_2 = await crud_orders.get_order(2)
         self.assertEqual(order_2["order_status"], utils_orders.ORDER_STATUS.QUEUED)
+
+        # get 2 orders if queued orders are included in the filter
+        orders_filter = crud_orders.OrderFilter(filter_status="active", filter_show_queued="on")
+        orders, _ = await crud_orders.get_orders_admin(filters=orders_filter)
+        self.assertEqual(len(orders), 2)
+
+        # get 1 order if queued orders are not included in the filter
+        orders_filter = crud_orders.OrderFilter(filter_status="active")
+        orders, _ = await crud_orders.get_orders_admin(filters=orders_filter)
+        self.assertEqual(len(orders), 1)
 
         # Change order 1 user status to completed
         update_values = {"order_status": utils_orders.ORDER_STATUS.COMPLETED}
@@ -140,8 +155,47 @@ class TestDB(unittest.TestCase):
         order_2 = await crud_orders.get_order(2)
         self.assertEqual(order_2["order_status"], utils_orders.ORDER_STATUS.ORDERED)
 
+        # The user is notified about the status change of order 2
         logs_2 = await crud_orders.get_logs(2)
         self.assertIn("Bruger status ændret. Mail sendt", logs_2[0]["message"])
+
+        # Only 1 active orders in search filters even with queued on (though it doesn't matter as order 1 is order_history now)
+        orders_filter = crud_orders.OrderFilter(filter_status="active", filter_show_queued="on")
+        orders, _ = await crud_orders.get_orders_admin(filters=orders_filter)
+        self.assertEqual(len(orders), 1)
+
+        # Completed (records) should still be 0.
+        orders_filter = crud_orders.OrderFilter(filter_status="completed")
+        orders, _ = await crud_orders.get_orders_admin(filters=orders_filter)
+        self.assertEqual(len(orders), 0)
+
+        # order_history should now be 1
+        orders_filter = crud_orders.OrderFilter(filter_status="order_history")
+        orders, _ = await crud_orders.get_orders_admin(filters=orders_filter)
+        self.assertEqual(len(orders), 1)
+
+        # Complete order 2
+        update_values = {"order_status": utils_orders.ORDER_STATUS.COMPLETED}
+        await crud_orders.update_order(
+            me_2["id"],
+            order_2["order_id"],
+            update_values,
+        )
+
+        # Only 1 active orders in search filters even with queued on (though it doesn't matter as order 1 is order_history now)
+        orders_filter = crud_orders.OrderFilter(filter_status="active", filter_show_queued="on")
+        orders, _ = await crud_orders.get_orders_admin(filters=orders_filter)
+        self.assertEqual(len(orders), 0)
+
+        # Completed (records) should still be 0.
+        orders_filter = crud_orders.OrderFilter(filter_status="completed")
+        orders, _ = await crud_orders.get_orders_admin(filters=orders_filter)
+        self.assertEqual(len(orders), 1)
+
+        # order_history should now be 1
+        orders_filter = crud_orders.OrderFilter(filter_status="order_history")
+        orders, _ = await crud_orders.get_orders_admin(filters=orders_filter)
+        self.assertEqual(len(orders), 2)
 
 
 if __name__ == "__main__":
