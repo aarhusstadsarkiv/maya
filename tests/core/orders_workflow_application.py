@@ -100,7 +100,7 @@ class TestDB(unittest.TestCase):
         logs = await crud_orders.get_logs(1)
         self.assertIn("Bruger status ændret. Mail sendt", logs[0]["message"])
 
-        # Test correct amount of log messages. Insert, promate, location change and mail sent. 
+        # Test correct amount of log messages. Insert, promate, location change and mail sent.
         logs = await crud_orders.get_logs(1)
         self.assertEqual(len(logs), 3)
 
