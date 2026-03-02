@@ -55,8 +55,12 @@ class TestDB(unittest.TestCase):
 
         me, me_2, meta_data, record_and_types = self.get_test_data_application()
 
-        # Test insert_order application order
+        # Test insert_order application order. Both order that same record, but different users
         await crud_orders.insert_order(meta_data, record_and_types, me)
+        await crud_orders.insert_order(meta_data, record_and_types, me_2)
+
+        logs = await crud_orders.get_logs(1)
+        self.assertIn("Bestilling oprettet", logs[0]["message"])
 
         order = await crud_orders.get_order(1)
         self.assertEqual(order["order_status"], utils_orders.ORDER_STATUS.APPLICATION)
@@ -64,7 +68,7 @@ class TestDB(unittest.TestCase):
         # application are displayed as active orders
         orders_filter = crud_orders.OrderFilter(filter_status="active")
         orders, _ = await crud_orders.get_orders_admin(filters=orders_filter)
-        self.assertEqual(len(orders), 1)
+        self.assertEqual(len(orders), 2)
 
         # Set location to reading room
         update_values = {"location": utils_orders.RECORD_LOCATION.READING_ROOM}
@@ -73,6 +77,10 @@ class TestDB(unittest.TestCase):
             order["order_id"],
             update_values,
         )
+
+        # Check that the location was updated and logged correctly
+        logs = await crud_orders.get_logs(1)
+        self.assertIn("Lokation ændret", logs[0]["message"])
 
         # Order should NOT have an expire_at date when it's an application order
         order = await crud_orders.get_order(1)
@@ -85,7 +93,14 @@ class TestDB(unittest.TestCase):
         order = await crud_orders.get_order(1)
         self.assertEqual(order["order_status"], utils_orders.ORDER_STATUS.ORDERED)
 
-        # Check that the user cannot add another order for the same record. 
+        logs = await crud_orders.get_logs(1)
+        self.assertIn("Bruger status ændret. Mail sendt", logs[0]["message"])
+
+        # Test correct amount of log messages. One line for inserting and one for promoting the application to an order
+        logs = await crud_orders.get_logs(1)
+        self.assertEqual(len(logs), 3)
+
+        # Check that the user cannot add another order for the same record.
         with self.assertRaises(Exception) as cm:
             await crud_orders.insert_order(meta_data, record_and_types, me)
         self.assertIn("User is already active on this record", str(cm.exception))
@@ -94,19 +109,39 @@ class TestDB(unittest.TestCase):
         has_active_order = await crud_orders.has_active_order(me["id"], meta_data["id"])
         self.assertTrue(has_active_order)
 
-        # Test correct amount of log messages. One line for inserting and one for promoting the application to an order
+        logs = await crud_orders.get_logs(2)
+        self.assertIn("Bestilling oprettet", logs[0]["message"])
+
+        # promte second application to order
+        order_2 = await crud_orders.get_order(2)
+        await crud_orders.promote_application_order(me_2["id"], order_2["order_id"])
+
+        # order_2 should now have status "queued"
+        order_2 = await crud_orders.get_order(2)
+        self.assertEqual(order_2["order_status"], utils_orders.ORDER_STATUS.QUEUED)
+
+        # Change order 1 user status to completed
+        update_values = {"order_status": utils_orders.ORDER_STATUS.COMPLETED}
+        await crud_orders.update_order(
+            me["id"],
+            order["order_id"],
+            update_values,
+        )
+
+        # get order_1 again and check that status is completed
+        order = await crud_orders.get_order(1)
+        self.assertEqual(order["order_status"], utils_orders.ORDER_STATUS.COMPLETED)
+
+        # check last log status is ORDER_STATUS.COMPLETED
         logs = await crud_orders.get_logs(1)
-        self.assertEqual(len(logs), 3)
+        self.assertEqual(utils_orders.ORDER_STATUS.COMPLETED, logs[0]["order_status"])
 
-        # Test that log messages are correct
-        # last thing is that the order was promoted to an order so "status" has changed
-        self.assertIn("Bruger status ændret", logs[0]["message"])
+        # Order 2 should now be active since order 1 is completed
+        order_2 = await crud_orders.get_order(2)
+        self.assertEqual(order_2["order_status"], utils_orders.ORDER_STATUS.ORDERED)
 
-        # print all logs message
-        for log_entry in logs:
-            print(log_entry["message"])
-
-        # Update location to reading room
+        logs_2 = await crud_orders.get_logs(2)
+        self.assertIn("Bruger status ændret. Mail sendt", logs_2[0]["message"])
 
 
 if __name__ == "__main__":
