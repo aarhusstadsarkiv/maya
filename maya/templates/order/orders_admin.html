@@ -80,6 +80,7 @@
     <table>
         <thead>
             <tr>
+                <th>ID</th>
                 <th>Materiale</th>
                 <th>Arkivskaber</th>
                 <th>Titel</th>
@@ -104,6 +105,7 @@
             {% set queued = '' %}
             {% endif %}
             <tr class="{{ queued }}">
+                <td>{{ order.order_id }}</td>
                 <td class="record-link">
                     <a title="{{ order.record_and_types_title }}"
                         href="/admin/orders/{{order.record_id}}/html">{{order.record_id}}</a>
