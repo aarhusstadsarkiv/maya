@@ -526,9 +526,14 @@ FROM orders o
 LEFT JOIN records r ON o.record_id = r.record_id
 LEFT JOIN users u ON o.user_id = u.user_id
 WHERE
-    (o.order_status IN ({utils_orders.ORDER_STATUS.QUEUED}, {utils_orders.ORDER_STATUS.APPLICATION})) OR
-    (o.order_status IN ({utils_orders.ORDER_STATUS.ORDERED}) AND r.location <> {utils_orders.RECORD_LOCATION.READING_ROOM})
-AND o.user_id = :user_id
+  o.user_id = :user_id
+  AND (
+    o.order_status IN ({utils_orders.ORDER_STATUS.QUEUED}, {utils_orders.ORDER_STATUS.APPLICATION})
+    OR (
+      o.order_status IN ({utils_orders.ORDER_STATUS.ORDERED})
+      AND r.location <> {utils_orders.RECORD_LOCATION.READING_ROOM}
+    )
+  )
 ORDER BY o.order_id DESC
             """
 
