@@ -133,10 +133,6 @@ async def admin_users_delete(request: Request):
         return JSONResponse(error)
 
 
-async def admin_test(request: Request):
-    pass
-
-
 async def admin_users_get_json(request: Request):
     await is_authenticated(request, permissions=["admin"])
     user_ = await api.user_get(request)

@@ -318,8 +318,3 @@ async def auth_send_verify_email(request: Request):
         flash.set_message(request, str(e), type="error", use_settings=True)
 
     return RedirectResponse(url="/auth/me?sent_mail=1", status_code=302)
-
-
-async def auth_user_info(request: Request):
-    is_logged_in = await api.is_logged_in(request)
-    return JSONResponse({"is_logged_in": is_logged_in})

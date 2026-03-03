@@ -92,7 +92,6 @@ routes = [
     Route("/admin/users/{uuid}/permissions", endpoint=endpoints_admin.admin_users_patch, name="admin_users_patch", methods=["POST"]),
     Route("/admin/users/{uuid}/delete", endpoint=endpoints_admin.admin_users_delete, name="admin_users_delete", methods=["POST"]),
     Route("/admin/users/{uuid}/json", endpoint=endpoints_admin.admin_users_get_json, name="admin_users_get_json"),
-    Route("/admin/test", endpoint=endpoints_admin.admin_test, name="admin_test"),
     Route("/admin/config", endpoint=endpoints_admin.admin_config_get, name="admin_config_get"),
     Route("/auth/login", endpoint=endpoints_auth.auth_login_get, name="auth_login_get"),
     Route("/auth/login", endpoint=endpoints_auth.auth_login_post, name="auth_login_post", methods=["POST"]),
@@ -113,7 +112,6 @@ routes = [
     Route("/auth/verify/{token:str}", endpoint=endpoints_auth.auth_verify, name="auth_verify"),
     # send verify email again
     Route("/auth/send-verify-email", endpoint=endpoints_auth.auth_send_verify_email, name="auth_send_verify_email"),
-    Route("/auth/user-info", endpoint=endpoints_auth.auth_user_info, name="auth_user_info", methods=["POST"]),
     Route("/search", endpoint=endpoints_search.search_get, name="search_get"),
     Route("/auto_complete", endpoint=endpoints_search.records_auto_complete_search, name="records_auto_complete_search"),
     Route("/auto_complete_relations", endpoint=endpoints_search.records_auto_complete_relations, name="records_auto_complete_relations"),
