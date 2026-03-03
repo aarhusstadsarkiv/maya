@@ -111,7 +111,7 @@
                         href="/admin/orders/{{order.record_id}}/html">{{order.record_id}}</a>
                 </td>
                 <td class="width-300" title="{{ order.collectors }}">{{ order.collectors }} </td>
-                {% if order.order_status == ORDER_STATUS.APPLICATION %}
+                {% if order.is_application_order %}
                 <td class="width-300" title="KUN via skiftlig ansøgning: {{ order.label }}">
                     <span class="has-comment">{{ get_icon('counter_1')|safe }} {{ order.label }} </span>
                 </td>
@@ -191,6 +191,7 @@ at benytte det. Du må først afslutte den aktive bestilling, før du kan ændre
 
             {% endfor %}
             <tr>
+                <td></td>
                 <td></td>
                 <td></td>
                 <td></td>

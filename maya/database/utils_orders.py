@@ -7,6 +7,7 @@ from maya.core import utils_core
 from maya.core import api
 from maya.core.templates import get_template_content
 from maya.core.dynamic_settings import settings
+from maya.records.meta_data_record import is_orderable_by_form
 
 
 log = get_log()
@@ -153,6 +154,9 @@ def format_order_display(order: dict):
         # Load json data
         order["record_and_types"] = json.loads(order["record_and_types"])
         order["meta_data_dict"] = json.loads(order["meta_data"])
+
+        is_application_order = is_orderable_by_form(order["meta_data_dict"])
+        order["is_application_order"] = is_application_order
 
         # Convert record_and_types to string
         record_and_types = order["record_and_types"]

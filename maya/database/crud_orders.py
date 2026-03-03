@@ -636,7 +636,8 @@ WHERE
         LIMIT 1
     )
 
-    -- Exclude records that have an ORDERED status or APPLICATION as these records are still active and should not be in the completed section
+    -- Exclude records that have an ORDERED status or APPLICATION status
+    -- as these records are still active and should not be in the completed section
     -- We don't need QUEUED here as there will be no QUEUED if there is an ORDERED order
     AND o.record_id NOT IN (
         SELECT record_id
