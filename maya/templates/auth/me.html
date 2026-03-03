@@ -17,6 +17,13 @@
 <div class="record-section">
     <div class="record-main">
         <div class="record-content">
+            <div class="label">Navn</div>
+            <div class="content">
+                <p>{{ me["display_name"] }}</p>
+            </div>
+        </div>
+        
+        <div class="record-content">
             <div class="label">Email</div>
             <div class="content">
                 <p>{{ me["email"] }}</p>
@@ -52,6 +59,7 @@
                 <p>{{ me["token"] }}</p>
             </div>
         </div>
+
         <div class="record-content">
             <div class="label">Bruger ID</div>
             <div class="content">
@@ -149,7 +157,7 @@
 </script>
 
 {% if get_setting('debug') %}
-<pre>{{ to_json(me.data) }}</pre>
+<pre>{{ to_json(me) }}</pre>
 {% endif %}
 
 {% endblock content %}
