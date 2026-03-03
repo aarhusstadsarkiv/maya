@@ -636,12 +636,12 @@ WHERE
         LIMIT 1
     )
 
-    -- Exclude records that have an ORDERED status
+    -- Exclude records that have an ORDERED status or APPLICATION as these records are still active and should not be in the completed section
     -- We don't need QUEUED here as there will be no QUEUED if there is an ORDERED order
     AND o.record_id NOT IN (
         SELECT record_id
         FROM orders
-        WHERE order_status = {utils_orders.ORDER_STATUS.ORDERED}
+        WHERE order_status IN ({utils_orders.ORDER_STATUS.ORDERED}, {utils_orders.ORDER_STATUS.APPLICATION})
     )
 
     -- Also exclude records with location IN_STORAGE
