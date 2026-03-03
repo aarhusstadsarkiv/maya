@@ -4,6 +4,7 @@ import { asyncLogError } from '/static/js/error.js';
 import { truncateText } from '/static/js/truncate-text.js';
 import { config } from '/static/js/config.js';
 import jsCookie from '/static/js/js-cookie.js';
+import { isLikelyPhoneDevice } from '/static/js/common-utils.js';
 
 const containerLeft = document.querySelector('.container-left');
 const containerMainFacets = document.querySelector('.container-main-facets');
@@ -131,7 +132,7 @@ function onSearchDateEvent(dateFormClass) {
         const toDay = document.querySelector(`${dateFormClass} .to-day`).value || '31';
 
         if (!fromYear && !toYear) {
-            Flash.setMessage('Du skal indtaste en dato mellem 1200 og aktuel data', 'error');
+            Flash.setMessage('Du skal indtaste en dato', 'error');
             return;
         }
 
@@ -300,10 +301,9 @@ function searchEvents() {
 
         // Focus on search input field
         // Only if not on mobile device
-        // if (window.innerWidth > config.mobileWidth) {
-        //     document.getElementById('q').focus();
-        // }
-        // document.getElementById('q').focus();
+        if (!isLikelyPhoneDevice()) {
+             document.getElementById('q').focus();
+        }
 
     } catch (error) {
         console.log(error)

@@ -10,4 +10,14 @@ function getPathPart(num, path) {
     return ary[num];
 }
 
-export {getPathPart}
+function isLikelyPhoneDevice() {
+    if (navigator.userAgentData && typeof navigator.userAgentData.mobile === 'boolean') {
+        return navigator.userAgentData.mobile;
+    }
+
+    const userAgent = navigator.userAgent || '';
+    return /(iPhone|iPod|Android.*Mobile|Windows Phone|Mobile)/i.test(userAgent);
+}
+
+
+export { getPathPart, isLikelyPhoneDevice };
