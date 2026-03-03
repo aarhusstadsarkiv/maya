@@ -232,6 +232,7 @@
 <script type="module" nonce="{{ request.state.csp_nonce }}">
 
     import { autoCompleteInit } from '/static/js/auto-complete-instance.js';
+    import { isLikelyPhoneDevice } from '/static/js/common-utils.js';
 
     const searchBaseUrl = '/search?';
     window.addEventListener("pageshow", function(event) {
@@ -240,7 +241,9 @@
         }
     });
 
-    document.getElementById('q').focus();
+    if (!isLikelyPhoneDevice()) {
+        document.getElementById('q').focus();
+    }
 </script>
 
 <footer class="footer">
