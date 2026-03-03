@@ -8,7 +8,16 @@
 
 .home-search-form {
     padding: 25px;
+}
 
+.home-search-form input {
+    background-color: rgba(0, 0, 0, 0.3);
+    color: white;
+}
+
+
+.home-search-form input::placeholder {
+    color: rgba(255, 255, 255, 0.7);
 }
 
 #q {
@@ -133,4 +142,8 @@
 
 .footer {
     margin-top: 0;
+}
+
+.page-home {
+    
 }
