@@ -35,6 +35,7 @@
 <script type="module" nonce="{{ request.state.csp_nonce }}">
 
     import { autoCompleteInit } from '/static/js/auto-complete-instance.js';
+    import { isLikelyPhoneDevice } from '/static/js/common-utils.js';
 
     const homeSearchContainer = document.querySelector('.home-search-container');
     const frontpageImages = [
@@ -51,7 +52,9 @@
         }
     });
 
-    document.getElementById('q').focus();
+    if (!isLikelyPhoneDevice()) {
+        document.getElementById('q').focus();
+    }
 </script>
 
 <footer class="footer">
