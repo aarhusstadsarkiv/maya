@@ -32,7 +32,7 @@ log = get_log()
 
 base_url = str(settings["api_base_url"])
 REQUEST_TIME_USED: dict = {}
-PROXY_CACHE_EXPIRE = 60 * 60 * 24
+PROXY_CACHE_EXPIRE = 60
 database_connection = DatabaseConnection(database_url)
 
 
@@ -87,12 +87,18 @@ def _set_time_used(name: str, elapsed: float) -> None:
 
 
 async def _proxy_cache_get(key: str) -> typing.Any:
+    if not database_url:
+        return None
+
     async with database_connection.transaction_scope_async() as connection:
         database_cache = DatabaseCache(connection)
         return await database_cache.get(key, expire_in=PROXY_CACHE_EXPIRE)
 
 
 async def _proxy_cache_set(key: str, data: typing.Any) -> None:
+    if not database_url:
+        return None
+
     async with database_connection.transaction_scope_async() as connection:
         database_cache = DatabaseCache(connection)
         await database_cache.set(key, data)
