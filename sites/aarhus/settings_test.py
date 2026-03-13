@@ -6,4 +6,5 @@ settings: dict[str, typing.Any] = {
         "default": "/tmp/database.db",
         "orders": "/tmp/orders.db",
     },
+    "proxy_cache_expire": None,
 }
