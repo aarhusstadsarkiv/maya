@@ -1,7 +1,7 @@
 #!/bin/sh
 
-# This script upgrades the module to the latest tag, unless the latest tag is already checked out.
-# Usage: bin/upgrade.sh
+# This script upgrades the module to the latest tag or a supplied tag 
+# Usage: ./bin/upgrade.sh
 
 # Fetch tags from the origin
 git fetch --tags
