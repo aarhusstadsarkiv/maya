@@ -15,8 +15,9 @@ from maya.core import user
 from maya.core.translate import translate
 from maya.core.dynamic_settings import settings
 from maya.core import query
-
-# from maya.core.file_cache import file_cache_set, file_cache_get
+from maya.database.cache import DatabaseCache
+from maya.database.crud_default import database_url
+from maya.database.utils import DatabaseConnection
 from maya.core.hooks import get_hooks
 from maya.core.logging import get_log
 from urllib.parse import quote
@@ -31,6 +32,8 @@ log = get_log()
 
 base_url = str(settings["api_base_url"])
 REQUEST_TIME_USED: dict = {}
+PROXY_CACHE_EXPIRE = 60 * 60 * 24
+database_connection = DatabaseConnection(database_url)
 
 
 async def _request_start_time(request):
@@ -81,6 +84,27 @@ def _set_time_used(name: str, elapsed: float) -> None:
         REQUEST_TIME_USED[name] = [elapsed]
     else:
         REQUEST_TIME_USED[name].append(elapsed)
+
+
+async def _proxy_cache_get(key: str) -> typing.Any:
+    async with database_connection.transaction_scope_async() as connection:
+        database_cache = DatabaseCache(connection)
+        return await database_cache.get(key, expire_in=PROXY_CACHE_EXPIRE)
+
+
+async def _proxy_cache_set(key: str, data: typing.Any) -> None:
+    async with database_connection.transaction_scope_async() as connection:
+        database_cache = DatabaseCache(connection)
+        await database_cache.set(key, data)
+
+
+def _proxy_record_cache_key(record_id: str) -> str:
+    return f"proxy_record:{record_id}"
+
+
+def _proxy_records_cache_key(query_params_before_search: list) -> str:
+    normalized_params = [[str(key), str(value)] for key, value in query_params_before_search]
+    return "proxy_records:" + json.dumps(normalized_params, sort_keys=False, separators=(",", ":"))
 
 
 def get_time_used(request: Request) -> typing.Any:
@@ -498,13 +522,20 @@ async def proxies_record_get_by_id(record_id: str) -> typing.Any:
     """
     GET a record from the api
     """
+    cache_key = _proxy_record_cache_key(record_id)
+    cached_record = await _proxy_cache_get(cache_key)
+    if cached_record is not None:
+        return cached_record
+
     async with _get_async_client() as client:
         url = base_url + "/proxy/records/" + record_id
         headers = {"Accept": "application/json"}
         response = await client.get(url, headers=headers)
 
         if response.is_success:
-            return response.json()
+            record = response.json()
+            await _proxy_cache_set(cache_key, record)
+            return record
         else:
 
             if response.status_code == 404:
@@ -536,12 +567,17 @@ def _check_query_params(query_params_before_search: list) -> list:
     return query_params_before_search
 
 
-async def proxies_records(request: Request, query_params_before_search: list = []) -> typing.Any:
+async def proxies_records(request: Request, query_params_before_search: typing.Optional[list] = None) -> typing.Any:
     """
     GET search results from the api
 
     """
+    query_params_before_search = query_params_before_search or []
     query_params_before_search = _check_query_params(query_params_before_search)
+    cache_key = _proxy_records_cache_key(query_params_before_search)
+    cached_records = await _proxy_cache_get(cache_key)
+    if cached_records is not None:
+        return cached_records
 
     query_str = query.get_str_from_list(query_params_before_search)
     query_str = quote(query_str)
@@ -552,6 +588,7 @@ async def proxies_records(request: Request, query_params_before_search: list = [
 
         if response.is_success:
             records = response.json()
+            await _proxy_cache_set(cache_key, records)
             return records
         else:
             response.raise_for_status()
