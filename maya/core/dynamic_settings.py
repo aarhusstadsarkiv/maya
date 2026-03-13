@@ -14,6 +14,7 @@ This module attempts to load configuration settings in the following order of pr
 
 4. Test-specific overrides (applied if the TEST environment variable is set):
    - tests/settings_test.py
+   - BASE_DIR/settings_test.yml or BASE_DIR/settings_test.py
 
 Settings are merged into the `settings` and `settings_facets` dictionaries.
 Supports both YAML (.yml) and Python (.py) formats, with preference given to YAML when both exist.
@@ -101,6 +102,11 @@ if os.getenv("TEST"):
     submodule = importlib.import_module(module_name)
     settings_test = getattr(submodule, "settings")
     settings.update(settings_test)
+
+    if os.path.exists(get_base_dir_path("settings_test.yml")):
+        _load_yaml_settings("settings_test.yml")
+    elif os.path.exists(get_base_dir_path("settings_test.py")):
+        _load_py_settings("settings_test.py")
 
 
 def get_setting(key):

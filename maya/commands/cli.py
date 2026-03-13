@@ -250,7 +250,7 @@ if _is_source() and os.name != "nt":
         run_tests("sites/base_test", "tests/base_test/*.py")
         run_tests("sites/aarhus", "tests/aarhus/*.py")
         run_tests("sites/teater", "tests/teater/*.py")
-        run_tests("", "tests/core/*.py")
+        run_tests("sites/aarhus", "tests/core/*.py")
 
     @cli.command(help="Fix code according to black, flake8, mypy.")
     def source_fix():

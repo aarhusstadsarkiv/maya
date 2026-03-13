@@ -89,3 +89,4 @@ class Settings(TypedDict, total=True):
     sqlite3: NotRequired[Sqlite3Settings]
     cron_orders: NotRequired[bool]
     boto3_presigned_urls: NotRequired[bool]
+    proxy_cache_expire: NotRequired[int]

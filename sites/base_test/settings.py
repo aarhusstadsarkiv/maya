@@ -31,4 +31,8 @@ settings: dict[str, typing.Any] = {
     "show_version": True,
     "allow_user_registration": True,
     "allow_user_management": True,
+    "sqlite3": {
+        "default": "/tmp/database.db",
+        "orders": "/tmp/orders.db",
+    },
 }
