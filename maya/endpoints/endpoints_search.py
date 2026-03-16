@@ -283,10 +283,9 @@ async def _normalize_search_result(records: dict):
     return records
 
 
-def _get_search_result_session_cache(search_result: dict, query_params: list) -> dict:
+def _get_record_navigation_cache(search_result: dict, query_params: list) -> dict:
     """
-    Store only the data needed for record prev/next navigation.
-    Sessions are cookie-backed, so the full search response is too expensive.
+    Build an internal, ephemeral cache for record prev/next navigation on the /records page.
     """
     return {
         "query_params": [list(item) for item in query_params if item[0] != "start"],
@@ -334,8 +333,8 @@ async def get_search_context_values(request: Request, extra_query_params: list =
 
     search_result = await api.proxies_records(request, query_params_before_search_copy)
 
-    # Store a compact page cache for prev / next on the record page.
-    request.session["search_result"] = _get_search_result_session_cache(search_result, query_params_before_search)
+    # Store internal ephemeral navigation state for the record page.
+    request.session["record_navigation_cache"] = _get_record_navigation_cache(search_result, query_params_before_search)
 
     search_result = await _normalize_search_result(search_result)
 

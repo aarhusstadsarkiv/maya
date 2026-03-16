@@ -37,11 +37,10 @@ def _get_search_page_size(query_params: list) -> int:
 
 def _get_search_page_cache(request: Request, query_params: list) -> typing.Optional[dict]:
     """
-    Get the cached search page for the active search.
-    The session payload is stored in a signed cookie
+    Get the internal ephemeral cache for the active search page.
     """
     try:
-        cache = request.session.get("search_result")
+        cache = request.session.get("record_navigation_cache")
         assert isinstance(cache, dict)
 
         cached_query_params = [tuple(item) for item in cache["query_params"]]
@@ -65,7 +64,8 @@ def _get_search_page_cache(request: Request, query_params: list) -> typing.Optio
 
 
 def _set_search_page_cache(request: Request, cache: dict) -> None:
-    request.session["search_result"] = {
+    """Persist the internal ephemeral record navigation cache in the session."""
+    request.session["record_navigation_cache"] = {
         "query_params": [list(item) for item in cache["query_params"]],
         "start": cache["start"],
         "size": cache["size"],
