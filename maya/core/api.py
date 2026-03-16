@@ -17,7 +17,7 @@ from maya.core.dynamic_settings import settings
 from maya.core import query
 from maya.core.hooks import get_hooks
 from maya.core.logging import get_log
-from maya.core.proxy_cache import proxy_cache_get, proxy_cache_set, proxy_record_cache_key, proxy_records_cache_key
+from maya.core.proxy_cache import proxy_cache_get, proxy_cache_set, proxy_record_cache_key
 from urllib.parse import quote
 import httpx
 import typing
@@ -548,10 +548,6 @@ async def proxies_records(request: Request, query_params_before_search: typing.O
     """
     query_params_before_search = query_params_before_search or []
     query_params_before_search = _check_query_params(query_params_before_search)
-    cache_key = proxy_records_cache_key(query_params_before_search)
-    cached_records = await proxy_cache_get(cache_key)
-    if cached_records is not None:
-        return cached_records
 
     query_str = query.get_str_from_list(query_params_before_search)
     query_str = quote(query_str)
@@ -561,9 +557,7 @@ async def proxies_records(request: Request, query_params_before_search: typing.O
         response = await client.get(url)
 
         if response.is_success:
-            records = response.json()
-            await proxy_cache_set(cache_key, records)
-            return records
+            return response.json()
         else:
             response.raise_for_status()
 
