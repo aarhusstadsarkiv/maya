@@ -17,7 +17,7 @@ class TestRecordPagination(IsolatedAsyncioTestCase):
                     "start": 0,
                     "size": 20,
                     "total": 25,
-                    "record_ids": list(range(1, 21)),
+                    "record_ids": [str(record_id) for record_id in range(1, 21)],
                 }
             },
         )
@@ -37,8 +37,8 @@ class TestRecordPagination(IsolatedAsyncioTestCase):
         self.assertEqual(pagination.current_page, 10)
         self.assertEqual(pagination.prev_page, 9)
         self.assertEqual(pagination.next_page, 11)
-        self.assertEqual(pagination.prev_record, 9)
-        self.assertEqual(pagination.next_record, 11)
+        self.assertEqual(pagination.prev_record, "9")
+        self.assertEqual(pagination.next_record, "11")
         proxies_records.assert_not_awaited()
 
     async def test_fetches_next_page_when_navigation_crosses_cached_boundary(self):
@@ -51,7 +51,7 @@ class TestRecordPagination(IsolatedAsyncioTestCase):
                     "start": 0,
                     "size": 20,
                     "total": 25,
-                    "record_ids": list(range(1, 21)),
+                    "record_ids": [str(record_id) for record_id in range(1, 21)],
                 }
             },
         )
@@ -65,7 +65,7 @@ class TestRecordPagination(IsolatedAsyncioTestCase):
             "start": 20,
             "size": 20,
             "total": 25,
-            "result": [{"id": record_id} for record_id in range(21, 26)],
+            "result": [{"id": str(record_id)} for record_id in range(21, 26)],
         }
 
         with (
@@ -75,8 +75,8 @@ class TestRecordPagination(IsolatedAsyncioTestCase):
             pagination = await _get_record_pagination(request)
 
         self.assertEqual(pagination.current_page, 20)
-        self.assertEqual(pagination.prev_record, 19)
-        self.assertEqual(pagination.next_record, 21)
+        self.assertEqual(pagination.prev_record, "19")
+        self.assertEqual(pagination.next_record, "21")
         proxies_records.assert_awaited_once_with(request, [("size", "20"), ("q", "test"), ("start", "20")])
         self.assertEqual(request.session["record_navigation_cache"]["start"], 20)
-        self.assertEqual(request.session["record_navigation_cache"]["record_ids"], [21, 22, 23, 24, 25])
+        self.assertEqual(request.session["record_navigation_cache"]["record_ids"], ["21", "22", "23", "24", "25"])

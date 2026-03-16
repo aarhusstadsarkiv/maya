@@ -50,7 +50,7 @@ def _get_search_page_cache(request: Request, query_params: list) -> typing.Optio
         start = int(cache["start"])
         size = int(cache["size"])
         total = int(cache["total"])
-        record_ids = [int(record_id) for record_id in cache["record_ids"]]
+        record_ids = [str(record_id) for record_id in cache["record_ids"]]
 
         return {
             "query_params": cached_query_params,
@@ -96,7 +96,7 @@ async def _get_search_page_for_position(request: Request, query_params: list, to
             "start": int(search_result.get("start", expected_start)),
             "size": int(search_result.get("size", size)),
             "total": int(search_result.get("total", total)),
-            "record_ids": [int(record["id"]) for record in search_result.get("result", []) if record.get("id")],
+            "record_ids": [str(record["id"]) for record in search_result.get("result", []) if record.get("id")],
         }
     except (TypeError, ValueError):
         return None
@@ -107,9 +107,9 @@ async def _get_search_page_for_position(request: Request, query_params: list, to
 
 async def _get_record_id_for_position(
     request: Request, query_params: list, total: int, position: int, cache: typing.Optional[dict] = None
-) -> int:
+) -> typing.Optional[str]:
     if position < 1 or position > total:
-        return 0
+        return None
 
     if cache:
         index = position - cache["start"] - 1
@@ -118,11 +118,11 @@ async def _get_record_id_for_position(
 
     cache = await _get_search_page_for_position(request, query_params, total, position)
     if not cache:
-        return 0
+        return None
 
     index = position - cache["start"] - 1
     if index < 0 or index >= len(cache["record_ids"]):
-        return 0
+        return None
 
     return cache["record_ids"][index]
 
