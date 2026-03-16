@@ -30,7 +30,7 @@ Third-party Middleware:
 The middleware list is assembled dynamically based on application settings.
 """
 
-from starsessions import CookieStore, SessionMiddleware, SessionAutoloadMiddleware
+from starlette.middleware.sessions import SessionMiddleware
 from starlette.middleware import Middleware
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.middleware.cors import CORSMiddleware
@@ -232,13 +232,6 @@ class SameOriginMiddleware(BaseHTTPMiddleware):
         return await call_next(request)
 
 
-# Variables for cookie handling
-secret_key = str(os.getenv("SECRET"))
-session_store: CookieStore = CookieStore(secret_key=secret_key)
-lifetime = settings["cookie"]["lifetime"]  # type: ignore
-cookie_httponly = settings["cookie"]["httponly"]  # type: ignore
-
-
 middleware = []
 
 middleware.append(Middleware(AccessLogMiddleware))
@@ -257,7 +250,12 @@ middleware.append(Middleware(CSPMiddleware))
 
 # Instruct what origins the client browser should permit for state-changing requests
 middleware.append(Middleware(SameOriginMiddleware, allow_same_origin=True))
-middleware.append(Middleware(SessionMiddleware, store=session_store, cookie_https_only=cookie_httponly, lifetime=lifetime))
-middleware.append(Middleware(SessionAutoloadMiddleware, paths=["/"]))
+
+# Session management with secure cookies
+secret_key = str(os.getenv("SECRET"))
+lifetime = settings["cookie"]["lifetime"]  # type: ignore
+cookie_httponly = settings["cookie"]["httponly"]  # type: ignore
+
+middleware.append(Middleware(SessionMiddleware, secret_key=secret_key, https_only=cookie_httponly, max_age=lifetime))
 middleware.append(Middleware(BeforeResponseMiddleware))
 middleware.append(Middleware(NoCacheMiddleware))
