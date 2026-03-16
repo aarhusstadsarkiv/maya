@@ -12,7 +12,7 @@ class TestRecordPagination(IsolatedAsyncioTestCase):
             query_params={"search": "10"},
             cookies={},
             session={
-                "search_result": {
+                "record_navigation_cache": {
                     "query_params": [["size", "20"], ["q", "test"]],
                     "start": 0,
                     "size": 20,
@@ -46,7 +46,7 @@ class TestRecordPagination(IsolatedAsyncioTestCase):
             query_params={"search": "20"},
             cookies={},
             session={
-                "search_result": {
+                "record_navigation_cache": {
                     "query_params": [["size", "20"], ["q", "test"]],
                     "start": 0,
                     "size": 20,
@@ -78,5 +78,5 @@ class TestRecordPagination(IsolatedAsyncioTestCase):
         self.assertEqual(pagination.prev_record, 19)
         self.assertEqual(pagination.next_record, 21)
         proxies_records.assert_awaited_once_with(request, [("size", "20"), ("q", "test"), ("start", "20")])
-        self.assertEqual(request.session["search_result"]["start"], 20)
-        self.assertEqual(request.session["search_result"]["record_ids"], [21, 22, 23, 24, 25])
+        self.assertEqual(request.session["record_navigation_cache"]["start"], 20)
+        self.assertEqual(request.session["record_navigation_cache"]["record_ids"], [21, 22, 23, 24, 25])
