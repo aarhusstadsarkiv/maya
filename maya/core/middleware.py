@@ -253,9 +253,20 @@ middleware.append(Middleware(SameOriginMiddleware, allow_same_origin=True))
 
 # Session management with secure cookies
 secret_key = str(os.getenv("SECRET"))
+session_cookie = settings["cookie"]["name"]  # type: ignore
 lifetime = settings["cookie"]["lifetime"]  # type: ignore
 cookie_httponly = settings["cookie"]["httponly"]  # type: ignore
+same_site = settings["cookie"]["samesite"]  # type: ignore
 
-middleware.append(Middleware(SessionMiddleware, secret_key=secret_key, https_only=cookie_httponly, max_age=lifetime))
+middleware.append(
+    Middleware(
+        SessionMiddleware,
+        session_cookie=session_cookie,
+        secret_key=secret_key,
+        https_only=cookie_httponly,
+        max_age=lifetime,
+        same_site=same_site,
+    )
+)
 middleware.append(Middleware(BeforeResponseMiddleware))
 middleware.append(Middleware(NoCacheMiddleware))
