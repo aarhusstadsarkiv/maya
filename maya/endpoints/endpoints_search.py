@@ -283,6 +283,20 @@ async def _normalize_search_result(records: dict):
     return records
 
 
+def _get_search_result_session_cache(search_result: dict, query_params: list) -> dict:
+    """
+    Store only the data needed for record prev/next navigation.
+    Sessions are cookie-backed, so the full search response is too expensive.
+    """
+    return {
+        "query_params": [list(item) for item in query_params if item[0] != "start"],
+        "start": int(search_result.get("start", 0)),
+        "size": int(search_result.get("size", len(search_result.get("result", [])) or 0)),
+        "total": int(search_result.get("total", 0)),
+        "record_ids": [record["id"] for record in search_result.get("result", []) if record.get("id")],
+    }
+
+
 async def get_search_context_values(request: Request, extra_query_params: list = []) -> dict:
     """
     Get all context values used on the search page
@@ -319,6 +333,10 @@ async def get_search_context_values(request: Request, extra_query_params: list =
         query_params_before_search_copy.append(("q", ""))
 
     search_result = await api.proxies_records(request, query_params_before_search_copy)
+
+    # Store a compact page cache for prev / next on the record page.
+    request.session["search_result"] = _get_search_result_session_cache(search_result, query_params_before_search)
+
     search_result = await _normalize_search_result(search_result)
 
     # Alter query params after search

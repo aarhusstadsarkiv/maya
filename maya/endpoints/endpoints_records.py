@@ -21,6 +21,113 @@ from maya.endpoints.endpoints_utils import get_record_data
 log = get_log()
 
 
+def _get_search_query_params(query_params: list) -> list:
+    """Use the search query params as a stable cache key and fetch template."""
+    return [tuple(item) for item in query_params if item[0] != "start"]
+
+
+def _get_search_page_size(query_params: list) -> int:
+    for key, value in query_params:
+        if key == "size":
+            try:
+                return max(int(value), 1)
+            except (TypeError, ValueError):
+                break
+    return 20
+
+
+def _get_search_page_cache(request: Request, query_params: list) -> typing.Optional[dict]:
+    """
+    Get the cached search page for the active search.
+    The session payload is stored in a signed cookie
+    """
+    try:
+        cache = request.session.get("search_result")
+        assert isinstance(cache, dict)
+
+        cached_query_params = [tuple(item) for item in cache["query_params"]]
+        if cached_query_params != query_params:
+            return None
+
+        start = int(cache["start"])
+        size = int(cache["size"])
+        total = int(cache["total"])
+        record_ids = [int(record_id) for record_id in cache["record_ids"]]
+
+        return {
+            "query_params": cached_query_params,
+            "start": start,
+            "size": size,
+            "total": total,
+            "record_ids": record_ids,
+        }
+    except (AssertionError, KeyError, TypeError, ValueError):
+        return None
+
+
+def _set_search_page_cache(request: Request, cache: dict) -> None:
+    request.session["search_result"] = {
+        "query_params": [list(item) for item in cache["query_params"]],
+        "start": cache["start"],
+        "size": cache["size"],
+        "total": cache["total"],
+        "record_ids": cache["record_ids"],
+    }
+
+
+async def _get_search_page_for_position(request: Request, query_params: list, total: int, position: int) -> typing.Optional[dict]:
+    """
+    Get the cached search page that contains the absolute search position.
+    Fetch a fresh page only when navigation crosses the cached page boundaries.
+    """
+    size = _get_search_page_size(query_params)
+    expected_start = ((position - 1) // size) * size
+
+    cache = _get_search_page_cache(request, query_params)
+    if cache and cache["start"] == expected_start and cache["size"] == size:
+        return cache
+
+    page_query_params = query_params.copy()
+    page_query_params.append(("start", str(expected_start)))
+    search_result = await api.proxies_records(request, page_query_params)
+
+    try:
+        cache = {
+            "query_params": query_params,
+            "start": int(search_result.get("start", expected_start)),
+            "size": int(search_result.get("size", size)),
+            "total": int(search_result.get("total", total)),
+            "record_ids": [int(record["id"]) for record in search_result.get("result", []) if record.get("id")],
+        }
+    except (TypeError, ValueError):
+        return None
+
+    _set_search_page_cache(request, cache)
+    return cache
+
+
+async def _get_record_id_for_position(
+    request: Request, query_params: list, total: int, position: int, cache: typing.Optional[dict] = None
+) -> int:
+    if position < 1 or position > total:
+        return 0
+
+    if cache:
+        index = position - cache["start"] - 1
+        if 0 <= index < len(cache["record_ids"]):
+            return cache["record_ids"][index]
+
+    cache = await _get_search_page_for_position(request, query_params, total, position)
+    if not cache:
+        return 0
+
+    index = position - cache["start"] - 1
+    if index < 0 or index >= len(cache["record_ids"]):
+        return 0
+
+    return cache["record_ids"][index]
+
+
 async def _get_record_pagination(request: Request) -> typing.Optional[RecordPagination]:
     """
     Get the record pagination object or return None if not present
@@ -45,12 +152,7 @@ async def _get_record_pagination(request: Request) -> typing.Optional[RecordPagi
     if not search_cookie.total:
         return None
 
-    # Copy the query params and remove the size parameter
-    # This is needed to generate the next and previous links
-    # Only query for one record to get the next and previous record
-    query_params = search_cookie.query_params.copy()
-    query_params = [tuple(item) for item in query_params if item[0] != "size"]
-    query_params.append(("size", "1"))
+    query_params = _get_search_query_params(search_cookie.query_params.copy())
 
     # Calculate if there is a next and previous page
     has_next = current_page < search_cookie.total
@@ -67,35 +169,11 @@ async def _get_record_pagination(request: Request) -> typing.Optional[RecordPagi
     record_pagination["next_page"] = next_page
     record_pagination["prev_page"] = prev_page
 
-    async def get_next_record() -> int:
-        if next_page:
-            next_query_params = query_params.copy()
-            search_params = [("start", str(next_page - 1))]
-            next_query_params.extend(search_params)
-            records = await api.proxies_records_from_list(request, next_query_params)
-            id = records["result"][0]["id"]
-            return id
-        else:
-            return 0
-
-    async def get_prev_record() -> int:
-        if prev_page:
-            prev_query_params = query_params.copy()
-            search_params = [("start", str(prev_page - 1))]
-            prev_query_params.extend(search_params)
-            records = await api.proxies_records_from_list(request, prev_query_params)
-            id = records["result"][0]["id"]
-            return id
-        else:
-            return 0
-
     # Get the next and previous record
     try:
-        """
-        This will fail if 'list index out of range'
-        This can happen if the user uses two tabs and the search result is updated in one tab.
-        """
-        next_record, prev_record = await asyncio.gather(get_next_record(), get_prev_record())
+        current_cache = await _get_search_page_for_position(request, query_params, search_cookie.total, current_page)
+        next_record = await _get_record_id_for_position(request, query_params, search_cookie.total, next_page, current_cache)
+        prev_record = await _get_record_id_for_position(request, query_params, search_cookie.total, prev_page, current_cache)
     except IndexError:
         return None
 
