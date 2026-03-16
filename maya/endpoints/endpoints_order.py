@@ -96,7 +96,7 @@ async def orders_post(request: Request):
     try:
         record_id = request.path_params["record_id"]
 
-        record = await api.proxies_record_get_by_id(record_id)
+        record = await api.proxies_record_get_by_id(request, record_id)
         record, meta_data, record_and_types = await get_record_data(request, record)
 
         is_ordered = await crud_orders.has_active_order(user_id=me["id"], record_id=meta_data["id"])
@@ -364,7 +364,7 @@ async def orders_record_get(request: Request):
     await is_authenticated(request, permissions=["employee"])
 
     record_id = request.path_params["record_id"]
-    record = await api.proxies_record_get_by_id(record_id)
+    record = await api.proxies_record_get_by_id(request, record_id)
 
     record, meta_data, record_and_types = await get_record_data(request, record)
 
@@ -426,7 +426,7 @@ async def _get_print_data(request: Request, order_id: int = 0) -> dict:
     order = await crud_orders.get_order(order_id)
     record_id = order["record_id"]
 
-    record = await api.proxies_record_get_by_id(record_id)
+    record = await api.proxies_record_get_by_id(request, record_id)
 
     record, meta_data, record_and_types = await get_record_data(request, record)
 

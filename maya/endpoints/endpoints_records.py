@@ -195,7 +195,7 @@ async def records_get(request: Request):
     if not record_id.isdigit():
         raise HTTPException(404)
 
-    record_pagination, record = await asyncio.gather(_get_record_pagination(request), api.proxies_record_get_by_id(record_id))
+    record_pagination, record = await asyncio.gather(_get_record_pagination(request), api.proxies_record_get_by_id(request, record_id))
     record, meta_data, record_and_types = await get_record_data(request, record)
 
     context_variables = {
@@ -222,7 +222,7 @@ async def records_get_misc(request: Request):
         record_id = request.path_params["record_id"]
         type = request.path_params["type"]
 
-        record = await api.proxies_record_get_by_id(record_id)
+        record = await api.proxies_record_get_by_id(request, record_id)
         record_original = copy.deepcopy(record)
 
         record, meta_data, record_and_types = await get_record_data(request, record)

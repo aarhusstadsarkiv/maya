@@ -492,14 +492,17 @@ async def has_permission(request: Request, permission: str) -> bool:
     return permission in user_permissions_list
 
 
-async def proxies_record_get_by_id(record_id: str) -> typing.Any:
+async def proxies_record_get_by_id(request: Request, record_id: str) -> typing.Any:
     """
-    GET a record from the api
+    GET a record from the api if not logged in
     """
+
+    logged_in = await is_logged_in(request)
     cache_key = proxy_record_cache_key(record_id)
-    cached_record = await proxy_cache_get(cache_key)
-    if cached_record is not None:
-        return cached_record
+    if not logged_in:
+        cached_record = await proxy_cache_get(cache_key)
+        if cached_record is not None:
+            return cached_record
 
     async with _get_async_client() as client:
         url = base_url + "/proxy/records/" + record_id
@@ -508,7 +511,8 @@ async def proxies_record_get_by_id(record_id: str) -> typing.Any:
 
         if response.is_success:
             record = response.json()
-            await proxy_cache_set(cache_key, record)
+            if not logged_in:
+                await proxy_cache_set(cache_key, record)
             return record
         else:
 
