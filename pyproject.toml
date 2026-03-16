@@ -11,7 +11,7 @@ dependencies = [
     "attrs==22.2.0",
     "autopep8==2.0.1",
     "beautifulsoup4==4.12.2",
-    "black==24.3.0",
+    "black==26.3.1",
     "boto3==1.40.4",
     "boto3-stubs==1.40.4",
     "certifi==2024.8.30",
