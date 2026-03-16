@@ -191,8 +191,8 @@ async def auth_verify_post(request: Request):
 
 async def users_me_get(request: Request) -> dict:
     """
-    GET the current user from the api. If already found in the request state\n
-    then return the user dict without calling the API. If not call the API\n
+    GET the current user from the api. If already found in the request state
+    then return the user dict without calling the API. If not then call the API
     and store the user in the request state.
     """
     if hasattr(request.state, "me"):
@@ -658,36 +658,6 @@ async def proxies_records_from_list(request, query_params) -> typing.Any:
             response.raise_for_status()
 
 
-async def internal_api_get(request: Request, path: str) -> typing.Any:
-    """
-    GET data from an internal api
-    """
-
-    client_url = await _get_server_url(request)
-    url = f"{client_url}{path}"
-
-    async with _get_async_client() as client:
-        response = await client.get(url)
-
-        if response.is_success:
-            return response.json()
-        else:
-            response.raise_for_status()
-
-
-async def _get_server_url(request):
-    scheme = request.url.scheme
-    host = request.url.hostname
-    port = request.url.port
-
-    # Construct base URL
-    server_url = f"{scheme}://{host}"
-    if port:
-        server_url += f":{port}"
-
-    return server_url
-
-
 async def proxies_auto_complete(request: Request, query_params: list = []) -> typing.Any:
     """
     Fetch auto complete data from the api\n
@@ -746,6 +716,10 @@ async def proxies_view_ids(request: Request) -> typing.Any:
     """
     Endpoint for getting ids from the api
     E.g. http://localhost:5555/search?content_types=100&view=ids&size=1000
+    Given is also a cursor:
+    http://localhost:5555/search?cursor=Vdpe3o4YQW9KK3pNeERLVEF3TURBd05URTFOZz098gc&view=ids
+
+
     """
     items = request.query_params.multi_items()
     return await proxies_view_ids_from_list(items)
