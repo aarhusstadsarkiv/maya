@@ -49,12 +49,17 @@ class DatabaseCache:
 
     async def set(self, key: str, data: Any) -> bool:
         """
-        Set a cache value. This will always delete the old value and insert a new one.
+        Set a cache value for a key using a single-row upsert.
         """
         json_data = json.dumps(data)
-        self.connection.execute("DELETE FROM cache WHERE key = ?", (key,))
         self.connection.execute(
-            "INSERT INTO cache (key, value, unix_timestamp) VALUES (?, ?, ?)",
+            """
+            INSERT INTO cache (key, value, unix_timestamp)
+            VALUES (?, ?, ?)
+            ON CONFLICT(key) DO UPDATE SET
+                value = excluded.value,
+                unix_timestamp = excluded.unix_timestamp
+            """,
             (key, json_data, int(time.time())),
         )
         return True
@@ -65,7 +70,10 @@ class DatabaseCache:
         Will return None if the key does not exist or if the key is expired.
         If expire_in is 0, the value will never expire.
         """
-        result = self.connection.execute("SELECT * FROM cache WHERE key = ?", (key,)).fetchone()
+        result = self.connection.execute(
+            "SELECT id, value, unix_timestamp FROM cache WHERE key = ?",
+            (key,),
+        ).fetchone()
 
         if result:
             if expire_in == 0:
@@ -74,8 +82,7 @@ class DatabaseCache:
             current_time = int(time.time())
             if current_time - result["unix_timestamp"] < expire_in:
                 return json.loads(result["value"])
-            else:
-                self.connection.execute("DELETE FROM cache WHERE id = ?", (result["id"],))
+            self.connection.execute("DELETE FROM cache WHERE key = ?", (key,))
         return None
 
     async def delete(self, id: int) -> None:
@@ -84,3 +91,17 @@ class DatabaseCache:
         """
         self.connection.execute("DELETE FROM cache WHERE id = ?", (id,))
         return None
+
+    async def delete_expired(self, expire_in: int) -> int:
+        """
+        Delete cache values older than the provided TTL.
+        """
+        if expire_in <= 0:
+            return 0
+
+        cutoff = int(time.time()) - expire_in
+        cursor = self.connection.execute(
+            "DELETE FROM cache WHERE unix_timestamp <= ?",
+            (cutoff,),
+        )
+        return cursor.rowcount
