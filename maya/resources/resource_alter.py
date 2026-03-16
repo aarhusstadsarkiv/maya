@@ -6,7 +6,6 @@ e.g. set sources_normalized, set outer years, etc.
 from maya.core.logging import get_log
 from maya.resources import normalize_resource
 
-
 log = get_log()
 
 

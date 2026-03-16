@@ -24,7 +24,6 @@ import typing
 from time import time
 import json
 
-
 log = get_log()
 
 

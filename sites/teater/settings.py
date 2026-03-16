@@ -1,6 +1,5 @@
 import typing
 
-
 settings: dict[str, typing.Any] = {
     # test
     "client_name": "teaterarkivet",

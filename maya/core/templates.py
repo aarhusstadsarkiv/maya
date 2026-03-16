@@ -33,7 +33,6 @@ import re
 import markdown
 from markdown.extensions.toc import TocExtension
 
-
 log = get_log()
 
 """

@@ -5,7 +5,6 @@ from maya.core.auth import is_authenticated
 import os
 import tempfile
 
-
 log = get_log()
 
 

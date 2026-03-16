@@ -9,7 +9,6 @@ from maya.core.templates import get_template_content
 from maya.core import api
 from maya.core.dynamic_settings import settings
 
-
 log = get_log()
 
 

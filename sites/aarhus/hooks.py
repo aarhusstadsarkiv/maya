@@ -7,7 +7,6 @@ import json
 from maya.database import crud_orders
 from maya.database import utils_orders
 
-
 log = get_log()
 
 

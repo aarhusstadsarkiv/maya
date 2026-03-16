@@ -12,7 +12,6 @@ from maya.core.api import OpenAwsException
 from maya.endpoints.endpoints_utils import get_record_data
 from maya.core import utils_core
 
-
 log = get_log()
 
 

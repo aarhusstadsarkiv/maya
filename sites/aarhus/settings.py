@@ -1,6 +1,5 @@
 from maya.settings_types import Settings
 
-
 settings: Settings = {
     "client_name": "Aarhus Stadsarkiv",
     "client_url": "https://www.aarhusarkivet.dk",

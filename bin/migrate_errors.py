@@ -2,6 +2,7 @@
 """
 sqlite3 migrations for adding logged errors into a sqlite3 database.
 """
+
 import sys
 
 sys.path.append(".")

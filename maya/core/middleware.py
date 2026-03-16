@@ -46,7 +46,6 @@ from maya.core.hooks import get_hooks
 from maya.core.api_error import OpenAwsException
 from starlette.responses import JSONResponse
 
-
 log = get_log()
 access_log = get_access_log()
 

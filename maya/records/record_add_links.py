@@ -1,4 +1,4 @@
-""""
+""" "
 Used to add special links to a record.
 Only link so far is a link to the 'serie' in the 'collection'
 """

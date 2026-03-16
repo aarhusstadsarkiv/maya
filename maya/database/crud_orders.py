@@ -11,7 +11,6 @@ from dataclasses import dataclass
 from typing import Optional
 from maya.records.meta_data_record import is_orderable_by_form
 
-
 log = get_log()
 cron_log = get_custom_log("cron")
 

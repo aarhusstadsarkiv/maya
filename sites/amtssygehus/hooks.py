@@ -2,7 +2,6 @@ from maya.core.logging import get_log
 from maya.core.hooks_spec import HooksSpec
 from maya.records import record_utils
 
-
 log = get_log()
 
 

@@ -6,6 +6,7 @@ migrations if the system needs to contain:
 - Searches
 
 """
+
 import sys
 
 sys.path.append(".")

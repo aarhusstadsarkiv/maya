@@ -7,7 +7,6 @@ from maya.core.translate import translate
 from maya.core.logging import get_log
 from maya.core.date_format import date_format_day
 
-
 log = get_log()
 
 

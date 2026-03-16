@@ -5,7 +5,6 @@ Normalize copyright status.
 from maya.core.logging import get_log
 from maya.core.translate import translate
 
-
 log = get_log()
 
 

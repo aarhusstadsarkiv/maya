@@ -9,7 +9,6 @@ from maya.core.templates import get_template_content
 from maya.core.dynamic_settings import settings
 from maya.records.meta_data_record import is_orderable_by_form
 
-
 log = get_log()
 
 

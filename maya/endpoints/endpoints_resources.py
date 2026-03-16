@@ -20,7 +20,6 @@ from maya.core.hooks import get_hooks
 from maya.core.object_storage import set_presigned_urls_resource
 import json
 
-
 log = get_log()
 
 

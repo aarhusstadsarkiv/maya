@@ -10,7 +10,6 @@ from maya.core.dynamic_settings import get_settings_facets
 from maya.settings_query_params import settings_query_params
 from urllib.parse import quote_plus
 
-
 log = get_log()
 
 

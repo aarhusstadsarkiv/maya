@@ -17,7 +17,6 @@ import typing
 import copy
 from maya.endpoints.endpoints_utils import get_record_data
 
-
 log = get_log()
 
 
