@@ -176,6 +176,7 @@ class AccessLogMiddleware(BaseHTTPMiddleware):
         query_string = request.url.query
         if query_string:
             query_string = f"?{query_string}"
+        user_agent = request.headers.get("user-agent", "-")
 
         if request.client:
             client_ip = request.client.host
@@ -194,7 +195,7 @@ class AccessLogMiddleware(BaseHTTPMiddleware):
         duration = time() - start_time
 
         # Log the access information to access.log, including client IP and port
-        access_log.info(f'{client_ip}:{client_port} - "{method} {path}{query_string}" {status_code} {duration:.4f}s')
+        access_log.info(f'{client_ip}:{client_port} - "{method} {path}{query_string}" {status_code} {duration:.4f}s ua="{user_agent}')
 
         return response
 
