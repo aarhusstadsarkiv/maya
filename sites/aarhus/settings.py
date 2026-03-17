@@ -88,6 +88,6 @@ settings: Settings = {
         "orders": "local/data/orders.db",
     },
     "cron_orders": True,
-    "proxy_cache_expire": 60 * 60 * 24,  # seconds
+    "proxy_cache_expire": 60 * 60 * 24 * 7,  # one week in seconds
     "boto3_presigned_urls": True,
 }
