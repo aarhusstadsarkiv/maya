@@ -14,7 +14,6 @@ import contextlib
 import os
 import sys
 
-
 hooks = get_hooks()
 routes = get_app_routes()
 routes = hooks.after_routes_init(routes)

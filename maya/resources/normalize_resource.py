@@ -10,7 +10,6 @@ import re
 from urllib.parse import unquote
 from maya.core.dynamic_settings import settings
 
-
 _search_base_url = settings["search_base_url"]
 
 

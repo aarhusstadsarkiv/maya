@@ -9,7 +9,6 @@ from maya.core.dynamic_settings import settings
 from maya.core import cookie
 from starlette.requests import Request
 
-
 log = get_log()
 
 _record_definitions = get_record_definitions()

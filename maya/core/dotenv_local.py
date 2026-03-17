@@ -7,7 +7,6 @@ import os
 from maya.core.logging_handlers import get_init_logger
 from maya.core.paths import get_base_dir_path
 
-
 log = get_init_logger()
 
 

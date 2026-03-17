@@ -20,8 +20,8 @@ class RecordPagination:
     total: int = 0
     next_page: typing.Optional[int] = None
     prev_page: typing.Optional[int] = None
-    next_record: typing.Optional[int] = None
-    prev_record: typing.Optional[int] = None
+    next_record: typing.Optional[str] = None
+    prev_record: typing.Optional[str] = None
     current_page: typing.Optional[int] = None
 
 

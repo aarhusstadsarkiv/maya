@@ -26,7 +26,6 @@ from starlette.requests import Request
 from maya.core.translate import translate
 from maya.core.logging import get_log
 
-
 log = get_log()
 
 

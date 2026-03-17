@@ -17,13 +17,12 @@ from maya.core.dynamic_settings import settings
 from maya.core import query
 from maya.core.hooks import get_hooks
 from maya.core.logging import get_log
-from maya.core.proxy_cache import proxy_cache_get, proxy_cache_set, proxy_record_cache_key, proxy_records_cache_key
+from maya.core.proxy_cache import proxy_cache_get, proxy_cache_set, proxy_record_cache_key
 from urllib.parse import quote
 import httpx
 import typing
 from time import time
 import json
-
 
 log = get_log()
 
@@ -191,8 +190,8 @@ async def auth_verify_post(request: Request):
 
 async def users_me_get(request: Request) -> dict:
     """
-    GET the current user from the api. If already found in the request state\n
-    then return the user dict without calling the API. If not call the API\n
+    GET the current user from the api. If already found in the request state
+    then return the user dict without calling the API. If not then call the API
     and store the user in the request state.
     """
     if hasattr(request.state, "me"):
@@ -493,14 +492,17 @@ async def has_permission(request: Request, permission: str) -> bool:
     return permission in user_permissions_list
 
 
-async def proxies_record_get_by_id(record_id: str) -> typing.Any:
+async def proxies_record_get_by_id(request: Request, record_id: str) -> typing.Any:
     """
-    GET a record from the api
+    GET a record from the api if not logged in
     """
+
+    logged_in = await is_logged_in(request)
     cache_key = proxy_record_cache_key(record_id)
-    cached_record = await proxy_cache_get(cache_key)
-    if cached_record is not None:
-        return cached_record
+    if not logged_in:
+        cached_record = await proxy_cache_get(cache_key)
+        if cached_record is not None:
+            return cached_record
 
     async with _get_async_client() as client:
         url = base_url + "/proxy/records/" + record_id
@@ -509,7 +511,8 @@ async def proxies_record_get_by_id(record_id: str) -> typing.Any:
 
         if response.is_success:
             record = response.json()
-            await proxy_cache_set(cache_key, record)
+            if not logged_in:
+                await proxy_cache_set(cache_key, record)
             return record
         else:
 
@@ -549,10 +552,6 @@ async def proxies_records(request: Request, query_params_before_search: typing.O
     """
     query_params_before_search = query_params_before_search or []
     query_params_before_search = _check_query_params(query_params_before_search)
-    cache_key = proxy_records_cache_key(query_params_before_search)
-    cached_records = await proxy_cache_get(cache_key)
-    if cached_records is not None:
-        return cached_records
 
     query_str = query.get_str_from_list(query_params_before_search)
     query_str = quote(query_str)
@@ -562,9 +561,7 @@ async def proxies_records(request: Request, query_params_before_search: typing.O
         response = await client.get(url)
 
         if response.is_success:
-            records = response.json()
-            await proxy_cache_set(cache_key, records)
-            return records
+            return response.json()
         else:
             response.raise_for_status()
 
@@ -658,36 +655,6 @@ async def proxies_records_from_list(request, query_params) -> typing.Any:
             response.raise_for_status()
 
 
-async def internal_api_get(request: Request, path: str) -> typing.Any:
-    """
-    GET data from an internal api
-    """
-
-    client_url = await _get_server_url(request)
-    url = f"{client_url}{path}"
-
-    async with _get_async_client() as client:
-        response = await client.get(url)
-
-        if response.is_success:
-            return response.json()
-        else:
-            response.raise_for_status()
-
-
-async def _get_server_url(request):
-    scheme = request.url.scheme
-    host = request.url.hostname
-    port = request.url.port
-
-    # Construct base URL
-    server_url = f"{scheme}://{host}"
-    if port:
-        server_url += f":{port}"
-
-    return server_url
-
-
 async def proxies_auto_complete(request: Request, query_params: list = []) -> typing.Any:
     """
     Fetch auto complete data from the api\n
@@ -746,6 +713,10 @@ async def proxies_view_ids(request: Request) -> typing.Any:
     """
     Endpoint for getting ids from the api
     E.g. http://localhost:5555/search?content_types=100&view=ids&size=1000
+    Given is also a cursor:
+    http://localhost:5555/search?cursor=Vdpe3o4YQW9KK3pNeERLVEF3TURBd05URTFOZz098gc&view=ids
+
+
     """
     items = request.query_params.multi_items()
     return await proxies_view_ids_from_list(items)

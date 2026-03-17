@@ -23,7 +23,6 @@ import yaml
 from pathlib import Path
 import os
 
-
 log = get_log()
 
 # Load built-in languages

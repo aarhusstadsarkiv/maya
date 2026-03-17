@@ -14,7 +14,6 @@ from maya.core import logging_handlers
 import asyncio
 from maya import __version__, __program__
 
-
 logging.basicConfig(level=logging.INFO)
 logger: logging.Logger = logging.getLogger(__name__)
 stream_handler = logging_handlers.get_stream_handler(logging.INFO)
@@ -254,7 +253,7 @@ if _is_source() and os.name != "nt":
 
     @cli.command(help="Fix code according to black, flake8, mypy.")
     def source_fix():
-        os.system("black . --config pyproject.toml")
+        os.system("black . --target-version py312 --config pyproject.toml")
         os.system("mypy  --config-file pyproject.toml .")
         os.system("flake8 . --config .flake8")
 

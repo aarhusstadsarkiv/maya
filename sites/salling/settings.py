@@ -1,6 +1,5 @@
 import typing
 
-
 settings: dict[str, typing.Any] = {
     "client_name": "SallingArkivet",
     "client_url": "https://www.sallingarkivet.dk",

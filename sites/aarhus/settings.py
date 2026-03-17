@@ -1,6 +1,5 @@
 from maya.settings_types import Settings
 
-
 settings: Settings = {
     "client_name": "Aarhus Stadsarkiv",
     "client_url": "https://www.aarhusarkivet.dk",
@@ -89,6 +88,6 @@ settings: Settings = {
         "orders": "local/data/orders.db",
     },
     "cron_orders": True,
-    "proxy_cache_expire": 3600,  # seconds
+    "proxy_cache_expire": 60*60*24,  # seconds
     "boto3_presigned_urls": True,
 }

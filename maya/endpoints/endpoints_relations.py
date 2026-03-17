@@ -6,7 +6,6 @@ from maya.core import api
 from maya.core.relations import format_relations, sort_data
 from maya.core.auth import is_authenticated
 
-
 log = get_log()
 
 

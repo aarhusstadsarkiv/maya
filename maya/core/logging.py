@@ -14,7 +14,6 @@ from maya.core import logging_handlers
 import warnings
 from maya.core.paths import get_data_dir_path
 
-
 logging_handlers.generate_log_dir()
 warnings.simplefilter(action="ignore", category=FutureWarning)
 logging.getLogger("uvicorn.error").setLevel(logging.CRITICAL)

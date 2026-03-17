@@ -18,7 +18,6 @@ from maya.database.crud_default import database_url
 from maya.database.crud import CRUD
 from maya.database.utils import DatabaseConnection
 
-
 log = get_log()
 
 

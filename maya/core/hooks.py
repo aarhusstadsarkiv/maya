@@ -23,7 +23,6 @@ import typing
 import os
 import sys
 
-
 log = get_log()
 
 

@@ -11,7 +11,6 @@ from maya.core.object_storage import set_presigned_urls_record
 from maya.core.dynamic_settings import settings
 import typing
 
-
 log = get_log()
 
 

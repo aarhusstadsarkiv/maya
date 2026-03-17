@@ -9,7 +9,6 @@ from maya.records.constants import LEGAL, CONTRACT, AVAILABILITY
 from maya.core import api
 from maya.core.dynamic_settings import settings
 
-
 log = get_log()
 
 

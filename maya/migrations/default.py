@@ -28,14 +28,14 @@ CREATE INDEX idx_searches_user_id ON searches (user_id);
 create_cache_query = """
 CREATE TABLE cache (
     id INTEGER PRIMARY KEY,
-    key TEXT NOT NULL,
+    key TEXT NOT NULL UNIQUE,
     value TEXT,
-    unix_timestamp INTEGER DEFAULT 0
+    unix_timestamp INTEGER NOT NULL DEFAULT 0
 ) STRICT;
 """
 
 create_cache_index_query = """
-CREATE INDEX idx_cache_key ON cache (key);
+CREATE INDEX idx_cache_unix_timestamp ON cache (unix_timestamp);
 """
 
 create_error_logs = """
@@ -62,6 +62,30 @@ alter_bookmarks_table = """
 ALTER TABLE bookmarks RENAME COLUMN bookmark TO record_id;
 """
 
+rebuild_cache_table_with_unique_key = """
+DROP INDEX IF EXISTS idx_cache_key;
+DROP INDEX IF EXISTS idx_cache_unix_timestamp;
+ALTER TABLE cache RENAME TO cache_old;
+CREATE TABLE cache (
+    id INTEGER PRIMARY KEY,
+    key TEXT NOT NULL UNIQUE,
+    value TEXT,
+    unix_timestamp INTEGER NOT NULL DEFAULT 0
+) STRICT;
+INSERT INTO cache (key, value, unix_timestamp)
+SELECT cache_old.key, cache_old.value, cache_old.unix_timestamp
+FROM cache_old
+WHERE cache_old.id = (
+    SELECT cache_old_inner.id
+    FROM cache_old AS cache_old_inner
+    WHERE cache_old_inner.key = cache_old.key
+    ORDER BY cache_old_inner.unix_timestamp DESC, cache_old_inner.id DESC
+    LIMIT 1
+);
+CREATE INDEX idx_cache_unix_timestamp ON cache (unix_timestamp);
+DROP TABLE cache_old;
+"""
+
 drop_error_logs = """
 DROP TABLE IF EXISTS error_logs;
 """
@@ -77,5 +101,6 @@ migrations_default = {
     "create_error_logs": create_error_logs,
     "create_error_logs_index": create_error_logs_index,
     "alter_bookmarks_table": alter_bookmarks_table,
+    "rebuild_cache_table_with_unique_key": rebuild_cache_table_with_unique_key,
     "drop_error_logs": drop_error_logs,
 }

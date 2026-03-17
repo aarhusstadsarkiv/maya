@@ -1,6 +1,5 @@
 import typing
 
-
 settings: dict[str, typing.Any] = {
     "client_name": "test",
     "client_url": "https://demo.openaws.dk",

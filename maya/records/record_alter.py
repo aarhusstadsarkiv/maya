@@ -14,7 +14,6 @@ from maya.records.record_definitions import get_record_definitions
 from maya.core.translate import translate
 from starlette.requests import Request
 
-
 _record_definitions = get_record_definitions()
 log = get_log()
 
