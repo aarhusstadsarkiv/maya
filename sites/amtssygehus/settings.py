@@ -41,4 +41,9 @@ settings: dict[str, typing.Any] = {
     # default search parameters
     "search_default_sort": "created_at",
     "search_default_view": "list",
+    # cache
+    "sqlite3": {
+        "default": "local/data/database.db",
+    },
+    "proxy_cache_expire": 60 * 60 * 24 * 7,  # one week in seconds
 }
