@@ -6,13 +6,13 @@ concatenate them into a single JSON file.
 Examples:
     export BASE_DIR=sites/aarhus
     python bin/fetch_all_proxy_ids.py \
-        --query "content_types=100&size=10000" \
-        --output ids.json \
+        --query "size=10000" \
+        --output tmp/ids.json \
         --pages-dir tmp/proxy-pages
 
     python bin/fetch_all_proxy_ids.py \
         --url "http://localhost:5555/search?content_types=100&view=ids&size=5000" \
-        --output ids.json \
+        --output tmp/ids.json \
         --pages-dir tmp/proxy-pages
 """
 
