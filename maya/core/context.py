@@ -12,6 +12,7 @@ from maya.core.dynamic_settings import settings
 from maya.core import api
 from maya.core.hooks import get_hooks
 from maya.core import cookie
+from maya.core.auth import sanitize_next_url
 from maya.core.logging import get_log
 from maya.settings_types import PageSettings
 import urllib.parse
@@ -96,8 +97,12 @@ def _generate_menu_urls(request: Request, menu_items: list, search_query_str):
             if request.url.query:
                 path_with_query += f"?{request.url.query}"
 
-            next_url = urllib.parse.quote(path_with_query, safe="")
-            menu_item["url"] = f"{url}?next={next_url}"
+            next_url = sanitize_next_url(path_with_query)
+            if next_url:
+                next_url = urllib.parse.quote(next_url, safe="")
+                menu_item["url"] = f"{url}?next={next_url}"
+            else:
+                menu_item["url"] = url
         else:
             menu_item["url"] = url
 

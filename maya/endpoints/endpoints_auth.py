@@ -6,7 +6,7 @@ from starlette.requests import Request
 from starlette.responses import RedirectResponse, JSONResponse
 from maya.core.templates import templates
 from maya.core.context import get_context
-from maya.core.auth import is_authenticated
+from maya.core.auth import is_authenticated, sanitize_next_url
 from maya.core import flash
 from maya.core.translate import translate
 from maya.core import user
@@ -20,6 +20,13 @@ import urllib.parse
 log = get_log()
 
 
+def _get_default_next_url(request: Request) -> str:
+    search_query_str = cookie.get_search_query_str(request)
+    if search_query_str:
+        return f"/search?{search_query_str}"
+    return "/search"
+
+
 async def auth_login_get(request: Request):
     """
     Login GET endpoint
@@ -27,13 +34,13 @@ async def auth_login_get(request: Request):
     is_logged_in = await api.is_logged_in(request)
 
     post_url = "/auth/login"
-    next_url = request.query_params.get("next")
+    next_url = sanitize_next_url(request.query_params.get("next"))
 
     if next_url:
         encoded_next_url = urllib.parse.quote_plus(next_url)
         post_url = f"/auth/login?next={encoded_next_url}"
     else:
-        next_url = f"/search?{cookie.get_search_query_str(request)}"
+        next_url = _get_default_next_url(request)
         encoded_next_url = urllib.parse.quote_plus(next_url)
         post_url = f"/auth/login?next={encoded_next_url}"
 
@@ -51,7 +58,7 @@ async def auth_login_post(request: Request):
     """
     Login POST endpoint
     """
-    next_url = request.query_params.get("next")
+    next_url = sanitize_next_url(request.query_params.get("next"))
 
     try:
         await api.auth_jwt_login_post(request)
@@ -59,7 +66,7 @@ async def auth_login_post(request: Request):
         if next_url:
             return JSONResponse({"error": False, "redirect": next_url})
         else:
-            return JSONResponse({"error": False, "redirect": "/search"})
+            return JSONResponse({"error": False, "redirect": _get_default_next_url(request)})
 
     except OpenAwsException as e:
         log.exception("OpenAwsException in auth_login_post")

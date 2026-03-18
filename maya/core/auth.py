@@ -15,6 +15,7 @@ from maya.core import api
 from starlette.requests import Request
 from maya.core.logging import get_log
 from maya.core.translate import translate
+import urllib.parse
 
 log = get_log()
 
@@ -22,6 +23,27 @@ log = get_log()
 def _get_redirect_url(request: Request):
     next_url = request.url.path
     return f"/auth/login?next={next_url}"
+
+
+def sanitize_next_url(next_url: str | None) -> str | None:
+    """
+    Return a safe relative redirect target or None.
+    Reject absolute URLs and redirects back to the login page to avoid loops.
+    """
+    if not next_url:
+        return None
+
+    parsed = urllib.parse.urlsplit(next_url)
+
+    # Only allow local absolute paths.
+    if parsed.scheme or parsed.netloc or not parsed.path.startswith("/"):
+        return None
+
+    # Prevent recursive redirects back to login.
+    if parsed.path == "/auth/login":
+        return None
+
+    return urllib.parse.urlunsplit(("", "", parsed.path, parsed.query, parsed.fragment))
 
 
 def _log_401_error(request: Request, message: str):

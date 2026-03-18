@@ -2,6 +2,7 @@ from maya.core.dynamic_settings import init_settings
 from maya.app import app
 from maya.core.logging import get_log
 from starlette.testclient import TestClient
+from unittest.mock import AsyncMock, patch
 import unittest
 
 init_settings()
@@ -112,3 +113,18 @@ class TestAuth(unittest.TestCase):
         client = TestClient(app)
         response = client.get("/auth/me", follow_redirects=True)
         self.assertEqual(response.url, "http://testserver/auth/login?next=/auth/me")
+
+    def test_login_get_sanitizes_recursive_next(self):
+        client = TestClient(app)
+        response = client.get("/auth/login?next=/auth/login?next=%2Frecords%2F000357864")
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('action="/auth/login?next=%2Fsearch"', response.text)
+
+    @patch("maya.endpoints.endpoints_auth.api.auth_jwt_login_post", new_callable=AsyncMock)
+    def test_login_post_rejects_recursive_next(self, mock_auth_login_post):
+        client = TestClient(app, headers=headers)
+        response = client.post(
+            "/auth/login?next=/auth/login?next=%2Frecords%2F000357864",
+            data=correct_login,
+        )
+        self.assertEqual(response.json(), {"error": False, "redirect": "/search"})
