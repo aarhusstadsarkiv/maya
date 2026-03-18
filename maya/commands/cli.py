@@ -212,13 +212,13 @@ def run_tests(base_dir: str = "", tests_path_pattern: str = ""):
 
     os.environ["TEST"] = "TRUE"
     if base_dir:
-        os.environ["BASE_DIR"] = base_dir
+        os.environ["BASE_DIR"] = _get_base_dir(base_dir)
         logger.info(f"Running tests with config dir: {os.getenv('BASE_DIR')}")
     else:
         logger.info("No BASE_DIR is set. Running tests with built-in BASE_DIR and configuration")
 
-    # Get all test files
-    test_files = glob.glob(tests_path_pattern)
+    # Accept either a direct file path or a glob pattern.
+    test_files = [tests_path_pattern] if os.path.isfile(tests_path_pattern) else glob.glob(tests_path_pattern)
     if test_files:
         for test_file in test_files:
             logger.info(f"Running tests in {test_file}")
@@ -230,6 +230,23 @@ def run_tests(base_dir: str = "", tests_path_pattern: str = ""):
             subprocess.run([sys.executable, "-m", "unittest", test_file], check=True)
     else:
         logger.info(f"No tests found matching pattern {tests_path_pattern}")
+
+
+def _infer_test_base_dir(test_file: str) -> str:
+    test_file = os.path.normpath(test_file)
+
+    mapping = {
+        os.path.normpath("tests/base_test"): "sites/base_test",
+        os.path.normpath("tests/aarhus"): "sites/aarhus",
+        os.path.normpath("tests/teater"): "sites/teater",
+        os.path.normpath("tests/core"): "sites/aarhus",
+    }
+
+    for prefix, base_dir in mapping.items():
+        if test_file.startswith(prefix + os.sep):
+            return base_dir
+
+    raise click.ClickException(f"Could not infer BASE_DIR for test file: {test_file}")
 
 
 def _is_source():
@@ -250,6 +267,16 @@ if _is_source() and os.name != "nt":
         run_tests("sites/aarhus", "tests/aarhus/*.py")
         run_tests("sites/teater", "tests/teater/*.py")
         run_tests("sites/aarhus", "tests/core/*.py")
+
+    @cli.command(help="Run a single test file.")
+    @click.argument("test_file")
+    @click.option("--base-dir", default=None, help="Optional config dir override.")
+    def source_test_file(test_file: str, base_dir: str | None):
+        test_file = os.path.normpath(test_file)
+        if not os.path.isfile(test_file):
+            raise click.ClickException(f"Test file does not exist: {test_file}")
+
+        run_tests(base_dir or _infer_test_base_dir(test_file), test_file)
 
     @cli.command(help="Fix code according to black, flake8, mypy.")
     def source_fix():
