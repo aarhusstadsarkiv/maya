@@ -179,3 +179,4 @@ data-local
 .DS_Store
 .vscode
 uv.lock
+tmp
