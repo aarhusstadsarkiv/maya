@@ -715,6 +715,8 @@ async def proxies_view_ids(request: Request) -> typing.Any:
     E.g. http://localhost:5555/search?content_types=100&view=ids&size=1000
     Given is also a cursor:
     http://localhost:5555/search?cursor=Vdpe3o4YQW9KK3pNeERLVEF3TURBd05URTFOZz098gc&view=ids
+    Output is JSON with the ids:
+    {"result":["000110308","000249018"],"next_cursor":"VVeIkIMYQW9KMXR1TXRLVEF3TURJME9UQXhPQT09Cg","status_code":0}
 
 
     """
