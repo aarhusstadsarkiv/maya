@@ -1,5 +1,7 @@
 """
 Helpers for generating sitemap XML files from paginated proxy record ids.
+Fetches all record ids using the /proxies/view/ids endpoint and generates sitemap XML files in the
+static/sitemap directory.
 """
 
 import asyncio
