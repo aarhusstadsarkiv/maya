@@ -4,26 +4,22 @@ Helpers for generating sitemap XML files from paginated proxy record ids.
 
 import asyncio
 from pathlib import Path
-from urllib.parse import parse_qsl, urlparse
+from urllib.parse import parse_qsl
 from xml.sax.saxutils import escape
 
 from maya.core.api import proxies_view_ids_from_list
 from maya.core.dynamic_settings import settings
 from maya.core.paths import get_base_dir_path
+from maya.core.logging import get_custom_log
+
+cron_log = get_custom_log("cron_sitemap")
 
 MAX_PAGE_SIZE = 10000
 MAX_URLS_PER_SITEMAP = 50000
 
 
-def _parse_items(query: str | None = None, url: str | None = None) -> list[tuple[str, str]]:
-    if query:
-        query_string = query.lstrip("?")
-    elif url:
-        parsed = urlparse(url)
-        query_string = parsed.query or url.lstrip("?")
-    else:
-        query_string = ""
-
+def _parse_items(query: str | None = None) -> list[tuple[str, str]]:
+    query_string = query.lstrip("?") if query else ""
     items = [(key, value) for key, value in parse_qsl(query_string, keep_blank_values=True) if key]
     items = [(key, value) for key, value in items if key not in {"cursor", "view", "size"}]
     items.append(("view", "ids"))
@@ -48,7 +44,7 @@ async def _fetch_all_ids(items: list[tuple[str, str]]) -> list[str]:
 
         page_number += 1
         ids.extend(page_ids)
-        print(f"Fetched page {page_number}: {len(page_ids)} ids")
+        cron_log.info(f"Fetched page {page_number}: {len(page_ids)} ids")
 
         next_cursor = payload.get("next_cursor")
         if not next_cursor or not page_ids:
@@ -112,7 +108,7 @@ def _write_sitemaps(host: str, ids: list[str], output_dir: Path) -> None:
 
     if len(chunks) <= 1:
         _write_output(index_path, _build_sitemap(host, ids))
-        print(f"Wrote sitemap with {len(ids)} URLs to {index_path}")
+        cron_log.info(f"Wrote sitemap with {len(ids)} URLs to {index_path}")
         return
 
     sitemap_names = []
@@ -121,14 +117,14 @@ def _write_sitemaps(host: str, ids: list[str], output_dir: Path) -> None:
         sitemap_names.append(sitemap_name)
         sitemap_path = output_dir / sitemap_name
         _write_output(sitemap_path, _build_sitemap(host, chunk))
-        print(f"Wrote sitemap {sitemap_name} with {len(chunk)} URLs")
+        cron_log.info(f"Wrote sitemap {sitemap_name} with {len(chunk)} URLs")
 
     _write_output(index_path, _build_sitemap_index(host, sitemap_names))
-    print(f"Wrote sitemap index with {len(sitemap_names)} sitemap files to {index_path}")
+    cron_log.info(f"Wrote sitemap index with {len(sitemap_names)} sitemap files to {index_path}")
 
 
-def generate_sitemap(query: str | None = None, url: str | None = None) -> Path:
-    items = _parse_items(query=query, url=url)
+def generate_sitemap(query: str | None = None) -> Path:
+    items = _parse_items(query=query)
     host = settings["client_url"]
     ids = asyncio.run(_fetch_all_ids(items))
     output_dir = Path(get_base_dir_path("static", "sitemap"))

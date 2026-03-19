@@ -179,17 +179,13 @@ def cron(base_dir: str):
 @cli.command(name="sitemap", help="Generate sitemap files in BASE_DIR/static/sitemap.")
 @click.argument("base_dir")
 @click.option("--query", default=None, help="Raw search query string, e.g. 'content_types=100'.")
-@click.option("--url", default=None, help="Full search URL or path to extract query parameters from.")
-def generate_sitemap_command(base_dir: str, query: str | None, url: str | None):
-    if query and url:
-        raise click.ClickException("Use either --query or --url, not both.")
-
+def generate_sitemap_command(base_dir: str, query: str | None):
     base_dir = _get_base_dir(base_dir)
     os.environ["BASE_DIR"] = base_dir
 
     from maya.core.sitemap import generate_sitemap
 
-    sitemap_path = generate_sitemap(query=query, url=url)
+    sitemap_path = generate_sitemap(query=query)
     logger.info(f"Sitemap written to {sitemap_path}")
 
 
