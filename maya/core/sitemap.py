@@ -31,13 +31,6 @@ def _parse_items(query: str | None = None, url: str | None = None) -> list[tuple
     return items
 
 
-def _normalize_host(host: str | None) -> str:
-    host = (host or settings["client_url"]).strip().rstrip("/")
-    if "://" not in host:
-        host = "https://" + host
-    return host
-
-
 async def _fetch_all_ids(items: list[tuple[str, str]]) -> list[str]:
     ids = []
     next_cursor = None
@@ -134,10 +127,10 @@ def _write_sitemaps(host: str, ids: list[str], output_dir: Path) -> None:
     print(f"Wrote sitemap index with {len(sitemap_names)} sitemap files to {index_path}")
 
 
-def generate_sitemap(query: str | None = None, url: str | None = None, host: str | None = None) -> Path:
+def generate_sitemap(query: str | None = None, url: str | None = None) -> Path:
     items = _parse_items(query=query, url=url)
-    normalized_host = _normalize_host(host)
+    host = settings["client_url"]
     ids = asyncio.run(_fetch_all_ids(items))
     output_dir = Path(get_base_dir_path("static", "sitemap"))
-    _write_sitemaps(normalized_host, ids, output_dir)
+    _write_sitemaps(host, ids, output_dir)
     return output_dir / "sitemap.xml"
