@@ -1,2 +1,2 @@
-__version__ = "1.3.917"
+__version__ = "1.3.918"
 __program__ = "maya"
