@@ -18,8 +18,8 @@ DATA=$3
 # Change owner to dennis:www-data
 chown -R $USER:$GROUP $DATA
 
-# Change all dirs to 770
+# Change all dirs to 775
 find $DATA -type d -exec chmod 775 {} \;
 
-# Change all files to 660
+# Change all files to 664
 find $DATA -type f -exec chmod 664 {} \;
