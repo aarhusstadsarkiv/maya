@@ -176,6 +176,24 @@ def cron(base_dir: str):
     asyncio.run(_run_cron_tasks())
 
 
+@cli.command(name="sitemap", help="Generate sitemap files in BASE_DIR/static/sitemap.")
+@click.argument("base_dir")
+@click.option("--query", default=None, help="Raw search query string, e.g. 'content_types=100'.")
+@click.option("--url", default=None, help="Full search URL or path to extract query parameters from.")
+@click.option("--host", default=None, help="Optional sitemap host. Defaults to settings['client_url'].")
+def generate_sitemap_command(base_dir: str, query: str | None, url: str | None, host: str | None):
+    if query and url:
+        raise click.ClickException("Use either --query or --url, not both.")
+
+    base_dir = _get_base_dir(base_dir)
+    os.environ["BASE_DIR"] = base_dir
+
+    from maya.core.sitemap import generate_sitemap
+
+    sitemap_path = generate_sitemap(query=query, url=url, host=host)
+    logger.info(f"Sitemap written to {sitemap_path}")
+
+
 @cli.command(help="Execute a script within a config context.")
 @click.option("-s", "--script", help="Path to the script to execute.", required=True)
 @click.option("-c", "--config-dir", default="local", help="Specify a path to a config directory.", required=False)

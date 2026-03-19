@@ -3,8 +3,9 @@ Define routes for the application.
 """
 
 from starlette.routing import Route, Mount
-from starlette.responses import PlainTextResponse, RedirectResponse
+from starlette.responses import PlainTextResponse, RedirectResponse, FileResponse
 from starlette.requests import Request
+from starlette.exceptions import HTTPException
 from maya.endpoints import (
     endpoints_admin,
     endpoints_auth,
@@ -72,6 +73,31 @@ async def robots_txt(request: Request):
     return PlainTextResponse(ROBOTS_CONTENT)
 
 
+def _get_sitemap_path(file_name: str) -> str:
+    if not file_name.endswith(".xml"):
+        raise HTTPException(status_code=404)
+
+    if file_name != "sitemap.xml" and not file_name.startswith("sitemap-"):
+        raise HTTPException(status_code=404)
+
+    sitemap_path = get_base_dir_path("static", "sitemap", file_name)
+    if not os.path.exists(sitemap_path):
+        raise HTTPException(status_code=404)
+
+    return sitemap_path
+
+
+async def sitemap_xml(request: Request):
+    sitemap_path = _get_sitemap_path("sitemap.xml")
+    return FileResponse(sitemap_path, media_type="application/xml")
+
+
+async def sitemap_file(request: Request):
+    file_name = f"sitemap-{request.path_params['name']}.xml"
+    sitemap_path = _get_sitemap_path(file_name)
+    return FileResponse(sitemap_path, media_type="application/xml")
+
+
 async def favicon(request: Request):
     """
     /favicon.ico endpoint
@@ -86,6 +112,8 @@ async def favicon(request: Request):
 routes = [
     Mount("/static", MultiStaticFiles(directories=_get_static_dirs()), name="static"),
     Route("/robots.txt", robots_txt),
+    Route("/sitemap.xml", sitemap_xml),
+    Route("/sitemap-{name:str}.xml", sitemap_file),
     Route("/favicon.ico", favicon),
     Route("/admin/users", endpoint=endpoints_admin.admin_users_get, name="admin_users_get"),
     Route("/admin/users/{uuid}/update", endpoint=endpoints_admin.admin_users_get_single, name="admin_users_get_single"),
