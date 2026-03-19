@@ -185,8 +185,7 @@ def generate_sitemap_command(base_dir: str, query: str | None):
 
     from maya.core.sitemap import generate_sitemap
 
-    sitemap_path = generate_sitemap(query=query)
-    logger.info(f"Sitemap written to {sitemap_path}")
+    generate_sitemap(query=query)
 
 
 @cli.command(help="Execute a script within a config context.")

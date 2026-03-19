@@ -125,10 +125,15 @@ def _write_sitemaps(host: str, ids: list[str], output_dir: Path) -> None:
     cron_log.info(f"Wrote sitemap index with {len(sitemap_names)} sitemap files to {index_path}")
 
 
-def generate_sitemap(query: str | None = None) -> Path:
-    items = _parse_items(query=query)
-    host = settings["client_url"]
-    ids = asyncio.run(_fetch_all_ids(items))
+def generate_sitemap(query: str | None = None) -> None:
     output_dir = Path(get_base_dir_path("static", "sitemap"))
-    _write_sitemaps(host, ids, output_dir)
-    return output_dir / "sitemap.xml"
+    sitemap_path = output_dir / "sitemap.xml"
+
+    try:
+        items = _parse_items(query=query)
+        host = settings["client_url"]
+        ids = asyncio.run(_fetch_all_ids(items))
+        _write_sitemaps(host, ids, output_dir)
+        cron_log.info(f"Sitemap written to {sitemap_path}")
+    except Exception:
+        cron_log.exception("Failed to generate sitemap")
