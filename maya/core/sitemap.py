@@ -126,10 +126,9 @@ def _write_sitemaps(host: str, ids: list[str], output_dir: Path) -> None:
 
 
 def generate_sitemap(query: str | None = None) -> None:
-    output_dir = Path(get_base_dir_path("static", "sitemap"))
-    sitemap_path = output_dir / "sitemap.xml"
-
     try:
+        output_dir = Path(get_base_dir_path("static", "sitemap"))
+        sitemap_path = output_dir / "sitemap.xml"
         items = _parse_items(query=query)
         host = settings["client_url"]
         ids = asyncio.run(_fetch_all_ids(items))
