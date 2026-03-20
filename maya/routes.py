@@ -80,7 +80,7 @@ def _get_sitemap_path(file_name: str) -> str:
     if file_name != "sitemap.xml" and not file_name.startswith("sitemap-"):
         raise HTTPException(status_code=404)
 
-    sitemap_path = get_base_dir_path("static", "sitemap", file_name)
+    sitemap_path = get_base_dir_path("data", "sitemap", file_name)
     if not os.path.exists(sitemap_path):
         raise HTTPException(status_code=404)
 

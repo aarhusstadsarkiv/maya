@@ -127,7 +127,7 @@ def _write_sitemaps(host: str, ids: list[str], output_dir: Path) -> None:
 
 def generate_sitemap(query: str | None = None) -> None:
     try:
-        output_dir = Path(get_base_dir_path("static", "sitemap"))
+        output_dir = Path(get_base_dir_path("data", "sitemap"))
         sitemap_path = output_dir / "sitemap.xml"
         items = _parse_items(query=query)
         host = settings["client_url"]
