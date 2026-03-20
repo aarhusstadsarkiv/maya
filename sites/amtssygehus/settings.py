@@ -45,5 +45,5 @@ settings: dict[str, typing.Any] = {
     "sqlite3": {
         "default": "local/data/database.db",
     },
-    "proxy_cache_expire": 60 * 60 * 24 * 7,  # one week in seconds
+    "proxy_cache_expire": 60 * 60 * 24 * 30,  # one month in seconds
 }
