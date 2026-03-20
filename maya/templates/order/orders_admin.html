@@ -87,7 +87,7 @@
                 <th>Lb-nr</th>
                 <th>Brugernavn</th>
                 <th>Status</th>
-                <th>Opdateret</th>
+                <th>Oprettet</th>
                 <th>Deadline</th>
                 <th title="Antal brugere som står i kø">I Kø</th>
                 <th>Lokation</th>
@@ -121,7 +121,7 @@
                 <td>{{ order.lb_number }}</td>
                 <td title="{{ order.user_email }}">{{ order.user_display_name }}</td>
                 <td class="width-100">{{ order.order_status_human }}</td>
-                <td>{{ order.updated_at }}</td>
+                <td>{{ order.created_at_short }}</td>
                 {% if order.deadline_human %}
                 <td>{{ order.deadline_human }}</td>
                 {% else %}
