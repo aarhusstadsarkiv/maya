@@ -81,6 +81,7 @@
         <thead>
             <tr>
                 <th>ID</th>
+                <th>Lokation</th>
                 <th>Materiale</th>
                 <th>Arkivskaber</th>
                 <th>Titel</th>
@@ -91,7 +92,6 @@
                 <th>Oprettet</th>
                 <th>Deadline</th>
                 <th title="Antal brugere som står i kø">I Kø</th>
-                <th>Lokation</th>
                 <th></th><!-- has note indicator -->
                 <th><a href="#" title="Vælg alle til print" class="action-link print-select-all">Alle</a> </th>
                 <th>Handling</th>
@@ -107,6 +107,26 @@
             {% endif %}
             <tr class="{{ queued }}">
                 <td>{{ order.order_id }}</td>
+                <td>
+                    {% if order.allow_location_change %}
+                    {% set location_change_disabled = "" %}
+                    {% set title = "" %}
+                    {% else %}
+                    {% set location_change_disabled = "disabled" %}
+                    {% set title = "
+Du kan ikke ændre lokation, da materialet er i Læsesalen og en bruger har rettighed til
+at benytte det. Du må først afslutte den aktive bestilling, før du kan ændre lokation."
+                    %}
+                    {% endif %}
+
+                    <select {{ location_change_disabled }} name="location" class="location"
+                        data-id="{{ order.order_id }}" title="{{ title }}">
+                        {% for key, value in locations.items() %}
+                        <option value="{{ key }}" data-initial="{{ key }}" {% if order.location==key %}selected{% endif
+                            %}>{{ value }}</option>
+                        {% endfor %}
+                    </select>
+                </td>
                 <td class="record-link">
                     <a title="{{ order.record_and_types_title }}"
                         href="/admin/orders/{{order.record_id}}/html">{{order.record_id}}</a>
@@ -130,26 +150,6 @@
                 <td></td>
                 {% endif %}
                 <td class="width-50">{{ order.count }}</td>
-                <td>
-                    {% if order.allow_location_change %}
-                    {% set location_change_disabled = "" %}
-                    {% set title = "" %}
-                    {% else %}
-                    {% set location_change_disabled = "disabled" %}
-                    {% set title = "
-Du kan ikke ændre lokation, da materialet er i Læsesalen og en bruger har rettighed til
-at benytte det. Du må først afslutte den aktive bestilling, før du kan ændre lokation."
-                    %}
-                    {% endif %}
-
-                    <select {{ location_change_disabled }} name="location" class="location"
-                        data-id="{{ order.order_id }}" title="{{ title }}">
-                        {% for key, value in locations.items() %}
-                        <option value="{{ key }}" data-initial="{{ key }}" {% if order.location==key %}selected{% endif
-                            %}>{{ value }}</option>
-                        {% endfor %}
-                    </select>
-                </td>
                 <td>
                     <span class="has-comment" title="{{ order.comment }}">
                         {% if order.comment %}
@@ -194,16 +194,6 @@ at benytte det. Du må først afslutte den aktive bestilling, før du kan ændre
             {% endfor %}
             <tr>
                 <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
 
                 <td>
                     {% if filters.filter_status != 'order_history' %}
@@ -211,6 +201,16 @@ at benytte det. Du må først afslutte den aktive bestilling, før du kan ændre
                     {% endif %}
                 </td>
 
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
                 <td></td>
 
                 <td>
