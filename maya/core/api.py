@@ -466,7 +466,7 @@ async def me_permissions(request: Request) -> list[str]:
     """
     try:
         me = await users_me_get(request)
-        return await user.permissions_from_me(me)
+        return user.permissions_from_me(me)
     except Exception:
         return []
 
