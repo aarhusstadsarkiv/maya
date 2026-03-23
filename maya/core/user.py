@@ -53,3 +53,21 @@ def permission_translated(permissions: list) -> str:
     """
     permission = permissions[0]
     return translate(f"Permission {permission}")
+
+
+async def permissions_from_me(me: dict) -> list:
+    """
+    Return a list of permissions for the user based on the "me" endpoint response.
+    """
+    user_permissions: dict = me.get("permissions", {})
+    user_permissions_list = permissions_as_list(user_permissions)
+    return user_permissions_list
+
+
+async def has_permission(me: dict, permission: str) -> bool:
+    """
+    Check if the user has the required permission.
+    The function will return True if the user has the specified permission.
+    """
+    user_permissions_list: list = await permissions_from_me(me)
+    return permission in user_permissions_list
