@@ -217,10 +217,12 @@ async def orders_admin_patch_multiple(request: Request):
         else:
             flash.set_message(request, "Ingen lokationer blev opdateret", type="success")
         return JSONResponse({"error": False})
+    except AuthExceptionJSON as e:
+        log.warning(f"Unauthorized attempt to update order locations: {str(e)}")
+        return JSONResponse({"error": True, "message": str(e)}, status_code=401)
     except Exception as e:
-        flash.set_message(request, str(e), type="error")
         log.exception("Error in orders_admin_patch_location")
-        return JSONResponse({"error": True})
+        return JSONResponse({"error": True, "message": str(e)})
 
 
 async def orders_admin_patch_single(request: Request):
@@ -302,6 +304,7 @@ async def orders_admin_get(request: Request):
     """
     GET endpoint for displaying all orders for an "employee" user
     """
+
     await is_authenticated(request, permissions=["employee"])
 
     me = await api.users_me_get(request)

@@ -81,7 +81,7 @@
         <thead>
             <tr>
                 <th>ID</th>
-                <th>Lokation</th>
+                <th>Transit</th>
                 <th>Materiale</th>
                 <th>Arkivskaber</th>
                 <th>Titel</th>
@@ -229,7 +229,7 @@ at benytte det. Du må først afslutte den aktive bestilling, før du kan ændre
     import { asyncLogError } from "/static/js/error.js";
     import { Requests } from "/static/js/requests.js";
     import { Flash } from "/static/js/flash.js";
-    import { OrderStatus } from '/static/js/orders.js';
+    import { OrderStatus, RecordLocation } from '/static/js/orders.js';
     import { config } from "/static/js/config.js";
 
     const spinner = document.querySelector('.loadingspinner');
@@ -306,6 +306,29 @@ at benytte det. Du må først afslutte den aktive bestilling, før du kan ændre
         initialLocationValues.push(selected);
     });
 
+    // Function that on submit checks if any location has changed to RecordLocation.READING_ROOM 
+    // If this is the case make a confirm dialog, as this will send mails to users with access to the record(s)
+    function checkReadingRoomChange() {
+
+        // Return if not "filter_status=active" or if "filter_staus" is missing, as this is the default
+        const urlParams = new URLSearchParams(window.location.search);
+        const filterStatus = urlParams.get('filter_status') || 'active';
+        if (filterStatus !== 'active') {
+            return true;
+        }
+
+        for (let i = 0; i < locationElements.length; i++) {
+            const element = locationElements[i];
+            const selected = element.options[element.selectedIndex].value;
+
+            if (selected == RecordLocation.READING_ROOM && initialLocationValues[i] != RecordLocation.READING_ROOM) {
+                return confirm('Lokation er ændret til læsesal for en eller flere bestillinger. Dette vil sende en mail til alle brugere med adgang til materialet. Er du sikker på at du vil fortsætte?');
+            }
+        }
+
+        return true;
+    }
+
     const updateLocations = document.querySelector('.update-locations');
     if (updateLocations) {
         updateLocations.addEventListener('click', async function () {
@@ -326,8 +349,18 @@ at benytte det. Du må først afslutte den aktive bestilling, før du kan ændre
             const url = '/admin/orders/patch';
             spinner.classList.toggle('hidden');
 
+            if (!checkReadingRoomChange()) {
+                spinner.classList.toggle('hidden');
+                return;
+            }
+
             try {
                 const res = await Requests.asyncPostJson(url, data);
+                if (res.error) {
+                    Flash.setMessage(res.message, 'error');
+                    spinner.classList.toggle('hidden');
+                    return;
+                }
 
                 // Redirect to same page to update view
                 window.location.reload();
