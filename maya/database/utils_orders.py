@@ -103,7 +103,7 @@ def get_insert_user_data(me: dict) -> dict:
         "user_id": me["id"],
         "user_email": me["email"],
         "user_display_name": me["display_name"],
-        "is_mail_disabled": int(is_employee),
+        "is_employee": int(is_employee),
     }
 
 
