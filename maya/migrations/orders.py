@@ -65,12 +65,12 @@ INSERT INTO users (user_id, user_email, user_display_name) VALUES ('SYSTEM', 'sy
 
 """
 
-user_mail_disabled = """
-ALTER TABLE users ADD COLUMN is_mail_disabled INTEGER DEFAULT 0;
+_is_employee = """
+ALTER TABLE users ADD COLUMN is_employee INTEGER DEFAULT 0;
 """
 
 # List of migrations with keys
 migrations_orders = {
     "create_orders": _create_orders_query,
-    "user_mail_disabled": user_mail_disabled,
+    "is_employee": _is_employee,
 }
