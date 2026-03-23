@@ -325,6 +325,10 @@ async def orders_admin_get(request: Request):
     for order in orders:
         admin_data_extra = utils_orders.get_lb_number(order["record_and_types"])
         order["lb_number"] = admin_data_extra
+        order["mag_location"] = utils_orders.get_mag_location_string(order["meta_data_dict"])
+
+    # print order keys
+    # log.info(f"Order keys: {orders[0].keys() if orders else 'No orders found'}")
 
     context_values = {
         "title": "Bestillinger",

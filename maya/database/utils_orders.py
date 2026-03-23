@@ -254,6 +254,15 @@ def get_lb_number(record_and_types: dict) -> str:
     return ""
 
 
+def get_mag_location_string(meta_data_dict: dict) -> str:
+    # MAG, VCU, BTV
+    placement_str = meta_data_dict.get("resources", {}).get("location", "").strip().lower()
+    if "bautavej" in placement_str:
+        return "BTV"
+
+    return "MAG"
+
+
 def get_expire_at_date() -> str:
     """
     Get an 'expire_at' date.\n
