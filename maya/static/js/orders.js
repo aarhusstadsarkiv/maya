@@ -1,5 +1,5 @@
 /**
- * If editing this file then also update `OrderStatus` or `RecordLocation` in `orders.py` 
+ * If editing this file then also update `OrderStatus` or `RecordLocation` in `orders.py`
  * maya/database/utils_orders.py
  */
 
@@ -18,4 +18,4 @@ class RecordLocation {
     static RETURN_TO_STORAGE = 5;
 }
 
-export {OrderStatus, RecordLocation };
+export { OrderStatus, RecordLocation };
