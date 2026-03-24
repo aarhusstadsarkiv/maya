@@ -52,8 +52,14 @@ settings: Settings = {
         {"name": "auth_login_get", "title": "Log ind"},
         {"name": "auth_logout_get", "title": "Log ud"},
         {"name": "auth_register_get", "title": "Ny bruger"},
-        {"name": "auth_me_get", "title": "Profil"},
-        {"name": "orders_admin_get", "title": "Bestillinger"},
+        {"name": "auth_me_get", "title": "Din Profil"},
+        {
+            "name": "orders_get_orders_user",
+            "title": "Dine Bestillinger",
+            "url": "/orders",
+            "params": {"status_type": "active"},
+        },
+        {"name": "orders_admin_get", "title": "Admin Bestillinger"},
         {"name": "admin_users_get", "title": "Brugere"},
     ],
     "main_menu_sections": [

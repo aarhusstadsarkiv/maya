@@ -41,7 +41,7 @@ async def get_context(request: Request, context_values: dict = {}, identifier: s
     if "search_query_str" not in context_values:
         search_query_str = cookie.get_search_query_str(request)
 
-    main_menu_system = _get_main_menu_system(is_logged_in, permissions_list)
+    main_menu_system = _get_main_menu_system(is_logged_in, permissions_list, is_verified)
     main_menu_system = _generate_menu_urls(request, main_menu_system, search_query_str)
     main_menu_top = _generate_menu_urls(request, settings["main_menu_top"], search_query_str)
 
@@ -85,7 +85,7 @@ def _generate_menu_urls(request: Request, menu_items: list, search_query_str):
     """
 
     for menu_item in menu_items:
-        url = str(request.url_for(menu_item["name"]))
+        url = str(request.url_for(menu_item["name"], **menu_item.get("params", {})))
         if menu_item["name"] == "search_get":
 
             # Add search_query_str to search url
@@ -109,7 +109,7 @@ def _generate_menu_urls(request: Request, menu_items: list, search_query_str):
     return menu_items
 
 
-def _get_main_menu_system(is_logged_in: bool, permissions_list: list) -> list:
+def _get_main_menu_system(is_logged_in: bool, permissions_list: list, is_verified: bool) -> list:
     """
     Get the main menu system. Based on the settings and the user's permissions.
     """
@@ -133,7 +133,11 @@ def _get_main_menu_system(is_logged_in: bool, permissions_list: list) -> list:
         main_menu_system = [item for item in main_menu_system if item["name"] not in excluded_items]
 
     if not is_logged_in:
-        excluded_items = {"auth_logout_get", "auth_me_get"}
+        excluded_items = {"auth_logout_get", "auth_me_get", "orders_get_orders_user"}
+        main_menu_system = [item for item in main_menu_system if item["name"] not in excluded_items]
+
+    if not is_verified:
+        excluded_items = {"orders_get_orders_user"}
         main_menu_system = [item for item in main_menu_system if item["name"] not in excluded_items]
 
     if "employee" not in permissions_list:
