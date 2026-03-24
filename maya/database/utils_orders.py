@@ -8,7 +8,6 @@ from maya.core import api
 from maya.core.templates import get_template_content
 from maya.core.dynamic_settings import settings
 from maya.records.meta_data_record import is_orderable_by_form
-from maya.core.user import has_permission
 
 log = get_log()
 
@@ -98,12 +97,10 @@ def get_insert_user_data(me: dict) -> dict:
     """
     Get user data for inserting into users table
     """
-    is_employee = has_permission(me, "employee")
     return {
         "user_id": me["id"],
         "user_email": me["email"],
         "user_display_name": me["display_name"],
-        "is_employee": int(is_employee),
     }
 
 
