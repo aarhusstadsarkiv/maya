@@ -390,14 +390,22 @@ async def orders_record_get(request: Request):
 async def orders_logs(request: Request):
     await is_authenticated(request, permissions=["employee"])
 
-    # get query params order_id
+    limit = 100
+    offset = max(int(request.query_params.get("offset", "0")), 0)
     order_id = request.query_params.get("order_id", "0")
 
-    logs = await crud_orders.get_logs(order_id=int(order_id))
+    logs = await crud_orders.get_logs(order_id=int(order_id), limit=limit + 1, offset=offset)
+    has_next = len(logs) > limit
+    logs = logs[:limit]
     context_variables = {
         "logs": logs,
         "title": "Order Logs",
         "meta_title": "Order Logs",
+        "has_next": has_next,
+        "has_previous": offset > 0,
+        "next_offset": offset + limit,
+        "prev_offset": max(offset - limit, 0),
+        "order_id": order_id,
     }
 
     context = await get_context(request, context_variables, "record")

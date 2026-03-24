@@ -768,9 +768,9 @@ async def get_order(order_id: int):
         return order
 
 
-async def get_logs(order_id: int = 0) -> list:
+async def get_logs(order_id: int = 0, limit: int = 100, offset: int = 0) -> list:
     """
-    Get logs for an order. If order_id is provided, get logs for that order, otherwise get the latest 100 logs.
+    Get logs for an order. If order_id is provided, get logs for that order, otherwise get the latest logs.
     Latest logs are returned first.
     """
     database_connection = DatabaseConnection(orders_url)
@@ -781,7 +781,7 @@ async def get_logs(order_id: int = 0) -> list:
         values = {}
         if order_id:
             sql.append("l.order_id = :order_id")
-            values = {"order_id": order_id}
+            values["order_id"] = order_id
 
         where_sql = ""
         if sql:
@@ -793,12 +793,15 @@ JOIN users u ON l.user_id = u.user_id
 JOIN records r ON l.record_id = r.record_id
 {where_sql}
 ORDER BY l.log_id DESC
-LIMIT 100
+LIMIT :limit
+OFFSET :offset
 """
 
+        values["limit"] = limit
+        values["offset"] = offset
         logs = await crud.query(query, values)
         for single_log in logs:
-            single_log = utils_orders.format_log_display(single_log)
+            utils_orders.format_log_display(single_log)
         return logs
 
 

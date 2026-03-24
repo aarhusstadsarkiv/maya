@@ -32,6 +32,19 @@ generate simple table from these columns
 {% if logs|length == 0 %}
     <div class="alert alert-info">No logs found</div>
 {% else %}
+<div class="action-links">
+    {% if has_previous %}
+    <a href="?order_id={{ order_id }}&offset={{ prev_offset }}">&lt;&lt; Forrige</a>
+    {% else %}
+    <span class="disabled">&lt;&lt; Forrige</span>
+    {% endif %}
+
+    {% if has_next %}
+    <a href="?order_id={{ order_id }}&offset={{ next_offset }}">Næste &gt;&gt;</a>
+    {% else %}
+    <span class="disabled">Næste &gt;&gt;</span>
+    {% endif %}
+</div>
 <table class="table table-striped">
     <thead>
         <tr>
@@ -57,6 +70,19 @@ generate simple table from these columns
     </tr>
     {% endfor %}
 </table>
+<div class="action-links">
+    {% if has_previous %}
+    <a href="?order_id={{ order_id }}&offset={{ prev_offset }}">&lt;&lt; Forrige</a>
+    {% else %}
+    <span class="disabled">&lt;&lt; Forrige</span>
+    {% endif %}
+
+    {% if has_next %}
+    <a href="?order_id={{ order_id }}&offset={{ next_offset }}">Næste &gt;&gt;</a>
+    {% else %}
+    <span class="disabled">Næste &gt;&gt;</span>
+    {% endif %}
+</div>
 {% endif %}
 
 {% endblock content %}
