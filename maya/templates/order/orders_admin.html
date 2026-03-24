@@ -81,7 +81,7 @@
         <thead>
             <tr>
                 <th>ID</th>
-                <th>Transit</th>
+                <th>Lokation</th>
                 <th>Materiale</th>
                 <th>Arkivskaber</th>
                 <th>Titel</th>
@@ -89,7 +89,7 @@
                 <th>Brugernavn</th>
                 <th>Status</th>
                 <th>Magasin</th>
-                <th>Oprettet</th>
+                <th>Bestilt</th>
                 <th>Deadline</th>
                 <th title="Antal brugere som står i kø">I Kø</th>
                 <th></th><!-- has note indicator -->
@@ -322,7 +322,8 @@ at benytte det. Du må først afslutte den aktive bestilling, før du kan ændre
             const selected = element.options[element.selectedIndex].value;
 
             if (selected == RecordLocation.READING_ROOM && initialLocationValues[i] != RecordLocation.READING_ROOM) {
-                return confirm('Lokation er ændret til læsesal for en eller flere bestillinger. Dette vil sende en mail til alle brugere med adgang til materialet. Er du sikker på at du vil fortsætte?');
+                let confirmMessage = `Er du sikker på at du vil ændre lokation til læsesal? Mail(s) vil blive sendt til bruger(e) om at materiale er tilgængeligt i læsesalen.`;
+                return confirm(confirmMessage);
             }
         }
 
