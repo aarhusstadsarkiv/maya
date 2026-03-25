@@ -18,8 +18,6 @@
 
 {{ basic_macros.page_title(title) }}
 
-<p><a title="Se logs" class="action-link" href="/admin/orders/logs">Se Logs</a></p>
-
 {# Select active, completed, order_history #}
 <form class="filters" method="GET" action="/admin/orders">
 
@@ -55,6 +53,7 @@
     {% endif %}
 
     <a href="#" class="clear-search-filters action-link">Ryd filtre</a>
+    <a title="Se logs for alle bestillinger" class="action-link" href="/admin/orders/logs">Alle Logs</a>
     {% if filters.filter_has_prev %}
     <a id="filter-prev" class="action-link" href="#" data-prev="{{ filters.filter_prev_offset }}">&lt;&lt; Forrige</a>
     {% endif %}
@@ -106,7 +105,7 @@
             {% set queued = '' %}
             {% endif %}
             <tr class="{{ queued }}">
-                <td>{{ order.order_id }}</td>
+                <td><a title="Se logs for denne bestilling" href="/admin/orders/logs?order_id={{ order.order_id }}">{{ order.order_id}}</a></td>
                 <td>
                     {% if order.allow_location_change %}
                     {% set location_change_disabled = "" %}
