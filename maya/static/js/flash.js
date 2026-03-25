@@ -51,7 +51,7 @@ class Flash {
 	 * Set a flash message in the DOM. Based on singleMessage, it will either clear the message element or not
 	 * Based on removeAfterSecs, it will remove the message after a set amount of seconds
 	 */
-    static setMessage(message, type) {
+    static setMessage(message, type, removeAfterSecs = null) {
         const messageElem = document.querySelector(".flash-messages");
         messageElem.focus();
 
@@ -64,14 +64,15 @@ class Flash {
         }
 
         let class_random = 'random_' + (Math.random() + 1).toString(36).substring(2);
-        if (this.removeAfterSecs) {
+		let removeAfter = this.removeAfterSecs || removeAfterSecs;
+        if (removeAfter) {
             class_random = 'random_' + (Math.random() + 1).toString(36).substring(2);
             setTimeout(function () {
                 let elem = document.querySelector('.' + class_random)
                 if (elem) {
                     elem.remove();
                 }
-            }, this.removeAfterSecs * 1000)
+            }, removeAfter * 1000)
         }
 
         const html = `<div class="flash flash-${type} ${class_random}">${message}</div>`;
