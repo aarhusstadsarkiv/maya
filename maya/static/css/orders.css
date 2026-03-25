@@ -137,3 +137,8 @@ span.has-comment > svg {
     vertical-align: middle;
     cursor: pointer;
 }
+
+span.content-copy > svg {
+    vertical-align: middle;
+    cursor: pointer;
+}
