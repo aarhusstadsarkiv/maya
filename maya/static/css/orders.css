@@ -133,7 +133,7 @@ td.collectors {
 }
 
 span.has-comment > svg {
-    fill: red;
+    fill: var(--flash-error-color);
     vertical-align: middle;
     cursor: pointer;
 }
@@ -141,4 +141,5 @@ span.has-comment > svg {
 span.content-copy > svg {
     vertical-align: middle;
     cursor: pointer;
+    fill: var(--svg-color);
 }
