@@ -53,7 +53,7 @@
     {% endif %}
 
     <a href="#" class="clear-search-filters action-link">Ryd filtre</a>
-    <a title="Se logs for alle bestillinger" class="action-link" href="/admin/orders/logs">Alle Logs</a>
+    <a title="Se logs for alle bestillinger" class="action-link" href="/admin/orders/logs">Logs</a>
     {% if filters.filter_has_prev %}
     <a id="filter-prev" class="action-link" href="#" data-prev="{{ filters.filter_prev_offset }}">&lt;&lt; Forrige</a>
     {% endif %}
@@ -545,7 +545,7 @@ at benytte det. Du må først afslutte den aktive bestilling, før du kan ændre
         element.addEventListener('click', function () {
             const email = this.dataset.email;
             navigator.clipboard.writeText(email).then(function() {
-                Flash.setMessage('E-mail kopieret til udklipsholderen', 'success', 2);
+                Flash.setMessage('E-mail kopieret til udklipsholderen', 'success', 5);
             }, function(err) {
                 Flash.setMessage('Kunne ikke kopiere e-mail: ' + err, 'error');
             });

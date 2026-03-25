@@ -399,8 +399,8 @@ async def orders_logs(request: Request):
     logs = logs[:limit]
     context_variables = {
         "logs": logs,
-        "title": "Alle Logs",
-        "meta_title": "Alle Logs",
+        "title": "Logs",
+        "meta_title": "Logs",
         "has_next": has_next,
         "has_previous": offset > 0,
         "next_offset": offset + limit,
