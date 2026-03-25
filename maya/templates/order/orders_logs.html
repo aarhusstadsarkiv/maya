@@ -60,7 +60,7 @@ generate simple table from these columns
     </thead>
     {% for log in logs %}
     <tr>
-        <td>{{ log.order_id }}</td>
+        <td><a href="/admin/orders/logs?order_id={{ log.order_id }}">{{ log.order_id}}</a></td>
         <td>{{ log.user_display_name }} ({{ log.user_email }})</td>
         <td>{{ log.record_id }}</td>
         <td>{{ log.updated_location }}</td>
