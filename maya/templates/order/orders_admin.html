@@ -139,8 +139,10 @@ at benytte det. Du må først afslutte den aktive bestilling, før du kan ændre
                 <td class="width-300" title="{{ order.label }}">{{ order.label }} </td>
                 {% endif %}
                 <td>{{ order.lb_number }}</td>
-                <td>{{ order.user_display_name }} 
+                <td>
                     <span  title="{{ order.user_email }}" class="content-copy" data-email="{{ order.user_email }}">{{ get_icon('content_copy')|safe }}</span>
+                    {{ order.user_display_name }} 
+                    
                 </td>
                 <td class="width-100">{{ order.order_status_human }}</td>
                 <td>{{ order.mag_location }}</td>
