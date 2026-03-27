@@ -1,0 +1,5317 @@
+components:
+  securitySchemes:
+    client:
+      in: cookie
+      name: client
+      type: apiKey
+    domain:
+      in: cookie
+      name: domain
+      type: apiKey
+    session:
+      in: cookie
+      name: session
+      type: apiKey
+info:
+  title: Webservice
+  version: 2.0.0
+openapi: 3.0.0
+paths:
+  /v2/clients/:
+    get:
+      description: Get list of clients the user has access to.
+      responses:
+        401:
+          content:
+            application/json:
+              schema:
+                description: AuthenticationError
+                properties:
+                  error:
+                    default: AuthenticationError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: AuthenticationError
+      security:
+      - session: []
+      tags:
+      - clients
+  /v2/clients/{id}:
+    get:
+      description: Get client.
+      parameters:
+      - description: ''
+        in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        400:
+          content:
+            application/json:
+              schema:
+                description: ParameterError
+                properties:
+                  error:
+                    default: ParameterError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: ParameterError
+        401:
+          content:
+            application/json:
+              schema:
+                description: AuthenticationError
+                properties:
+                  error:
+                    default: AuthenticationError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: AuthenticationError
+      security:
+      - session: []
+      tags:
+      - clients
+  /v2/clients/{id}/domains:
+    get:
+      description: Get list of domains tied to a client.
+      responses:
+        401:
+          content:
+            application/json:
+              schema:
+                description: AuthenticationError
+                properties:
+                  error:
+                    default: AuthenticationError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: AuthenticationError
+        403:
+          content:
+            application/json:
+              schema:
+                description: ForbiddenError
+                properties:
+                  error:
+                    default: ForbiddenError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: ForbiddenError
+      security:
+      - session: []
+      tags:
+      - clients
+  /v2/clients/{id}/domains/{domain}:
+    get:
+      description: Get a domain tied to a client.
+      responses:
+        401:
+          content:
+            application/json:
+              schema:
+                description: AuthenticationError
+                properties:
+                  error:
+                    default: AuthenticationError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: AuthenticationError
+        403:
+          content:
+            application/json:
+              schema:
+                description: ForbiddenError
+                properties:
+                  error:
+                    default: ForbiddenError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: ForbiddenError
+      security:
+      - session: []
+      tags:
+      - clients
+  /v2/clients/{id}/domains/{domain}/identity:
+    get:
+      description: Get the identification key for a domain.
+      responses:
+        401:
+          content:
+            application/json:
+              schema:
+                description: AuthenticationError
+                properties:
+                  error:
+                    default: AuthenticationError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: AuthenticationError
+        403:
+          content:
+            application/json:
+              schema:
+                description: ForbiddenError
+                properties:
+                  error:
+                    default: ForbiddenError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: ForbiddenError
+      security:
+      - session: []
+      tags:
+      - clients
+  /v2/clients/{id}/domains/{domain}/verify:
+    get:
+      description: Get the verification key for a domain.
+      responses:
+        401:
+          content:
+            application/json:
+              schema:
+                description: AuthenticationError
+                properties:
+                  error:
+                    default: AuthenticationError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: AuthenticationError
+        403:
+          content:
+            application/json:
+              schema:
+                description: ForbiddenError
+                properties:
+                  error:
+                    default: ForbiddenError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: ForbiddenError
+      security:
+      - session: []
+      tags:
+      - clients
+  /v2/clients/{id}/users:
+    get:
+      description: Get list of users that have a role in the client.
+      responses:
+        401:
+          content:
+            application/json:
+              schema:
+                description: AuthenticationError
+                properties:
+                  error:
+                    default: AuthenticationError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: AuthenticationError
+        403:
+          content:
+            application/json:
+              schema:
+                description: ForbiddenError
+                properties:
+                  error:
+                    default: ForbiddenError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: ForbiddenError
+      security:
+      - session: []
+      tags:
+      - clients
+  /v2/controlled-values/:
+    post:
+      description: Add a new controlled value.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $id: controlled_value
+              $schema: https://json-schema.org/draft/2020-12/schema
+              definitions:
+                value:
+                  properties:
+                    children:
+                      items:
+                        $ref: '#/definitions/value'
+                      type: array
+                    deprecated:
+                      const: true
+                      type: boolean
+                    description:
+                      type: string
+                    id:
+                      type: string
+                    label:
+                      minLength: 1
+                      type: string
+                  required:
+                  - id
+                  - label
+                  type: object
+              description: Controlled Value
+              properties:
+                description:
+                  type: string
+                label:
+                  type: string
+                name:
+                  pattern: ^\w+$
+                  type: string
+                values:
+                  items:
+                    $ref: '#/definitions/value'
+                  minItems: 1
+                  type: array
+              required:
+              - name
+              - description
+              - values
+              title: Controlled Value
+              type: object
+        description: ''
+        required: true
+      responses:
+        201:
+          content:
+            application/json:
+              schema:
+                description: ControlledValueRow
+                properties:
+                  data:
+                    properties:
+                      created_at:
+                        format: date-time
+                        title: Created At
+                        type: string
+                      created_by:
+                        format: uuid
+                        title: Created By
+                        type: string
+                      data:
+                        additionalProperties: true
+                        title: Data
+                        type: object
+                      id:
+                        format: uuid
+                        title: Id
+                        type: string
+                      name:
+                        title: Name
+                        type: string
+                      version:
+                        title: Version
+                        type: string
+                    required:
+                    - created_at
+                    - created_by
+                    - id
+                    - name
+                    - version
+                    - data
+                    title: ControlledValueRow
+                    type: object
+                required:
+                - data
+                title: APIResponse
+                type: object
+          description: ControlledValueRow
+        401:
+          content:
+            application/json:
+              schema:
+                description: AuthenticationError
+                properties:
+                  error:
+                    default: AuthenticationError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: AuthenticationError
+        403:
+          content:
+            application/json:
+              schema:
+                description: ForbiddenError
+                properties:
+                  error:
+                    default: ForbiddenError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: ForbiddenError
+        422:
+          content:
+            application/json:
+              schema:
+                description: BodyError
+                properties:
+                  error:
+                    default: BodyError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: BodyError
+      security:
+      - session: []
+      tags:
+      - controlled values
+  /v2/controlled-values/{name}:
+    get:
+      description: Get the latest version of a controlled value. Includes creation
+        information.
+      parameters:
+      - description: ''
+        in: path
+        name: name
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                description: ControlledValueRow
+                properties:
+                  data:
+                    properties:
+                      created_at:
+                        format: date-time
+                        title: Created At
+                        type: string
+                      created_by:
+                        format: uuid
+                        title: Created By
+                        type: string
+                      data:
+                        additionalProperties: true
+                        title: Data
+                        type: object
+                      id:
+                        format: uuid
+                        title: Id
+                        type: string
+                      name:
+                        title: Name
+                        type: string
+                      version:
+                        title: Version
+                        type: string
+                    required:
+                    - created_at
+                    - created_by
+                    - id
+                    - name
+                    - version
+                    - data
+                    title: ControlledValueRow
+                    type: object
+                required:
+                - data
+                title: APIResponse
+                type: object
+          description: ControlledValueRow
+        400:
+          content:
+            application/json:
+              schema:
+                description: ParameterError
+                properties:
+                  error:
+                    default: ParameterError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: ParameterError
+        401:
+          content:
+            application/json:
+              schema:
+                description: AuthenticationError
+                properties:
+                  error:
+                    default: AuthenticationError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: AuthenticationError
+        403:
+          content:
+            application/json:
+              schema:
+                description: ForbiddenError
+                properties:
+                  error:
+                    default: ForbiddenError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: ForbiddenError
+        404:
+          content:
+            application/json:
+              schema:
+                description: NotFoundError
+                properties:
+                  error:
+                    default: NotFoundError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: NotFoundError
+      security:
+      - session: []
+      tags:
+      - controlled values
+    post:
+      description: Edit an existing controlled value.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $id: controlled_value
+              $schema: https://json-schema.org/draft/2020-12/schema
+              definitions:
+                value:
+                  properties:
+                    children:
+                      items:
+                        $ref: '#/definitions/value'
+                      type: array
+                    deprecated:
+                      const: true
+                      type: boolean
+                    description:
+                      type: string
+                    id:
+                      type: string
+                    label:
+                      minLength: 1
+                      type: string
+                  required:
+                  - id
+                  - label
+                  type: object
+              description: Controlled Value
+              properties:
+                description:
+                  type: string
+                label:
+                  type: string
+                name:
+                  pattern: ^\w+$
+                  type: string
+                values:
+                  items:
+                    $ref: '#/definitions/value'
+                  minItems: 1
+                  type: array
+              required:
+              - name
+              - description
+              - values
+              title: Controlled Value
+              type: object
+        description: ''
+        required: true
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                description: ControlledValueRow
+                properties:
+                  data:
+                    properties:
+                      created_at:
+                        format: date-time
+                        title: Created At
+                        type: string
+                      created_by:
+                        format: uuid
+                        title: Created By
+                        type: string
+                      data:
+                        additionalProperties: true
+                        title: Data
+                        type: object
+                      id:
+                        format: uuid
+                        title: Id
+                        type: string
+                      name:
+                        title: Name
+                        type: string
+                      version:
+                        title: Version
+                        type: string
+                    required:
+                    - created_at
+                    - created_by
+                    - id
+                    - name
+                    - version
+                    - data
+                    title: ControlledValueRow
+                    type: object
+                required:
+                - data
+                title: APIResponse
+                type: object
+          description: ControlledValueRow
+        401:
+          content:
+            application/json:
+              schema:
+                description: AuthenticationError
+                properties:
+                  error:
+                    default: AuthenticationError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: AuthenticationError
+        403:
+          content:
+            application/json:
+              schema:
+                description: ForbiddenError
+                properties:
+                  error:
+                    default: ForbiddenError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: ForbiddenError
+        422:
+          content:
+            application/json:
+              schema:
+                description: BodyError
+                properties:
+                  error:
+                    default: BodyError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: BodyError
+      security:
+      - session: []
+      tags:
+      - controlled values
+  /v2/controlled-values/{name}/schema:
+    get:
+      description: Get the latest version of a controlled value.
+      parameters:
+      - description: ''
+        in: path
+        name: name
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                content:
+                  application/json:
+                    schema:
+                      $id: controlled_value
+                      $schema: https://json-schema.org/draft/2020-12/schema
+                      definitions:
+                        value:
+                          properties:
+                            children:
+                              items:
+                                $ref: '#/definitions/value'
+                              type: array
+                            deprecated:
+                              const: true
+                              type: boolean
+                            description:
+                              type: string
+                            id:
+                              type: string
+                            label:
+                              minLength: 1
+                              type: string
+                          required:
+                          - id
+                          - label
+                          type: object
+                      description: Controlled Value
+                      properties:
+                        description:
+                          type: string
+                        label:
+                          type: string
+                        name:
+                          pattern: ^\w+$
+                          type: string
+                        values:
+                          items:
+                            $ref: '#/definitions/value'
+                          minItems: 1
+                          type: array
+                      required:
+                      - name
+                      - description
+                      - values
+                      title: Controlled Value
+                      type: object
+          description: ''
+        400:
+          content:
+            application/json:
+              schema:
+                description: ParameterError
+                properties:
+                  error:
+                    default: ParameterError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: ParameterError
+      tags:
+      - controlled values
+  /v2/controlled-values/{name}/versions:
+    get:
+      description: Get all versions of a controlled value. Includes creation information.
+      parameters:
+      - description: ''
+        in: path
+        name: name
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                properties:
+                  data:
+                    items:
+                      properties:
+                        created_at:
+                          format: date-time
+                          title: Created At
+                          type: string
+                        created_by:
+                          format: uuid
+                          title: Created By
+                          type: string
+                        data:
+                          additionalProperties: true
+                          title: Data
+                          type: object
+                        id:
+                          format: uuid
+                          title: Id
+                          type: string
+                        name:
+                          title: Name
+                          type: string
+                        version:
+                          title: Version
+                          type: string
+                      required:
+                      - created_at
+                      - created_by
+                      - id
+                      - name
+                      - version
+                      - data
+                      title: ControlledValueRow
+                      type: object
+                    title: Data
+                    type: array
+                required:
+                - data
+                title: APIResponse
+                type: object
+          description: ''
+        400:
+          content:
+            application/json:
+              schema:
+                description: ParameterError
+                properties:
+                  error:
+                    default: ParameterError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: ParameterError
+        401:
+          content:
+            application/json:
+              schema:
+                description: AuthenticationError
+                properties:
+                  error:
+                    default: AuthenticationError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: AuthenticationError
+        403:
+          content:
+            application/json:
+              schema:
+                description: ForbiddenError
+                properties:
+                  error:
+                    default: ForbiddenError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: ForbiddenError
+        404:
+          content:
+            application/json:
+              schema:
+                description: NotFoundError
+                properties:
+                  error:
+                    default: NotFoundError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: NotFoundError
+      security:
+      - session: []
+      tags:
+      - controlled values
+  /v2/controlled-values/{name}/{version}:
+    get:
+      description: Get a specific version of a controlled value. Includes creation
+        information.
+      parameters:
+      - description: ''
+        in: path
+        name: name
+        required: true
+        schema:
+          type: string
+      - description: ''
+        in: path
+        name: version
+        required: true
+        schema:
+          pattern: ^\d+\.\d+\.\d+$
+          type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                description: ControlledValueRow
+                properties:
+                  data:
+                    properties:
+                      created_at:
+                        format: date-time
+                        title: Created At
+                        type: string
+                      created_by:
+                        format: uuid
+                        title: Created By
+                        type: string
+                      data:
+                        additionalProperties: true
+                        title: Data
+                        type: object
+                      id:
+                        format: uuid
+                        title: Id
+                        type: string
+                      name:
+                        title: Name
+                        type: string
+                      version:
+                        title: Version
+                        type: string
+                    required:
+                    - created_at
+                    - created_by
+                    - id
+                    - name
+                    - version
+                    - data
+                    title: ControlledValueRow
+                    type: object
+                required:
+                - data
+                title: APIResponse
+                type: object
+          description: ControlledValueRow
+        400:
+          content:
+            application/json:
+              schema:
+                description: ParameterError
+                properties:
+                  error:
+                    default: ParameterError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: ParameterError
+        401:
+          content:
+            application/json:
+              schema:
+                description: AuthenticationError
+                properties:
+                  error:
+                    default: AuthenticationError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: AuthenticationError
+        403:
+          content:
+            application/json:
+              schema:
+                description: ForbiddenError
+                properties:
+                  error:
+                    default: ForbiddenError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: ForbiddenError
+        404:
+          content:
+            application/json:
+              schema:
+                description: NotFoundError
+                properties:
+                  error:
+                    default: NotFoundError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: NotFoundError
+      security:
+      - session: []
+      tags:
+      - controlled values
+  /v2/controlled-values/{name}/{version}/schema:
+    get:
+      description: Get a specific version of a controlled value.
+      parameters:
+      - description: ''
+        in: path
+        name: name
+        required: true
+        schema:
+          type: string
+      - description: ''
+        in: path
+        name: version
+        required: true
+        schema:
+          pattern: ^\d+\.\d+\.\d+$
+          type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                content:
+                  application/json:
+                    schema:
+                      $id: controlled_value
+                      $schema: https://json-schema.org/draft/2020-12/schema
+                      definitions:
+                        value:
+                          properties:
+                            children:
+                              items:
+                                $ref: '#/definitions/value'
+                              type: array
+                            deprecated:
+                              const: true
+                              type: boolean
+                            description:
+                              type: string
+                            id:
+                              type: string
+                            label:
+                              minLength: 1
+                              type: string
+                          required:
+                          - id
+                          - label
+                          type: object
+                      description: Controlled Value
+                      properties:
+                        description:
+                          type: string
+                        label:
+                          type: string
+                        name:
+                          pattern: ^\w+$
+                          type: string
+                        values:
+                          items:
+                            $ref: '#/definitions/value'
+                          minItems: 1
+                          type: array
+                      required:
+                      - name
+                      - description
+                      - values
+                      title: Controlled Value
+                      type: object
+          description: ''
+        400:
+          content:
+            application/json:
+              schema:
+                description: ParameterError
+                properties:
+                  error:
+                    default: ParameterError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: ParameterError
+      tags:
+      - controlled values
+  /v2/emails/html:
+    post:
+      description: Send an email to a user with an arbitrary HTML body.
+      parameters:
+      - description: ''
+        in: header
+        name: x-domain-key
+        required: true
+        schema:
+          format: uuid
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                body:
+                  title: Body
+                  type: string
+                subject:
+                  title: Subject
+                  type: string
+                to:
+                  format: uuid
+                  title: To
+                  type: string
+              required:
+              - to
+              - subject
+              - body
+              title: BodyPostEmailHTML
+              type: object
+        description: ''
+        required: true
+      responses:
+        200:
+          content:
+            application/json:
+              schema: {}
+          description: ''
+        400:
+          content:
+            application/json:
+              schema:
+                description: HeaderError
+                properties:
+                  error:
+                    default: HeaderError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: HeaderError
+        401:
+          content:
+            application/json:
+              schema:
+                description: NotFoundError
+                properties:
+                  error:
+                    default: NotFoundError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: NotFoundError
+        404:
+          content:
+            application/json:
+              schema:
+                description: NotFoundError
+                properties:
+                  error:
+                    default: NotFoundError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: NotFoundError
+        422:
+          content:
+            application/json:
+              schema:
+                description: BodyError
+                properties:
+                  error:
+                    default: BodyError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: BodyError
+        500:
+          content:
+            application/json:
+              schema:
+                description: EmailError
+                properties:
+                  error:
+                    default: EmailError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: EmailError
+      tags:
+      - users
+  /v2/emails/template:
+    post:
+      description: Send an email to a user using a domain template.
+      parameters:
+      - description: ''
+        in: header
+        name: x-domain-key
+        required: true
+        schema:
+          format: uuid
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                context:
+                  additionalProperties: true
+                  title: Context
+                  type: object
+                template:
+                  enum:
+                  - 0
+                  - 1
+                  - 2
+                  - 3
+                  title: TemplateType
+                  type: integer
+                to:
+                  format: uuid
+                  title: To
+                  type: string
+              required:
+              - to
+              - template
+              title: BodyPostEmailTemplate
+              type: object
+        description: ''
+        required: true
+      responses:
+        200:
+          content:
+            application/json:
+              schema: {}
+          description: ''
+        400:
+          content:
+            application/json:
+              schema:
+                description: HeaderError
+                properties:
+                  error:
+                    default: HeaderError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: HeaderError
+        401:
+          content:
+            application/json:
+              schema:
+                description: NotFoundError
+                properties:
+                  error:
+                    default: NotFoundError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: NotFoundError
+        404:
+          content:
+            application/json:
+              schema:
+                description: NotFoundError
+                properties:
+                  error:
+                    default: NotFoundError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: NotFoundError
+        422:
+          content:
+            application/json:
+              schema:
+                description: BodyError
+                properties:
+                  error:
+                    default: BodyError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: BodyError
+        500:
+          content:
+            application/json:
+              schema:
+                description: EmailError
+                properties:
+                  error:
+                    default: EmailError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: EmailError
+      tags:
+      - users
+  /v2/entities/new/{schema_name}:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+        description: ''
+        required: true
+      responses:
+        401:
+          content:
+            application/json:
+              schema:
+                description: AuthenticationError
+                properties:
+                  error:
+                    default: AuthenticationError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: AuthenticationError
+        403:
+          content:
+            application/json:
+              schema:
+                description: ForbiddenError
+                properties:
+                  error:
+                    default: ForbiddenError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: ForbiddenError
+        404:
+          content:
+            application/json:
+              schema:
+                description: NotFoundError
+                properties:
+                  error:
+                    default: NotFoundError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: NotFoundError
+        422:
+          content:
+            application/json:
+              schema:
+                description: BodyError
+                properties:
+                  error:
+                    default: BodyError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: BodyError
+      security:
+      - session: []
+      tags:
+      - entities
+  /v2/entities/{id}:
+    delete:
+      parameters:
+      - description: ''
+        in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                properties: {}
+                title: APIResponse
+                type: object
+          description: ''
+        400:
+          content:
+            application/json:
+              schema:
+                description: ParameterError
+                properties:
+                  error:
+                    default: ParameterError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: ParameterError
+        401:
+          content:
+            application/json:
+              schema:
+                description: AuthenticationError
+                properties:
+                  error:
+                    default: AuthenticationError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: AuthenticationError
+        403:
+          content:
+            application/json:
+              schema:
+                description: ForbiddenError
+                properties:
+                  error:
+                    default: ForbiddenError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: ForbiddenError
+      security:
+      - session: []
+      tags:
+      - entities
+    get:
+      parameters:
+      - description: ''
+        in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                description: EntityRow
+                properties:
+                  data:
+                    properties:
+                      created_at:
+                        format: date-time
+                        title: Created At
+                        type: string
+                      created_by:
+                        format: uuid
+                        title: Created By
+                        type: string
+                      data:
+                        additionalProperties: true
+                        title: Data
+                        type: object
+                      deleted:
+                        title: Deleted
+                        type: boolean
+                      id:
+                        format: uuid
+                        title: Id
+                        type: string
+                      restricted:
+                        title: Restricted
+                        type: boolean
+                      schema_name:
+                        title: Schema Name
+                        type: string
+                      schema_version:
+                        title: Schema Version
+                        type: string
+                    required:
+                    - created_at
+                    - created_by
+                    - id
+                    - schema_name
+                    - schema_version
+                    - deleted
+                    - restricted
+                    - data
+                    title: EntityRow
+                    type: object
+                required:
+                - data
+                title: APIResponse
+                type: object
+          description: EntityRow
+        400:
+          content:
+            application/json:
+              schema:
+                description: ParameterError
+                properties:
+                  error:
+                    default: ParameterError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: ParameterError
+        404:
+          content:
+            application/json:
+              schema:
+                description: NotFoundError
+                properties:
+                  error:
+                    default: NotFoundError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: NotFoundError
+      tags:
+      - entities
+    post:
+      parameters:
+      - description: ''
+        in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+        description: ''
+        required: true
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                description: EntityUpdate
+                properties:
+                  data:
+                    properties:
+                      entity:
+                        properties:
+                          created_at:
+                            format: date-time
+                            title: Created At
+                            type: string
+                          created_by:
+                            format: uuid
+                            title: Created By
+                            type: string
+                          data:
+                            additionalProperties: true
+                            title: Data
+                            type: object
+                          deleted:
+                            title: Deleted
+                            type: boolean
+                          id:
+                            format: uuid
+                            title: Id
+                            type: string
+                          restricted:
+                            title: Restricted
+                            type: boolean
+                          schema_name:
+                            title: Schema Name
+                            type: string
+                          schema_version:
+                            title: Schema Version
+                            type: string
+                        required:
+                        - created_at
+                        - created_by
+                        - id
+                        - schema_name
+                        - schema_version
+                        - deleted
+                        - restricted
+                        - data
+                        title: EntityRow
+                        type: object
+                      patch:
+                        items:
+                          additionalProperties: true
+                          type: object
+                        title: Patch
+                        type: array
+                    required:
+                    - entity
+                    - patch
+                    title: EntityUpdate
+                    type: object
+                required:
+                - data
+                title: APIResponse
+                type: object
+          description: EntityUpdate
+        400:
+          content:
+            application/json:
+              schema:
+                description: ParameterError
+                properties:
+                  error:
+                    default: ParameterError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: ParameterError
+        401:
+          content:
+            application/json:
+              schema:
+                description: AuthenticationError
+                properties:
+                  error:
+                    default: AuthenticationError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: AuthenticationError
+        403:
+          content:
+            application/json:
+              schema:
+                description: ForbiddenError
+                properties:
+                  error:
+                    default: ForbiddenError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: ForbiddenError
+        404:
+          content:
+            application/json:
+              schema:
+                description: NotFoundError
+                properties:
+                  error:
+                    default: NotFoundError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: NotFoundError
+        422:
+          content:
+            application/json:
+              schema:
+                description: BodyError
+                properties:
+                  error:
+                    default: BodyError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: BodyError
+      security:
+      - session: []
+      tags:
+      - entities
+  /v2/entities/{id}/files:
+    post:
+      description: Add a new file to an entity.
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                description: FileRow
+                properties:
+                  data:
+                    properties:
+                      blob_id:
+                        format: uuid
+                        title: Blob Id
+                        type: string
+                      checksum:
+                        title: Checksum
+                        type: string
+                      comment:
+                        title: Comment
+                        type: string
+                      created_at:
+                        format: date-time
+                        title: Created At
+                        type: string
+                      created_by:
+                        format: uuid
+                        title: Created By
+                        type: string
+                      entity_id:
+                        format: uuid
+                        title: Entity Id
+                        type: string
+                      id:
+                        format: uuid
+                        title: Id
+                        type: string
+                      metadata:
+                        additionalProperties: true
+                        title: Metadata
+                        type: object
+                      mimetype:
+                        anyOf:
+                        - type: string
+                        - type: 'null'
+                        title: Mimetype
+                      path:
+                        title: Path
+                        type: string
+                      puid:
+                        anyOf:
+                        - type: string
+                        - type: 'null'
+                        title: Puid
+                      size:
+                        title: Size
+                        type: integer
+                    required:
+                    - created_at
+                    - created_by
+                    - id
+                    - entity_id
+                    - blob_id
+                    - path
+                    - puid
+                    - mimetype
+                    - size
+                    - checksum
+                    - comment
+                    - metadata
+                    title: FileRow
+                    type: object
+                required:
+                - data
+                title: APIResponse
+                type: object
+          description: FileRow
+        401:
+          content:
+            application/json:
+              schema:
+                description: AuthenticationError
+                properties:
+                  error:
+                    default: AuthenticationError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: AuthenticationError
+        403:
+          content:
+            application/json:
+              schema:
+                description: ForbiddenError
+                properties:
+                  error:
+                    default: ForbiddenError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: ForbiddenError
+        404:
+          content:
+            application/json:
+              schema:
+                description: NotFoundError
+                properties:
+                  error:
+                    default: NotFoundError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: NotFoundError
+        422:
+          content:
+            application/json:
+              schema:
+                description: FormError
+                properties:
+                  error:
+                    default: FormError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: FormError
+        500:
+          content:
+            application/json:
+              schema:
+                description: StorageError
+                properties:
+                  error:
+                    default: StorageError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: StorageError
+      security:
+      - session: []
+      tags:
+      - files
+  /v2/entities/{id}/versions:
+    get:
+      parameters:
+      - description: ''
+        in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                description: EntityVersionRow
+                properties:
+                  data:
+                    properties:
+                      created_at:
+                        format: date-time
+                        title: Created At
+                        type: string
+                      created_by:
+                        format: uuid
+                        title: Created By
+                        type: string
+                      entity_id:
+                        format: uuid
+                        title: Entity Id
+                        type: string
+                      patch:
+                        items:
+                          additionalProperties: true
+                          type: object
+                        title: Patch
+                        type: array
+                      schema_name:
+                        title: Schema Name
+                        type: string
+                      schema_version:
+                        title: Schema Version
+                        type: string
+                      version:
+                        title: Version
+                        type: integer
+                    required:
+                    - created_at
+                    - created_by
+                    - entity_id
+                    - version
+                    - schema_name
+                    - schema_version
+                    - patch
+                    title: EntityVersionRow
+                    type: object
+                required:
+                - data
+                title: APIResponse
+                type: object
+          description: EntityVersionRow
+        400:
+          content:
+            application/json:
+              schema:
+                description: ParameterError
+                properties:
+                  error:
+                    default: ParameterError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: ParameterError
+        404:
+          content:
+            application/json:
+              schema:
+                description: NotFoundError
+                properties:
+                  error:
+                    default: NotFoundError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: NotFoundError
+      tags:
+      - entities
+  /v2/entities/{id}/versions/{version_a}/diff:
+    get:
+      parameters:
+      - description: ''
+        in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      - description: ''
+        in: path
+        name: version_a
+        required: true
+        schema:
+          minimum: 1
+          type: integer
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                description: EntityVersionCompare
+                properties:
+                  data:
+                    properties:
+                      diff:
+                        items:
+                          additionalProperties: true
+                          type: object
+                        title: Diff
+                        type: array
+                      entity_a:
+                        additionalProperties: true
+                        title: Entity A
+                        type: object
+                      entity_b:
+                        additionalProperties: true
+                        title: Entity B
+                        type: object
+                      version_a:
+                        title: Version A
+                        type: string
+                      version_b:
+                        title: Version B
+                        type: string
+                    required:
+                    - entity_a
+                    - version_a
+                    - entity_b
+                    - version_b
+                    - diff
+                    title: EntityVersionCompare
+                    type: object
+                required:
+                - data
+                title: APIResponse
+                type: object
+          description: EntityVersionCompare
+        400:
+          content:
+            application/json:
+              schema:
+                description: ParameterError
+                properties:
+                  error:
+                    default: ParameterError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: ParameterError
+        404:
+          content:
+            application/json:
+              schema:
+                description: NotFoundError
+                properties:
+                  error:
+                    default: NotFoundError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: NotFoundError
+      tags:
+      - entities
+  /v2/entities/{id}/versions/{version_a}/diff/{version_b}:
+    get:
+      parameters:
+      - description: ''
+        in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      - description: ''
+        in: path
+        name: version_a
+        required: true
+        schema:
+          minimum: 1
+          type: integer
+      - description: ''
+        in: path
+        name: version_b
+        required: true
+        schema:
+          minimum: 1
+          type: integer
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                description: EntityVersionCompare
+                properties:
+                  data:
+                    properties:
+                      diff:
+                        items:
+                          additionalProperties: true
+                          type: object
+                        title: Diff
+                        type: array
+                      entity_a:
+                        additionalProperties: true
+                        title: Entity A
+                        type: object
+                      entity_b:
+                        additionalProperties: true
+                        title: Entity B
+                        type: object
+                      version_a:
+                        title: Version A
+                        type: string
+                      version_b:
+                        title: Version B
+                        type: string
+                    required:
+                    - entity_a
+                    - version_a
+                    - entity_b
+                    - version_b
+                    - diff
+                    title: EntityVersionCompare
+                    type: object
+                required:
+                - data
+                title: APIResponse
+                type: object
+          description: EntityVersionCompare
+        400:
+          content:
+            application/json:
+              schema:
+                description: ParameterError
+                properties:
+                  error:
+                    default: ParameterError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: ParameterError
+        404:
+          content:
+            application/json:
+              schema:
+                description: NotFoundError
+                properties:
+                  error:
+                    default: NotFoundError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: NotFoundError
+      tags:
+      - entities
+  /v2/entities/{id}/versions/{version}:
+    put:
+      parameters:
+      - description: ''
+        in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      - description: ''
+        in: path
+        name: version
+        required: true
+        schema:
+          minimum: 1
+          type: integer
+      responses:
+        400:
+          content:
+            application/json:
+              schema:
+                description: ParameterError
+                properties:
+                  error:
+                    default: ParameterError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: ParameterError
+        401:
+          content:
+            application/json:
+              schema:
+                description: AuthenticationError
+                properties:
+                  error:
+                    default: AuthenticationError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: AuthenticationError
+        403:
+          content:
+            application/json:
+              schema:
+                description: ForbiddenError
+                properties:
+                  error:
+                    default: ForbiddenError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: ForbiddenError
+        404:
+          content:
+            application/json:
+              schema:
+                description: NotFoundError
+                properties:
+                  error:
+                    default: NotFoundError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: NotFoundError
+      security:
+      - session: []
+      tags:
+      - entities
+  /v2/files/{id}:
+    delete:
+      description: Delete a file and its remote blob.
+      parameters:
+      - description: ''
+        in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                description: FileRow
+                properties:
+                  data:
+                    properties:
+                      blob_id:
+                        format: uuid
+                        title: Blob Id
+                        type: string
+                      checksum:
+                        title: Checksum
+                        type: string
+                      comment:
+                        title: Comment
+                        type: string
+                      created_at:
+                        format: date-time
+                        title: Created At
+                        type: string
+                      created_by:
+                        format: uuid
+                        title: Created By
+                        type: string
+                      entity_id:
+                        format: uuid
+                        title: Entity Id
+                        type: string
+                      id:
+                        format: uuid
+                        title: Id
+                        type: string
+                      metadata:
+                        additionalProperties: true
+                        title: Metadata
+                        type: object
+                      mimetype:
+                        anyOf:
+                        - type: string
+                        - type: 'null'
+                        title: Mimetype
+                      path:
+                        title: Path
+                        type: string
+                      puid:
+                        anyOf:
+                        - type: string
+                        - type: 'null'
+                        title: Puid
+                      size:
+                        title: Size
+                        type: integer
+                    required:
+                    - created_at
+                    - created_by
+                    - id
+                    - entity_id
+                    - blob_id
+                    - path
+                    - puid
+                    - mimetype
+                    - size
+                    - checksum
+                    - comment
+                    - metadata
+                    title: FileRow
+                    type: object
+                required:
+                - data
+                title: APIResponse
+                type: object
+          description: FileRow
+        400:
+          content:
+            application/json:
+              schema:
+                description: ParameterError
+                properties:
+                  error:
+                    default: ParameterError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: ParameterError
+        401:
+          content:
+            application/json:
+              schema:
+                description: AuthenticationError
+                properties:
+                  error:
+                    default: AuthenticationError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: AuthenticationError
+        403:
+          content:
+            application/json:
+              schema:
+                description: ForbiddenError
+                properties:
+                  error:
+                    default: ForbiddenError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: ForbiddenError
+        404:
+          content:
+            application/json:
+              schema:
+                description: NotFoundError
+                properties:
+                  error:
+                    default: NotFoundError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: NotFoundError
+        500:
+          content:
+            application/json:
+              schema:
+                description: StorageError
+                properties:
+                  error:
+                    default: StorageError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: StorageError
+      security:
+      - session: []
+      tags:
+      - files
+    get:
+      description: Get a file by id.
+      parameters:
+      - description: ''
+        in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                description: FileRow
+                properties:
+                  data:
+                    properties:
+                      blob_id:
+                        format: uuid
+                        title: Blob Id
+                        type: string
+                      checksum:
+                        title: Checksum
+                        type: string
+                      comment:
+                        title: Comment
+                        type: string
+                      created_at:
+                        format: date-time
+                        title: Created At
+                        type: string
+                      created_by:
+                        format: uuid
+                        title: Created By
+                        type: string
+                      entity_id:
+                        format: uuid
+                        title: Entity Id
+                        type: string
+                      id:
+                        format: uuid
+                        title: Id
+                        type: string
+                      metadata:
+                        additionalProperties: true
+                        title: Metadata
+                        type: object
+                      mimetype:
+                        anyOf:
+                        - type: string
+                        - type: 'null'
+                        title: Mimetype
+                      path:
+                        title: Path
+                        type: string
+                      puid:
+                        anyOf:
+                        - type: string
+                        - type: 'null'
+                        title: Puid
+                      size:
+                        title: Size
+                        type: integer
+                    required:
+                    - created_at
+                    - created_by
+                    - id
+                    - entity_id
+                    - blob_id
+                    - path
+                    - puid
+                    - mimetype
+                    - size
+                    - checksum
+                    - comment
+                    - metadata
+                    title: FileRow
+                    type: object
+                required:
+                - data
+                title: APIResponse
+                type: object
+          description: FileRow
+        400:
+          content:
+            application/json:
+              schema:
+                description: ParameterError
+                properties:
+                  error:
+                    default: ParameterError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: ParameterError
+        403:
+          content:
+            application/json:
+              schema:
+                description: ForbiddenError
+                properties:
+                  error:
+                    default: ForbiddenError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: ForbiddenError
+        404:
+          content:
+            application/json:
+              schema:
+                description: NotFoundError
+                properties:
+                  error:
+                    default: NotFoundError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: NotFoundError
+      tags:
+      - files
+    put:
+      description: Replace a file's blob.
+      parameters:
+      - description: ''
+        in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                description: FileRow
+                properties:
+                  data:
+                    properties:
+                      blob_id:
+                        format: uuid
+                        title: Blob Id
+                        type: string
+                      checksum:
+                        title: Checksum
+                        type: string
+                      comment:
+                        title: Comment
+                        type: string
+                      created_at:
+                        format: date-time
+                        title: Created At
+                        type: string
+                      created_by:
+                        format: uuid
+                        title: Created By
+                        type: string
+                      entity_id:
+                        format: uuid
+                        title: Entity Id
+                        type: string
+                      id:
+                        format: uuid
+                        title: Id
+                        type: string
+                      metadata:
+                        additionalProperties: true
+                        title: Metadata
+                        type: object
+                      mimetype:
+                        anyOf:
+                        - type: string
+                        - type: 'null'
+                        title: Mimetype
+                      path:
+                        title: Path
+                        type: string
+                      puid:
+                        anyOf:
+                        - type: string
+                        - type: 'null'
+                        title: Puid
+                      size:
+                        title: Size
+                        type: integer
+                    required:
+                    - created_at
+                    - created_by
+                    - id
+                    - entity_id
+                    - blob_id
+                    - path
+                    - puid
+                    - mimetype
+                    - size
+                    - checksum
+                    - comment
+                    - metadata
+                    title: FileRow
+                    type: object
+                required:
+                - data
+                title: APIResponse
+                type: object
+          description: FileRow
+        400:
+          content:
+            application/json:
+              schema:
+                description: ParameterError
+                properties:
+                  error:
+                    default: ParameterError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: ParameterError
+        401:
+          content:
+            application/json:
+              schema:
+                description: AuthenticationError
+                properties:
+                  error:
+                    default: AuthenticationError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: AuthenticationError
+        403:
+          content:
+            application/json:
+              schema:
+                description: ForbiddenError
+                properties:
+                  error:
+                    default: ForbiddenError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: ForbiddenError
+        404:
+          content:
+            application/json:
+              schema:
+                description: NotFoundError
+                properties:
+                  error:
+                    default: NotFoundError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: NotFoundError
+        422:
+          content:
+            application/json:
+              schema:
+                description: FormError
+                properties:
+                  error:
+                    default: FormError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: FormError
+        500:
+          content:
+            application/json:
+              schema:
+                description: StorageError
+                properties:
+                  error:
+                    default: StorageError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: StorageError
+      security:
+      - session: []
+      tags:
+      - files
+  /v2/files/{id}/blob:
+    get:
+      description: Get a file's blob.
+      parameters:
+      - description: ''
+        in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                description: Stream blob from storage.
+          description: ''
+        400:
+          description: ParameterError
+        403:
+          content:
+            application/json:
+              schema:
+                description: ForbiddenError
+          description: ''
+        404:
+          content:
+            application/json:
+              schema:
+                description: NotFoundError
+          description: ''
+        500:
+          content:
+            application/json:
+              schema:
+                description: StorageError
+          description: ''
+      tags:
+      - files
+  /v2/files/{id}/blob/{filename}:
+    get:
+      description: Get a file's blob.
+      parameters:
+      - description: ''
+        in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                description: Stream blob from storage.
+          description: ''
+        400:
+          description: ParameterError
+        403:
+          content:
+            application/json:
+              schema:
+                description: ForbiddenError
+          description: ''
+        404:
+          content:
+            application/json:
+              schema:
+                description: NotFoundError
+          description: ''
+        500:
+          content:
+            application/json:
+              schema:
+                description: StorageError
+          description: ''
+      tags:
+      - files
+  /v2/files/{id}/url:
+    get:
+      description: Get the pre-signed URL to a file's remote blob.
+      parameters:
+      - description: ''
+        in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                properties:
+                  data:
+                    title: Data
+                    type: string
+                required:
+                - data
+                title: APIResponse
+                type: object
+          description: ''
+        400:
+          content:
+            application/json:
+              schema:
+                description: ParameterError
+                properties:
+                  error:
+                    default: ParameterError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: ParameterError
+        403:
+          content:
+            application/json:
+              schema:
+                description: ForbiddenError
+                properties:
+                  error:
+                    default: ForbiddenError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: ForbiddenError
+        404:
+          content:
+            application/json:
+              schema:
+                description: NotFoundError
+                properties:
+                  error:
+                    default: NotFoundError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: NotFoundError
+        500:
+          content:
+            application/json:
+              schema:
+                description: StorageError
+                properties:
+                  error:
+                    default: StorageError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: StorageError
+      tags:
+      - files
+  /v2/schemata/:
+    post:
+      description: Add a new schema.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $comment: This meta-schema also defines keywords that have appeared
+                in previous drafts in order to prevent incompatible extensions as
+                they remain in common use.
+              $dynamicAnchor: meta
+              $id: https://json-schema.org/draft/2020-12/schema
+              $schema: https://json-schema.org/draft/2020-12/schema
+              $vocabulary:
+                https://json-schema.org/draft/2020-12/vocab/applicator: true
+                https://json-schema.org/draft/2020-12/vocab/content: true
+                https://json-schema.org/draft/2020-12/vocab/core: true
+                https://json-schema.org/draft/2020-12/vocab/format-annotation: true
+                https://json-schema.org/draft/2020-12/vocab/meta-data: true
+                https://json-schema.org/draft/2020-12/vocab/unevaluated: true
+                https://json-schema.org/draft/2020-12/vocab/validation: true
+              allOf:
+              - $ref: meta/core
+              - $ref: meta/applicator
+              - $ref: meta/unevaluated
+              - $ref: meta/validation
+              - $ref: meta/meta-data
+              - $ref: meta/format-annotation
+              - $ref: meta/content
+              properties:
+                $id:
+                  pattern: ^\w+(\.\w+)*$
+                  type: string
+                $recursiveAnchor:
+                  $comment: '"$recursiveAnchor" has been replaced by "$dynamicAnchor".'
+                  $ref: meta/core#/$defs/anchorString
+                  deprecated: true
+                $recursiveRef:
+                  $comment: '"$recursiveRef" has been replaced by "$dynamicRef".'
+                  $ref: meta/core#/$defs/uriReferenceString
+                  deprecated: true
+                definitions:
+                  $comment: '"definitions" has been replaced by "$defs".'
+                  additionalProperties:
+                    $dynamicRef: '#meta'
+                  default: {}
+                  deprecated: true
+                  type: object
+                dependencies:
+                  $comment: '"dependencies" has been split and replaced by "dependentSchemas"
+                    and "dependentRequired" in order to serve their differing semantics.'
+                  additionalProperties:
+                    anyOf:
+                    - $dynamicRef: '#meta'
+                    - $ref: meta/validation#/$defs/stringArray
+                  default: {}
+                  deprecated: true
+                  type: object
+              required:
+              - $id
+              title: Core and Validation specifications meta-schema
+              type:
+              - object
+              - boolean
+        description: ''
+        required: true
+      responses:
+        201:
+          content:
+            application/json:
+              schema:
+                description: SchemaRow
+                properties:
+                  data:
+                    properties:
+                      created_at:
+                        format: date-time
+                        title: Created At
+                        type: string
+                      created_by:
+                        format: uuid
+                        title: Created By
+                        type: string
+                      data:
+                        additionalProperties: true
+                        title: Data
+                        type: object
+                      id:
+                        format: uuid
+                        title: Id
+                        type: string
+                      name:
+                        title: Name
+                        type: string
+                      version:
+                        title: Version
+                        type: string
+                    required:
+                    - created_at
+                    - created_by
+                    - id
+                    - name
+                    - version
+                    - data
+                    title: SchemaRow
+                    type: object
+                required:
+                - data
+                title: APIResponse
+                type: object
+          description: SchemaRow
+        401:
+          content:
+            application/json:
+              schema:
+                description: AuthenticationError
+                properties:
+                  error:
+                    default: AuthenticationError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: AuthenticationError
+        403:
+          content:
+            application/json:
+              schema:
+                description: ForbiddenError
+                properties:
+                  error:
+                    default: ForbiddenError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: ForbiddenError
+        422:
+          content:
+            application/json:
+              schema:
+                description: BodyError
+                properties:
+                  error:
+                    default: BodyError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: BodyError
+      security:
+      - session: []
+      tags:
+      - schemata
+  /v2/schemata/{name}:
+    get:
+      description: Get the latest version of a schema. Includes creation information.
+      parameters:
+      - description: ''
+        in: path
+        name: name
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                description: SchemaRow
+                properties:
+                  data:
+                    properties:
+                      created_at:
+                        format: date-time
+                        title: Created At
+                        type: string
+                      created_by:
+                        format: uuid
+                        title: Created By
+                        type: string
+                      data:
+                        additionalProperties: true
+                        title: Data
+                        type: object
+                      id:
+                        format: uuid
+                        title: Id
+                        type: string
+                      name:
+                        title: Name
+                        type: string
+                      version:
+                        title: Version
+                        type: string
+                    required:
+                    - created_at
+                    - created_by
+                    - id
+                    - name
+                    - version
+                    - data
+                    title: SchemaRow
+                    type: object
+                required:
+                - data
+                title: APIResponse
+                type: object
+          description: SchemaRow
+        400:
+          content:
+            application/json:
+              schema:
+                description: ParameterError
+                properties:
+                  error:
+                    default: ParameterError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: ParameterError
+        401:
+          content:
+            application/json:
+              schema:
+                description: AuthenticationError
+                properties:
+                  error:
+                    default: AuthenticationError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: AuthenticationError
+        403:
+          content:
+            application/json:
+              schema:
+                description: ForbiddenError
+                properties:
+                  error:
+                    default: ForbiddenError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: ForbiddenError
+        404:
+          content:
+            application/json:
+              schema:
+                description: NotFoundError
+                properties:
+                  error:
+                    default: NotFoundError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: NotFoundError
+      security:
+      - session: []
+      tags:
+      - schemata
+    post:
+      description: Edit an existing schema.
+      parameters:
+      - description: ''
+        in: path
+        name: name
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $comment: This meta-schema also defines keywords that have appeared
+                in previous drafts in order to prevent incompatible extensions as
+                they remain in common use.
+              $dynamicAnchor: meta
+              $id: https://json-schema.org/draft/2020-12/schema
+              $schema: https://json-schema.org/draft/2020-12/schema
+              $vocabulary:
+                https://json-schema.org/draft/2020-12/vocab/applicator: true
+                https://json-schema.org/draft/2020-12/vocab/content: true
+                https://json-schema.org/draft/2020-12/vocab/core: true
+                https://json-schema.org/draft/2020-12/vocab/format-annotation: true
+                https://json-schema.org/draft/2020-12/vocab/meta-data: true
+                https://json-schema.org/draft/2020-12/vocab/unevaluated: true
+                https://json-schema.org/draft/2020-12/vocab/validation: true
+              allOf:
+              - $ref: meta/core
+              - $ref: meta/applicator
+              - $ref: meta/unevaluated
+              - $ref: meta/validation
+              - $ref: meta/meta-data
+              - $ref: meta/format-annotation
+              - $ref: meta/content
+              properties:
+                $id:
+                  pattern: ^\w+(\.\w+)*$
+                  type: string
+                $recursiveAnchor:
+                  $comment: '"$recursiveAnchor" has been replaced by "$dynamicAnchor".'
+                  $ref: meta/core#/$defs/anchorString
+                  deprecated: true
+                $recursiveRef:
+                  $comment: '"$recursiveRef" has been replaced by "$dynamicRef".'
+                  $ref: meta/core#/$defs/uriReferenceString
+                  deprecated: true
+                definitions:
+                  $comment: '"definitions" has been replaced by "$defs".'
+                  additionalProperties:
+                    $dynamicRef: '#meta'
+                  default: {}
+                  deprecated: true
+                  type: object
+                dependencies:
+                  $comment: '"dependencies" has been split and replaced by "dependentSchemas"
+                    and "dependentRequired" in order to serve their differing semantics.'
+                  additionalProperties:
+                    anyOf:
+                    - $dynamicRef: '#meta'
+                    - $ref: meta/validation#/$defs/stringArray
+                  default: {}
+                  deprecated: true
+                  type: object
+              required:
+              - $id
+              title: Core and Validation specifications meta-schema
+              type:
+              - object
+              - boolean
+        description: ''
+        required: true
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                description: SchemaRow
+                properties:
+                  data:
+                    properties:
+                      created_at:
+                        format: date-time
+                        title: Created At
+                        type: string
+                      created_by:
+                        format: uuid
+                        title: Created By
+                        type: string
+                      data:
+                        additionalProperties: true
+                        title: Data
+                        type: object
+                      id:
+                        format: uuid
+                        title: Id
+                        type: string
+                      name:
+                        title: Name
+                        type: string
+                      version:
+                        title: Version
+                        type: string
+                    required:
+                    - created_at
+                    - created_by
+                    - id
+                    - name
+                    - version
+                    - data
+                    title: SchemaRow
+                    type: object
+                required:
+                - data
+                title: APIResponse
+                type: object
+          description: SchemaRow
+        400:
+          content:
+            application/json:
+              schema:
+                description: ParameterError
+                properties:
+                  error:
+                    default: ParameterError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: ParameterError
+        401:
+          content:
+            application/json:
+              schema:
+                description: AuthenticationError
+                properties:
+                  error:
+                    default: AuthenticationError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: AuthenticationError
+        403:
+          content:
+            application/json:
+              schema:
+                description: ForbiddenError
+                properties:
+                  error:
+                    default: ForbiddenError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: ForbiddenError
+        422:
+          content:
+            application/json:
+              schema:
+                description: BodyError
+                properties:
+                  error:
+                    default: BodyError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: BodyError
+      security:
+      - session: []
+      tags:
+      - schemata
+  /v2/schemata/{name}/schema:
+    get:
+      description: Get the latest version of a schema.
+      parameters:
+      - description: ''
+        in: path
+        name: name
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: object
+          description: ''
+        400:
+          content:
+            application/json:
+              schema:
+                description: ParameterError
+                properties:
+                  error:
+                    default: ParameterError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: ParameterError
+        404:
+          content:
+            application/json:
+              schema:
+                description: NotFoundError
+                properties:
+                  error:
+                    default: NotFoundError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: NotFoundError
+      tags:
+      - schemata
+  /v2/schemata/{name}/versions:
+    get:
+      description: Get all versions of a schema. Includes creation information.
+      parameters:
+      - description: ''
+        in: path
+        name: name
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                properties:
+                  data:
+                    items:
+                      properties:
+                        created_at:
+                          format: date-time
+                          title: Created At
+                          type: string
+                        created_by:
+                          format: uuid
+                          title: Created By
+                          type: string
+                        data:
+                          additionalProperties: true
+                          title: Data
+                          type: object
+                        id:
+                          format: uuid
+                          title: Id
+                          type: string
+                        name:
+                          title: Name
+                          type: string
+                        version:
+                          title: Version
+                          type: string
+                      required:
+                      - created_at
+                      - created_by
+                      - id
+                      - name
+                      - version
+                      - data
+                      title: SchemaRow
+                      type: object
+                    title: Data
+                    type: array
+                required:
+                - data
+                title: APIResponse
+                type: object
+          description: ''
+        400:
+          content:
+            application/json:
+              schema:
+                description: ParameterError
+                properties:
+                  error:
+                    default: ParameterError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: ParameterError
+        401:
+          content:
+            application/json:
+              schema:
+                description: AuthenticationError
+                properties:
+                  error:
+                    default: AuthenticationError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: AuthenticationError
+        403:
+          content:
+            application/json:
+              schema:
+                description: ForbiddenError
+                properties:
+                  error:
+                    default: ForbiddenError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: ForbiddenError
+        404:
+          content:
+            application/json:
+              schema:
+                description: NotFoundError
+                properties:
+                  error:
+                    default: NotFoundError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: NotFoundError
+      security:
+      - session: []
+      tags:
+      - schemata
+  /v2/schemata/{name}/{version}:
+    get:
+      description: Get a specific version of a schema. Includes creation information.
+      parameters:
+      - description: ''
+        in: path
+        name: name
+        required: true
+        schema:
+          type: string
+      - description: ''
+        in: path
+        name: version
+        required: true
+        schema:
+          pattern: ^\d+\.\d+\.\d+$
+          type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                description: SchemaRow
+                properties:
+                  data:
+                    properties:
+                      created_at:
+                        format: date-time
+                        title: Created At
+                        type: string
+                      created_by:
+                        format: uuid
+                        title: Created By
+                        type: string
+                      data:
+                        additionalProperties: true
+                        title: Data
+                        type: object
+                      id:
+                        format: uuid
+                        title: Id
+                        type: string
+                      name:
+                        title: Name
+                        type: string
+                      version:
+                        title: Version
+                        type: string
+                    required:
+                    - created_at
+                    - created_by
+                    - id
+                    - name
+                    - version
+                    - data
+                    title: SchemaRow
+                    type: object
+                required:
+                - data
+                title: APIResponse
+                type: object
+          description: SchemaRow
+        400:
+          content:
+            application/json:
+              schema:
+                description: ParameterError
+                properties:
+                  error:
+                    default: ParameterError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: ParameterError
+        401:
+          content:
+            application/json:
+              schema:
+                description: AuthenticationError
+                properties:
+                  error:
+                    default: AuthenticationError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: AuthenticationError
+        403:
+          content:
+            application/json:
+              schema:
+                description: ForbiddenError
+                properties:
+                  error:
+                    default: ForbiddenError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: ForbiddenError
+        404:
+          content:
+            application/json:
+              schema:
+                description: NotFoundError
+                properties:
+                  error:
+                    default: NotFoundError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: NotFoundError
+      security:
+      - session: []
+      tags:
+      - schemata
+  /v2/schemata/{name}/{version}/schema:
+    get:
+      description: Get a specific version of a schema.
+      parameters:
+      - description: ''
+        in: path
+        name: name
+        required: true
+        schema:
+          type: string
+      - description: ''
+        in: path
+        name: version
+        required: true
+        schema:
+          pattern: ^\d+\.\d+\.\d+$
+          type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: object
+          description: ''
+        400:
+          content:
+            application/json:
+              schema:
+                description: ParameterError
+                properties:
+                  error:
+                    default: ParameterError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: ParameterError
+        404:
+          content:
+            application/json:
+              schema:
+                description: NotFoundError
+                properties:
+                  error:
+                    default: NotFoundError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: NotFoundError
+      tags:
+      - schemata
+  /v2/users/login:
+    post:
+      description: Log in using email and password.
+      parameters:
+      - description: ''
+        in: header
+        name: User-Agent
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                email:
+                  minLength: 5
+                  type: string
+                password:
+                  minLength: 8
+                  type: string
+              required:
+              - email
+              - password
+              type: object
+        description: ''
+        required: true
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                properties:
+                  checkin_at:
+                    format: date-time
+                    title: Checkin At
+                    type: string
+                  created_at:
+                    format: date-time
+                    title: Created At
+                    type: string
+                  created_by:
+                    format: uuid
+                    title: Created By
+                    type: string
+                  expires_at:
+                    format: date-time
+                    title: Expires At
+                    type: string
+                  id:
+                    format: uuid
+                    title: Id
+                    type: string
+                  user_agent:
+                    title: User Agent
+                    type: string
+                required:
+                - created_at
+                - created_by
+                - id
+                - checkin_at
+                - expires_at
+                - user_agent
+                title: Session
+                type: object
+          description: ''
+        400:
+          content:
+            application/json:
+              schema:
+                description: HeaderError
+                properties:
+                  error:
+                    default: HeaderError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: HeaderError
+        401:
+          content:
+            application/json:
+              schema:
+                description: AuthenticationError
+                properties:
+                  error:
+                    default: AuthenticationError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: AuthenticationError
+        422:
+          content:
+            application/json:
+              schema:
+                description: BodyError
+                properties:
+                  error:
+                    default: BodyError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: BodyError
+      tags:
+      - users
+  /v2/users/logout:
+    get:
+      description: Log out the current user.
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: object
+          description: ''
+        401:
+          content:
+            application/json:
+              schema:
+                description: AuthenticationError
+                properties:
+                  error:
+                    default: AuthenticationError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: AuthenticationError
+      security:
+      - session: []
+      tags:
+      - users
+  /v2/users/me:
+    delete:
+      description: Delete the current user.
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                properties:
+                  admin:
+                    title: Admin
+                    type: boolean
+                  created_at:
+                    format: date-time
+                    title: Created At
+                    type: string
+                  created_by:
+                    format: uuid
+                    title: Created By
+                    type: string
+                  email:
+                    title: Email
+                    type: string
+                  id:
+                    format: uuid
+                    title: Id
+                    type: string
+                  is_verified:
+                    title: Is Verified
+                    type: boolean
+                  name:
+                    title: Name
+                    type: string
+                required:
+                - created_at
+                - created_by
+                - id
+                - name
+                - email
+                - admin
+                - is_verified
+                title: User
+                type: object
+          description: ''
+        401:
+          content:
+            application/json:
+              schema:
+                description: AuthenticationError
+                properties:
+                  error:
+                    default: AuthenticationError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: AuthenticationError
+        404:
+          content:
+            application/json:
+              schema:
+                description: NotFoundError
+                properties:
+                  error:
+                    default: NotFoundError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: NotFoundError
+      security:
+      - session: []
+      tags:
+      - users
+    get:
+      description: Get the current user.
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                properties:
+                  admin:
+                    title: Admin
+                    type: boolean
+                  created_at:
+                    format: date-time
+                    title: Created At
+                    type: string
+                  created_by:
+                    format: uuid
+                    title: Created By
+                    type: string
+                  email:
+                    title: Email
+                    type: string
+                  id:
+                    format: uuid
+                    title: Id
+                    type: string
+                  is_verified:
+                    title: Is Verified
+                    type: boolean
+                  name:
+                    title: Name
+                    type: string
+                  role:
+                    anyOf:
+                    - enum:
+                      - 0
+                      - 10
+                      - 20
+                      - 30
+                      title: UserRole
+                      type: integer
+                    - type: 'null'
+                    default: null
+                required:
+                - created_at
+                - created_by
+                - id
+                - name
+                - email
+                - admin
+                - is_verified
+                title: AuthUser
+                type: object
+          description: ''
+        401:
+          content:
+            application/json:
+              schema:
+                description: AuthenticationError
+                properties:
+                  error:
+                    default: AuthenticationError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: AuthenticationError
+      security:
+      - session: []
+      tags:
+      - users
+  /v2/users/password-reset:
+    post:
+      description: Reset the password for a user.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                password:
+                  minLength: 8
+                  type: string
+                token:
+                  format: uuid
+                  pattern: ^[0-9a-fA-F]{8}-?[0-9a-fA-F]{4}-?[0-9a-fA-F]{4}-?[0-9a-fA-F]{4}-?[0-9a-fA-F]{12}$
+                  type: string
+              required:
+              - password
+              - token
+              type: object
+        description: ''
+        required: true
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: object
+          description: ''
+        401:
+          content:
+            application/json:
+              schema:
+                description: AuthenticationError
+                properties:
+                  error:
+                    default: AuthenticationError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: AuthenticationError
+        422:
+          content:
+            application/json:
+              schema:
+                description: BodyError
+                properties:
+                  error:
+                    default: BodyError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: BodyError
+      tags:
+      - users
+  /v2/users/password-reset/request:
+    post:
+      description: Request a new password reset token for a user.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                email:
+                  format: email
+                  type: string
+              required:
+              - email
+              type: object
+        description: ''
+        required: true
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: object
+          description: ''
+        404:
+          content:
+            application/json:
+              schema:
+                description: NotFoundError
+                properties:
+                  error:
+                    default: NotFoundError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: NotFoundError
+        422:
+          content:
+            application/json:
+              schema:
+                description: BodyError
+                properties:
+                  error:
+                    default: BodyError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: BodyError
+        500:
+          content:
+            application/json:
+              schema:
+                description: EmailError
+                properties:
+                  error:
+                    default: EmailError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: EmailError
+      tags:
+      - users
+  /v2/users/register:
+    post:
+      description: Register a new user.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                email:
+                  format: email
+                  type: string
+                name:
+                  minLength: 3
+                  type: string
+                password:
+                  minLength: 8
+                  type: string
+              required:
+              - name
+              - email
+              - password
+              type: object
+        description: ''
+        required: true
+      responses:
+        201:
+          content:
+            application/json:
+              schema:
+                properties:
+                  admin:
+                    title: Admin
+                    type: boolean
+                  created_at:
+                    format: date-time
+                    title: Created At
+                    type: string
+                  created_by:
+                    format: uuid
+                    title: Created By
+                    type: string
+                  email:
+                    title: Email
+                    type: string
+                  id:
+                    format: uuid
+                    title: Id
+                    type: string
+                  is_verified:
+                    title: Is Verified
+                    type: boolean
+                  name:
+                    title: Name
+                    type: string
+                required:
+                - created_at
+                - created_by
+                - id
+                - name
+                - email
+                - admin
+                - is_verified
+                title: User
+                type: object
+          description: ''
+        404:
+          content:
+            application/json:
+              schema:
+                description: NotFoundError
+                properties:
+                  error:
+                    default: NotFoundError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: NotFoundError
+        422:
+          content:
+            application/json:
+              schema:
+                description: BodyError
+                properties:
+                  error:
+                    default: BodyError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: BodyError
+        500:
+          content:
+            application/json:
+              schema:
+                description: EmailError
+                properties:
+                  error:
+                    default: EmailError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: EmailError
+      tags:
+      - users
+  /v2/users/verify:
+    post:
+      description: Verify a user.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                email:
+                  format: email
+                  type: string
+                token:
+                  format: uuid
+                  pattern: ^[0-9a-fA-F]{8}-?[0-9a-fA-F]{4}-?[0-9a-fA-F]{4}-?[0-9a-fA-F]{4}-?[0-9a-fA-F]{12}$
+                  type: string
+              required:
+              - email
+              - token
+              type: object
+        description: ''
+        required: true
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: object
+          description: ''
+        401:
+          content:
+            application/json:
+              schema:
+                description: AuthenticationError
+                properties:
+                  error:
+                    default: AuthenticationError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: AuthenticationError
+        422:
+          content:
+            application/json:
+              schema:
+                description: BodyError
+                properties:
+                  error:
+                    default: BodyError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: BodyError
+      tags:
+      - users
+  /v2/users/verify/request:
+    post:
+      description: Request a new verification token for a user.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                email:
+                  format: email
+                  type: string
+              required:
+              - email
+              type: object
+        description: ''
+        required: true
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: object
+          description: ''
+        404:
+          content:
+            application/json:
+              schema:
+                description: NotFoundError
+                properties:
+                  error:
+                    default: NotFoundError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: NotFoundError
+        422:
+          content:
+            application/json:
+              schema:
+                description: BodyError
+                properties:
+                  error:
+                    default: BodyError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: BodyError
+        500:
+          content:
+            application/json:
+              schema:
+                description: EmailError
+                properties:
+                  error:
+                    default: EmailError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: EmailError
+      tags:
+      - users
+  /v2/users/{id}:
+    delete:
+      description: Delete a user by id.
+      parameters:
+      - description: ''
+        in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                properties:
+                  admin:
+                    title: Admin
+                    type: boolean
+                  created_at:
+                    format: date-time
+                    title: Created At
+                    type: string
+                  created_by:
+                    format: uuid
+                    title: Created By
+                    type: string
+                  email:
+                    title: Email
+                    type: string
+                  id:
+                    format: uuid
+                    title: Id
+                    type: string
+                  is_verified:
+                    title: Is Verified
+                    type: boolean
+                  name:
+                    title: Name
+                    type: string
+                required:
+                - created_at
+                - created_by
+                - id
+                - name
+                - email
+                - admin
+                - is_verified
+                title: User
+                type: object
+          description: ''
+        400:
+          content:
+            application/json:
+              schema:
+                description: ParameterError
+                properties:
+                  error:
+                    default: ParameterError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: ParameterError
+        401:
+          content:
+            application/json:
+              schema:
+                description: AuthenticationError
+                properties:
+                  error:
+                    default: AuthenticationError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: AuthenticationError
+        403:
+          content:
+            application/json:
+              schema:
+                description: ForbiddenError
+                properties:
+                  error:
+                    default: ForbiddenError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: ForbiddenError
+        404:
+          content:
+            application/json:
+              schema:
+                description: NotFoundError
+                properties:
+                  error:
+                    default: NotFoundError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: NotFoundError
+      security:
+      - session: []
+      tags:
+      - users
+    get:
+      description: Get a user by id.
+      parameters:
+      - description: ''
+        in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                properties:
+                  admin:
+                    title: Admin
+                    type: boolean
+                  created_at:
+                    format: date-time
+                    title: Created At
+                    type: string
+                  created_by:
+                    format: uuid
+                    title: Created By
+                    type: string
+                  email:
+                    title: Email
+                    type: string
+                  id:
+                    format: uuid
+                    title: Id
+                    type: string
+                  is_verified:
+                    title: Is Verified
+                    type: boolean
+                  name:
+                    title: Name
+                    type: string
+                required:
+                - created_at
+                - created_by
+                - id
+                - name
+                - email
+                - admin
+                - is_verified
+                title: User
+                type: object
+          description: ''
+        400:
+          content:
+            application/json:
+              schema:
+                description: ParameterError
+                properties:
+                  error:
+                    default: ParameterError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: ParameterError
+        401:
+          content:
+            application/json:
+              schema:
+                description: AuthenticationError
+                properties:
+                  error:
+                    default: AuthenticationError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: AuthenticationError
+        403:
+          content:
+            application/json:
+              schema:
+                description: ForbiddenError
+                properties:
+                  error:
+                    default: ForbiddenError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: ForbiddenError
+        404:
+          content:
+            application/json:
+              schema:
+                description: NotFoundError
+                properties:
+                  error:
+                    default: NotFoundError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: NotFoundError
+      security:
+      - session: []
+      tags:
+      - users
+servers:
+- url: https://webservice.openaws.dk/api
