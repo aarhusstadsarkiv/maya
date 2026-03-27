@@ -28,6 +28,7 @@ log = get_log()
 
 
 base_url = str(settings["api_base_url"])
+base_url_v2 = str(settings["api_base_url_v2"])
 REQUEST_TIME_USED: dict = {}
 
 
