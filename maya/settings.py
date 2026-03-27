@@ -31,7 +31,6 @@ settings: Settings = {
     "environment": environment,
     "client_name": "development",
     "client_url": "https://demo.openaws.dk",
-    
     "debug": debug,
     "version": maya.__version__,
     "show_version": True,

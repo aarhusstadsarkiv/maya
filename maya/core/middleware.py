@@ -51,7 +51,8 @@ log = get_log()
 access_log = get_access_log()
 
 BOT_UA_RE = re.compile(
-    r"(ahrefsbot|semrushbot|awariobot|bytespider|googlebot|bingbot|" r"facebookexternalhit|meta-externalagent)",
+    r"(ahrefsbot|semrushbot|awariobot|bytespider|googlebot|bingbot|"
+    r"facebookexternalhit|meta-externalagent|sitecheck-sitecrawl|siteimprove)",
     re.IGNORECASE,
 )
 
