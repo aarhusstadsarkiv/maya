@@ -41,13 +41,43 @@ from maya.core.logging import get_log, get_access_log
 from maya.core import api
 import os
 import json
+import re
 from time import time
 from maya.core.hooks import get_hooks
 from maya.core.api_error import OpenAwsException
-from starlette.responses import JSONResponse
+from starlette.responses import JSONResponse, PlainTextResponse
 
 log = get_log()
 access_log = get_access_log()
+
+BOT_UA_RE = re.compile(
+    r"(ahrefsbot|semrushbot|awariobot|bytespider|googlebot|bingbot|" r"facebookexternalhit|meta-externalagent)",
+    re.IGNORECASE,
+)
+
+
+class BlockSpiderSearchMiddleware(BaseHTTPMiddleware):
+    """
+    Block known spider user-agents from faceted search URLs.
+    """
+
+    async def dispatch(self, request: Request, call_next):
+        path = request.url.path
+        query = request.url.query
+        user_agent = request.headers.get("user-agent", "-")
+
+        if request.client:
+            client_ip = request.client.host
+            client_port = str(request.client.port)
+        else:
+            client_ip = "unknown"
+            client_port = "unknown"
+
+        if path == "/search" and query and BOT_UA_RE.search(user_agent):
+            access_log.warning(f'{client_ip}:{client_port} - "BLOCKED {request.method} {path}?{query}" 403 ua="{user_agent}"')
+            return PlainTextResponse("Forbidden", status_code=403)
+
+        return await call_next(request)
 
 
 class RequestBeginMiddleware(BaseHTTPMiddleware):
@@ -234,6 +264,7 @@ class SameOriginMiddleware(BaseHTTPMiddleware):
 
 middleware = []
 
+middleware.append(Middleware(BlockSpiderSearchMiddleware))
 middleware.append(Middleware(AccessLogMiddleware))
 middleware.append(Middleware(RequestBeginMiddleware))
 
