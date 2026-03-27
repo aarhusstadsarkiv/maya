@@ -66,6 +66,7 @@ class Settings(TypedDict, total=True):
     custom_error: str
 
     api_base_url: str
+    api_base_url_v2: NotRequired[str]
 
     pages: list[PageSettings]
     main_menu_top: list[MenuItemSettings]
