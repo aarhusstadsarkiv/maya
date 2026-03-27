@@ -31,6 +31,7 @@ settings: Settings = {
     "environment": environment,
     "client_name": "development",
     "client_url": "https://demo.openaws.dk",
+    
     "debug": debug,
     "version": maya.__version__,
     "show_version": True,
@@ -47,6 +48,7 @@ settings: Settings = {
     },
     "custom_error": "Der skete en system fejl. Prøv igen lidt senere!",
     "api_base_url": "https://dev.openaws.dk/v1",
+    "api_base_url_v2": "https://webservice.openaws.dk/v2",
     "pages": [{"name": "home", "title": "Hjem", "template": "pages/home.html", "url": "/"}],
     "main_menu_top": [
         {"name": "search_get", "title": "Søg", "type": "icon", "icon": "search"},
