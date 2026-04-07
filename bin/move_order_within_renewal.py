@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Set an order's expire_at inside the renewal window for manual testing.
+Set one or more orders' expire_at inside the renewal window for manual testing.
 """
 
 import os
@@ -21,14 +21,14 @@ def main() -> int:
         print("export BASE_DIR=sites/aarhus")
         return 1
 
-    if len(sys.argv) != 2:
-        print("Usage: python bin/move_order_within_renewal.py <order_id>")
+    if len(sys.argv) < 2:
+        print("Usage: python bin/move_order_within_renewal.py <order_id> [<order_id> ...]")
         return 1
 
     try:
-        order_id = int(sys.argv[1])
+        order_ids = [int(order_id) for order_id in sys.argv[1:]]
     except ValueError:
-        print("order_id must be an integer")
+        print("All order_id values must be integers")
         return 1
 
     db_path = settings["sqlite3"]["orders"]
@@ -39,25 +39,29 @@ def main() -> int:
     connection.row_factory = sqlite3.Row
 
     try:
-        current_order = connection.execute(
-            "SELECT order_id, expire_at FROM orders WHERE order_id = ?",
-            (order_id,),
-        ).fetchone()
+        exit_code = 0
+        for order_id in order_ids:
+            current_order = connection.execute(
+                "SELECT order_id, expire_at FROM orders WHERE order_id = ?",
+                (order_id,),
+            ).fetchone()
 
-        if current_order is None:
-            print(f"Order {order_id} was not found")
-            return 1
+            if current_order is None:
+                print(f"Order {order_id} was not found")
+                exit_code = 1
+                continue
 
-        connection.execute(
-            "UPDATE orders SET expire_at = ? WHERE order_id = ?",
-            (new_expire_at, order_id),
-        )
+            connection.execute(
+                "UPDATE orders SET expire_at = ? WHERE order_id = ?",
+                (new_expire_at, order_id),
+            )
+
+            print(f"Order {order_id} expire_at updated")
+            print(f"Old expire_at: {current_order['expire_at']}")
+            print(f"New expire_at: {new_expire_at}")
+
         connection.commit()
-
-        print(f"Order {order_id} expire_at updated")
-        print(f"Old expire_at: {current_order['expire_at']}")
-        print(f"New expire_at: {new_expire_at}")
-        return 0
+        return exit_code
     finally:
         connection.close()
 
