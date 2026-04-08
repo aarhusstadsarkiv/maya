@@ -116,12 +116,12 @@
     const spinner = document.querySelector('.loadingspinner');
 
     async function handleDeleteUserClick(event) {
-        const res = confirm('Er du sikker på at du vil afslutte denne bestilling?');
-        if (!res) {
+        
+        event.preventDefault();
+        if (!confirm('Er du sikker på at du vil afslutte denne bestilling?')) {
             return;
         }
 
-        event.preventDefault();
         spinner.classList.toggle('hidden');
 
         try {
@@ -173,6 +173,9 @@
 
     async function handleRenewAllOrdersClick(event) {
         event.preventDefault();
+        if (!confirm('Er du sikker på at du vil forny alle bestillinger?')) {
+            return;
+        }
 
         spinner.classList.toggle('hidden');
 
