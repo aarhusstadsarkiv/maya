@@ -182,6 +182,12 @@ if settings["allow_online_ordering"]:
             name="orders_user_patch_renew",
             methods=["POST"],
         ),
+        Route(
+            "/order/patch/renew-all",
+            endpoint=endpoints_order.orders_user_renew_all,
+            name="orders_user_patch_renew_all",
+            methods=["POST"],
+        ),
         Route("/admin/orders/{record_id:str}/html", endpoint=endpoints_order.orders_record_get, name="orders_record_get"),
         Route("/admin/orders/logs", endpoint=endpoints_order.orders_logs, name="orders_logs"),
         Route(

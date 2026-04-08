@@ -84,6 +84,35 @@ async def orders_user_renew_by_order_id(request: Request):
         )
 
 
+async def orders_user_renew_all(request: Request):
+    """
+    Renew all of the authenticated user's active orders that qualify under the normal renewal rules.
+    """
+    await is_authenticated_json(request, must_be_verified=True)
+    me = await api.users_me_get(request)
+
+    try:
+        num_renewed = await crud_orders.renew_orders_user(me["id"])
+        if num_renewed == 0:
+            return JSONResponse(
+                {
+                    "message": "Ingen bestillinger kunne fornyes",
+                    "error": False,
+                }
+            )
+
+        flash.set_message(request, f"{num_renewed} bestillinger er blevet fornyet", type="success")
+        return JSONResponse({"message": f"{num_renewed} bestillinger er blevet fornyet", "error": False})
+    except Exception:
+        log.exception("Error in orders_user_renew_all")
+        return JSONResponse(
+            {
+                "message": "Fornyelse af bestillinger er desværre ikke mulig lige nu",
+                "error": True,
+            }
+        )
+
+
 async def orders_post(request: Request):
     """
     POST endpoint for creating an order.

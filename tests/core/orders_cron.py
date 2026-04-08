@@ -162,6 +162,73 @@ class TestDB(unittest.TestCase):
     def test_cron_expire_orders(self):
         asyncio.run(self._test_cron_expire_orders())
 
+    async def _test_renew_orders_user(self):
+        db_path = "/tmp/orders.db"
+        if os.path.exists(db_path):
+            os.remove(db_path)
+
+        migration = Migration(db_path=db_path, migrations=migrations_orders)
+        migration.run_migrations()
+
+        me, _, meta_data, record_and_types = self.get_test_data()
+
+        with open("tests/data/meta_data_000495102.json") as f:
+            meta_data_2 = json.load(f)
+
+        with open("tests/data/record_and_types_000495102.json") as f:
+            record_and_types_2 = json.load(f)
+
+        original_send_order_message = utils_orders.send_order_message
+
+        async def _send_order_message_stub(*args, **kwargs):
+            return None
+
+        utils_orders.send_order_message = _send_order_message_stub
+
+        try:
+            renewable_order = await crud_orders.insert_order(meta_data, record_and_types, me)
+            not_renewable_order = await crud_orders.insert_order(meta_data_2, record_and_types_2, me)
+
+            await crud_orders.update_order(
+                me["id"],
+                renewable_order["order_id"],
+                update_values={"location": utils_orders.RECORD_LOCATION.READING_ROOM},
+            )
+            await crud_orders.update_order(
+                me["id"],
+                not_renewable_order["order_id"],
+                update_values={"location": utils_orders.RECORD_LOCATION.READING_ROOM},
+            )
+
+            utc_now = arrow.utcnow()
+            renewable_expire_at = utc_now.floor("day").shift(days=utils_orders.DEADLINE_DAYS_RENEWAL + 1).format("YYYY-MM-DD HH:mm:ss")
+            not_renewable_expire_at = utc_now.floor("day").shift(days=utils_orders.DEADLINE_DAYS_RENEWAL + 10).format("YYYY-MM-DD HH:mm:ss")
+
+            await crud_orders.update_order(
+                me["id"],
+                renewable_order["order_id"],
+                update_values={"expire_at": renewable_expire_at},
+            )
+            await crud_orders.update_order(
+                me["id"],
+                not_renewable_order["order_id"],
+                update_values={"expire_at": not_renewable_expire_at},
+            )
+
+            num_renewed = await crud_orders.renew_orders_user(me["id"])
+            self.assertEqual(num_renewed, 1)
+
+            renewed_order = await crud_orders.get_order(renewable_order["order_id"])
+            skipped_order = await crud_orders.get_order(not_renewable_order["order_id"])
+
+            self.assertEqual(renewed_order["expire_at"], utils_orders.get_expire_at_date())
+            self.assertEqual(skipped_order["expire_at"], not_renewable_expire_at)
+        finally:
+            utils_orders.send_order_message = original_send_order_message
+
+    def test_renew_orders_user(self):
+        asyncio.run(self._test_renew_orders_user())
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -135,6 +135,24 @@ async def _is_order_renew_possible(crud: "CRUD", order: dict):
     return True
 
 
+async def _renew_order(crud: "CRUD", user_id: str, order_id: int) -> bool:
+    """
+    Renew a single order using the normal renewal rules.
+    """
+    order = await _get_orders_one(crud, order_id=order_id)
+
+    renew_possible = await _is_order_renew_possible(crud, order)
+    if not renew_possible:
+        raise Exception(f"Bestilling {order_id} kan ikke fornyes")
+
+    expire_at_date = utils_orders.get_expire_at_date()
+    await crud.update(table="orders", update_values={"expire_at": expire_at_date}, filters={"order_id": order_id})
+
+    renewed_order = await _get_orders_one(crud, order_id=order_id)
+    await _insert_log_message(crud, user_id=user_id, order=renewed_order, message=LOG_MESSAGES.ORDER_RENEWED)
+    return True
+
+
 async def renew_order(user_id: str, order_id: int):
     """
     Renew an order by updating its expire_at date.
@@ -142,17 +160,36 @@ async def renew_order(user_id: str, order_id: int):
     database_connection = DatabaseConnection(orders_url)
     async with database_connection.transaction_scope_async() as connection:
         crud = CRUD(connection)
-        order = await _get_orders_one(crud, order_id=order_id)
+        await _renew_order(crud, user_id, order_id)
 
-        renew_possible = await _is_order_renew_possible(crud, order)
-        if not renew_possible:
-            raise Exception(f"Bestilling {order_id} kan ikke fornyes")
 
-        expire_at_date = utils_orders.get_expire_at_date()
-        await crud.update(table="orders", update_values={"expire_at": expire_at_date}, filters={"order_id": order_id})
+async def renew_orders_user(user_id: str) -> int:
+    """
+    Renew all active user orders that qualify under the normal renewal rules.
+    """
+    database_connection = DatabaseConnection(orders_url)
+    async with database_connection.transaction_scope_async() as connection:
+        crud = CRUD(connection)
+        query = f"""
+        SELECT o.*
+        FROM orders o
+        LEFT JOIN records r ON o.record_id = r.record_id
+        WHERE o.user_id = :user_id
+          AND o.order_status = {utils_orders.ORDER_STATUS.ORDERED}
+          AND r.location = {utils_orders.RECORD_LOCATION.READING_ROOM}
+        ORDER BY o.order_id DESC
+        """
+        orders = await crud.query(query, {"user_id": user_id})
 
-        # Log the renewal
-        await _insert_log_message(crud, user_id=user_id, order=order, message=LOG_MESSAGES.ORDER_RENEWED)
+        num_renewed = 0
+        for order in orders:
+            try:
+                await _renew_order(crud, user_id, order["order_id"])
+                num_renewed += 1
+            except Exception:
+                continue
+
+        return num_renewed
 
 
 async def _update_user_record_data(crud: "CRUD", meta_data: dict, record_and_types: dict, me: dict):

@@ -14,10 +14,20 @@
 
 {{ basic_macros.page_title(title) }}
 
+{% set renewable_orders = orders | selectattr("renewal_possible") | list %}
+
 <div class="sub-menu">
     <a href="/auth/orders/active">Tilgængelig i læsesal</a>
     <a href="/auth/orders/reserved">Reserveret materiale</a>
 </div>
+
+{% if status == "active" and renewable_orders|length > 0 and has_permission('employee', permissions_list) %}
+<p>
+    <div class="sub-menu">
+        <a href="/order/patch/renew-all" class="renew-all-orders">Forny alle bestillinger</a>
+    </div>
+<p>
+{% endif %}
 
 {% if orders|length == 0 %}
     {% if status == "active" %}
@@ -138,7 +148,7 @@
 
     async function handleRenewOrderClick(event) {
         event.preventDefault();
-        
+
         spinner.classList.toggle('hidden');
 
         try {
@@ -149,7 +159,29 @@
             if (res.error) {
                 Flash.setMessage(res.message, 'error');
             } else {
-                // Reload
+                window.location.reload();
+            }
+
+        } catch (e) {
+            Flash.setMessage(config.jsExceptionMessage, 'error');
+            asyncLogError(e);
+            console.error(e);
+        } finally {
+            spinner.classList.toggle('hidden');
+        }
+    }
+
+    async function handleRenewAllOrdersClick(event) {
+        event.preventDefault();
+
+        spinner.classList.toggle('hidden');
+
+        try {
+            const res = await Requests.asyncPostJson('/order/patch/renew-all');
+
+            if (res.error) {
+                Flash.setMessage(res.message, 'error');
+            } else {
                 window.location.reload();
             }
 
@@ -168,6 +200,10 @@
 
     document.querySelectorAll('.renew-order').forEach(element => {
         element.addEventListener('click', handleRenewOrderClick);
+    });
+
+    document.querySelectorAll('.renew-all-orders').forEach(element => {
+        element.addEventListener('click', handleRenewAllOrdersClick);
     });
 
 
