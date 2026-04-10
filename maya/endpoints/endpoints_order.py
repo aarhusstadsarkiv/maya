@@ -188,13 +188,13 @@ async def _process_order_deletion(request: Request, id_key: str):
             update_values=update_values,
         )
 
+        updated_order = await orders_service.get_order(order_id)
+        order_message = utils_orders.get_single_order_message(updated_order)
+        return JSONResponse({"message": "Din bestilling er slettet", "order_message": order_message, "error": False})
+
     except Exception:
         log.exception("Error in orders_user_delete")
         return JSONResponse({"message": "Der opstod en fejl. Bestilling kunne ikke slettes.", "error": True})
-
-    updated_order = await orders_service.get_order(order_id)
-    order_message = utils_orders.get_single_order_message(updated_order)
-    return JSONResponse({"message": "Din bestilling er slettet", "order_message": order_message, "error": False})
 
 
 async def orders_user_delete_by_order_id(request: Request):
