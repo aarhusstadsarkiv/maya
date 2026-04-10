@@ -503,22 +503,6 @@ async def update_order(
         return ready_order_to_notify
 
 
-async def mark_ready_order_message_sent(user_id: str, order_id: int):
-    """
-    Mark a ready-order mail as sent and write the corresponding log message.
-    """
-    database_connection = DatabaseConnection(orders_url)
-    async with database_connection.transaction_scope_async() as connection:
-        crud = CRUD(connection)
-        order = await _get_orders_one(crud, order_id=order_id)
-        if order.get("message_sent"):
-            return
-
-        await crud.update(table="orders", update_values={"message_sent": 1}, filters={"order_id": order_id})
-        updated_order = await _get_orders_one(crud, order_id=order_id)
-        await _insert_log_message(crud, user_id=user_id, order=updated_order, message=LOG_MESSAGES.MAIL_SENT)
-
-
 async def _get_queued_orders_length(crud: "CRUD", orders: list[dict]) -> dict:
     """
     From a list of orders get the count of queued orders for each record in the list
