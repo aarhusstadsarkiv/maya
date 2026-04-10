@@ -274,7 +274,7 @@ async def insert_order(meta_data: dict, record_and_types: dict, me: dict) -> dic
             )
 
             # No chance that message_sent is already 1 here since the order was just created.
-            await utils_orders.send_order_message(MAIL_MESSAGE_ORDER_READY_TITLE, MAIL_MESSAGE_ORDER_READY, last_inserted_order)
+            await utils_orders.send_ready_orders_message(MAIL_MESSAGE_ORDER_READY_TITLE, MAIL_MESSAGE_ORDER_READY, [last_inserted_order])
             log_messages.append(LOG_MESSAGES.MAIL_SENT)
 
         await _insert_log_message(
@@ -326,14 +326,14 @@ async def _update_order_status(crud: "CRUD", user_id: str, order_id: int, new_st
                 filters={"order_id": next_queued_order["order_id"]},
             )
             next_queued_order = await _get_orders_one(crud, order_id=next_queued_order["order_id"])
-            await utils_orders.send_order_message(MAIL_MESSAGE_ORDER_READY_TITLE, MAIL_MESSAGE_ORDER_READY, next_queued_order)
+            await utils_orders.send_ready_orders_message(MAIL_MESSAGE_ORDER_READY_TITLE, MAIL_MESSAGE_ORDER_READY, [next_queued_order])
             log_messages.append(LOG_MESSAGES.MAIL_SENT)
 
         # Log the status change
         await _insert_log_message(crud, user_id=user_id, order=next_queued_order, message=". ".join(log_messages))
 
 
-async def _update_location(crud: "CRUD", user_id: str, order_id: int, new_location: int):
+async def _update_location(crud: "CRUD", user_id: str, order_id: int, new_location: int, send_ready_mail: bool = True):
     """
     Updates the location of a record.
     If the location changes to READING_ROOM and the order is ORDERED, set the expire_at and sends a message.
@@ -353,19 +353,27 @@ async def _update_location(crud: "CRUD", user_id: str, order_id: int, new_locati
     order_update_values["updated_at"] = utils_orders.get_current_date_time()
 
     # If the order is in the reading room, set the expire_at and send a message
+    ready_order_to_notify = None
     if new_location == utils_orders.RECORD_LOCATION.READING_ROOM and order["order_status"] == utils_orders.ORDER_STATUS.ORDERED:
         order_update_values["expire_at"] = utils_orders.get_expire_at_date()
 
         # Guard that ensures only one order message is sent.
         if not order.get("message_sent"):
-            await utils_orders.send_order_message(MAIL_MESSAGE_ORDER_READY_TITLE, MAIL_MESSAGE_ORDER_READY, order)
-            order_update_values["message_sent"] = 1
-            log_messages.append(LOG_MESSAGES.MAIL_SENT)
+            if send_ready_mail:
+                await utils_orders.send_ready_orders_message(MAIL_MESSAGE_ORDER_READY_TITLE, MAIL_MESSAGE_ORDER_READY, [order])
+                order_update_values["message_sent"] = 1
+                log_messages.append(LOG_MESSAGES.MAIL_SENT)
+            else:
+                ready_order_to_notify = True
 
     # Perform update on the order
     await crud.update(table="orders", update_values=order_update_values, filters={"order_id": order_id})
     updated_order = await _get_orders_one(crud, order_id=order_id)
     await _insert_log_message(crud, user_id=user_id, order=updated_order, message=". ".join(log_messages))
+    if ready_order_to_notify:
+        return updated_order
+
+    return None
 
 
 async def _update_comment(crud: "CRUD", user_id: str, order_id: int, new_comment: str):
@@ -424,7 +432,7 @@ async def _promote_order_status(crud: "CRUD", user_id: str, order_id: int):
         update_values["expire_at"] = utils_orders.get_expire_at_date()
 
         if not order.get("message_sent"):
-            await utils_orders.send_order_message(MAIL_MESSAGE_ORDER_READY_TITLE, MAIL_MESSAGE_ORDER_READY, order)
+            await utils_orders.send_ready_orders_message(MAIL_MESSAGE_ORDER_READY_TITLE, MAIL_MESSAGE_ORDER_READY, [order])
             update_values["message_sent"] = 1
             log_messages.append(LOG_MESSAGES.MAIL_SENT)
 
@@ -447,6 +455,7 @@ async def update_order(
     user_id: str,
     order_id: int,
     update_values: dict,
+    send_ready_mail: bool = True,
 ):
     """
     Updates an order's details (location or comment or order_status or expire_at).
@@ -461,12 +470,14 @@ async def update_order(
         location = update_values.get("location")
         expire_at = update_values.get("expire_at")
 
+        ready_order_to_notify = None
+
         # comment should also be updated if empty string
         if comment is not None:
             await _update_comment(crud, user_id, order_id, comment)
 
         if location:
-            await _update_location(crud, user_id, order_id, location)
+            ready_order_to_notify = await _update_location(crud, user_id, order_id, location, send_ready_mail=send_ready_mail)
 
         if order_status in [utils_orders.ORDER_STATUS.COMPLETED, utils_orders.ORDER_STATUS.DELETED]:
             await _update_order_status(crud, user_id, order_id, order_status)
@@ -481,6 +492,24 @@ async def update_order(
                 update_values=update_values,
                 filters={"order_id": order_id},
             )
+
+        return ready_order_to_notify
+
+
+async def mark_ready_order_message_sent(user_id: str, order_id: int):
+    """
+    Mark a ready-order mail as sent and write the corresponding log message.
+    """
+    database_connection = DatabaseConnection(orders_url)
+    async with database_connection.transaction_scope_async() as connection:
+        crud = CRUD(connection)
+        order = await _get_orders_one(crud, order_id=order_id)
+        if order.get("message_sent"):
+            return
+
+        await crud.update(table="orders", update_values={"message_sent": 1}, filters={"order_id": order_id})
+        updated_order = await _get_orders_one(crud, order_id=order_id)
+        await _insert_log_message(crud, user_id=user_id, order=updated_order, message=LOG_MESSAGES.MAIL_SENT)
 
 
 async def _get_queued_orders_length(crud: "CRUD", orders: list[dict]) -> dict:

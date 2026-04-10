@@ -12,21 +12,20 @@ init_settings()
 
 class TestMailTemplates(unittest.TestCase):
 
-    def test_order_renew_mail_renders_multiple_orders(self):
-        asyncio.run(self._test_order_renew_mail_renders_multiple_orders())
+    def test_order_mail_renders_multiple_orders(self):
+        asyncio.run(self._test_order_mail_renders_multiple_orders())
 
-    async def _test_order_renew_mail_renders_multiple_orders(self):
+    async def _test_order_mail_renders_multiple_orders(self):
         html_content = await get_template_content(
-            "mails/order_renew_mail.html",
+            "mails/order_mail.html",
             {
-                "title": "Udløb af materiale",
-                "message": "Din bestilling udløber snart.",
-                "user_display_name": "Test User",
+                "title": "Din bestilling er klar til gennemsyn",
+                "message": "Du har materiale klar.",
                 "client_domain_url": "https://example.com",
                 "client_name": "Aarhus Stadsarkiv",
                 "orders": [
-                    {"record_id": "0001", "label": "Materiale 1"},
-                    {"record_id": "0002", "label": "Materiale 2"},
+                    {"record_id": "0001", "label": "Materiale 1", "user_display_name": "Test User"},
+                    {"record_id": "0002", "label": "Materiale 2", "user_display_name": "Test User"},
                 ],
             },
         )

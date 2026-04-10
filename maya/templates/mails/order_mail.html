@@ -1,13 +1,19 @@
 {% extends "mails/mail_template.html" %}
 
 {% block content %}
-<p>Kære {{ order.user_display_name }},</p>
+<p>Kære {{ orders[0].user_display_name }},</p>
 
 <p>{{ message|safe }}</p>
 
 <p>Denne mail gælder bestilling af følgende materiale:</p>
 
-<p><a href="{{client_domain_url}}/records/{{ order.record_id }}">{{ order.label }}</a></p>
+<ul>
+    {% for order in orders %}
+    <li>
+        <a href="{{client_domain_url}}/records/{{ order.record_id }}">{{ order.label }}</a>
+    </li>
+    {% endfor %}
+</ul>
 
 <p>
     Vi har fire studiepladser til rådighed i tidsrummet tirsdag-torsdag kl. 9-16. (Lukket: Helligdage, mellem jul og

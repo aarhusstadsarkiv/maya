@@ -1,5 +1,6 @@
 from starlette.requests import Request
 from starlette.responses import JSONResponse, RedirectResponse
+from collections import defaultdict
 from maya.core.templates import templates
 from maya.core.context import get_context
 from maya.core import api
@@ -224,6 +225,7 @@ async def orders_admin_patch_multiple(request: Request):
         # Mutiple orders can be updated at once
         orders_and_locations: list = await request.json()
         num_orders = len(orders_and_locations)
+        ready_orders_by_user: dict[str, list[dict]] = defaultdict(list)
 
         for order_location in orders_and_locations:
 
@@ -233,11 +235,23 @@ async def orders_admin_patch_multiple(request: Request):
             location = order_location["location"]
             assert isinstance(location, int)
 
-            await crud_orders.update_order(
+            ready_order = await crud_orders.update_order(
                 user_id=me["id"],
                 order_id=order_id,
                 update_values={"location": location},  # No other values are updated than location
+                send_ready_mail=False,
             )
+            if ready_order:
+                ready_orders_by_user[ready_order["user_id"]].append(ready_order)
+
+        for user_orders in ready_orders_by_user.values():
+            await utils_orders.send_ready_orders_message(
+                crud_orders.MAIL_MESSAGE_ORDER_READY_TITLE,
+                crud_orders.MAIL_MESSAGE_ORDER_READY,
+                user_orders,
+            )
+            for order in user_orders:
+                await crud_orders.mark_ready_order_message_sent(me["id"], order["order_id"])
 
         if len(orders_and_locations) == 1:
             flash.set_message(request, "1 bestilling er blevet opdateret", type="success")

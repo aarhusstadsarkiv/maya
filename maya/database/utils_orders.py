@@ -280,14 +280,22 @@ def get_current_date_time() -> str:
     return arrow.utcnow().format("YYYY-MM-DD HH:mm:ss")
 
 
-async def send_order_message(title: str, message: str, order: dict):
+async def send_ready_orders_message(title: str, message: str, orders: list[dict]):
     """
-    Send a mail to the user when the order is ready for review
+    Send a mail to the user when one or more orders are ready for review.
     """
+    if not orders:
+        raise ValueError("orders must contain at least one order")
+
+    first_order = orders[0]
+    user_ids = {order["user_id"] for order in orders}
+    if len(user_ids) != 1:
+        raise ValueError("orders must belong to the same user")
+
     template_values = {
         "title": title,
         "message": message,
-        "order": order,
+        "orders": orders,
         "client_domain_url": settings["client_url"],
         "client_name": settings["client_name"],
     }
@@ -297,7 +305,7 @@ async def send_order_message(title: str, message: str, order: dict):
 
     mail_dict = {
         "data": {
-            "user_id": order["user_id"],
+            "user_id": first_order["user_id"],
             "subject": title,
             "sender": {"email": settings["client_email"], "name": settings["client_name"]},
             "reply_to": {"email": reply_to_email, "name": settings["client_name"]},
@@ -307,7 +315,14 @@ async def send_order_message(title: str, message: str, order: dict):
     }
 
     await api.mail_post(mail_dict)
-    log.info(f"Sent mail message: {message} Order: {order['order_id']}")
+    log.info(f"Sent mail message: {message} Orders: {[order['order_id'] for order in orders]}")
+
+
+async def send_order_message(title: str, message: str, order: dict):
+    """
+    Backwards compatible wrapper for single-order callers.
+    """
+    await send_ready_orders_message(title, message, [order])
 
 
 async def send_renew_order_message(title: str, message: str, orders: list[dict]):
