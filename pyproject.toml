@@ -60,7 +60,7 @@ dependencies = [
     "typing-extensions==4.12.2",
     "tzlocal==5.2",
     "urllib3==2.6.3",
-    "uv==0.9.6",
+    "uv==0.11.6",
     "uvicorn==0.30.6",
     "watchfiles==0.24.0",
 ]
