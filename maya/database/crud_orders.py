@@ -7,6 +7,7 @@ from maya.database.crud import CRUD
 from maya.database import utils_orders
 from maya.database.utils import DatabaseConnection
 from maya.core.logging import get_log, get_custom_log
+from collections import defaultdict
 from dataclasses import dataclass
 from typing import Optional
 from maya.records.meta_data_record import is_orderable_by_form
@@ -920,6 +921,7 @@ LEFT JOIN users u ON o.user_id = u.user_id
 WHERE o.expire_at IS NOT NULL
 AND o.expire_at = :expire_at
 AND o.order_status = {utils_orders.ORDER_STATUS.ORDERED}
+ORDER BY o.user_id, o.order_id
             """
             params = {"expire_at": date_indicating_renewal}
             renewal_orders = await crud.query(query, params)
@@ -930,29 +932,44 @@ AND o.order_status = {utils_orders.ORDER_STATUS.ORDERED}
         return 0
 
     num_renewal_emails = 0
-    for order in renewal_orders:
+    database_connection = DatabaseConnection(orders_url)
+    async with database_connection.transaction_scope_async() as connection:
+        crud = CRUD(connection)
+        renewal_orders_by_user = defaultdict(list)
 
-        try:
-            database_connection = DatabaseConnection(orders_url)
-            async with database_connection.transaction_scope_async() as connection:
-                crud = CRUD(connection)
-
+        for order in renewal_orders:
+            try:
                 if not await _is_order_renew_possible(crud, order):
                     cron_log.info(f"Order {order['order_id']} could not be renewed")
                     continue
 
-                cron_log.info(f"Order {order['order_id']} has expire_at indicating renewal. Sending mail")
+                renewal_orders_by_user[order["user_id"]].append(order)
+            except Exception:
+                cron_log.exception(f"Failed renewal eligibility check for order {order['order_id']}")
 
-                await utils_orders.send_order_message(MAIL_MESSAGE_ORDER_RENEW_TITLE, MAIL_MESSAGE_ORDER_RENEW, order)
-                await _insert_log_message(
-                    crud,
-                    user_id=SYSTEM_USER_ID,
-                    order=order,
-                    message=LOG_MESSAGES.RENEWAL_SENT,
+        for user_id, user_orders in renewal_orders_by_user.items():
+            try:
+                cron_log.info(
+                    f"User {user_id} has {len(user_orders)} order(s) with expire_at indicating renewal. Sending mail"
                 )
+
+                await utils_orders.send_renew_order_message(
+                    MAIL_MESSAGE_ORDER_RENEW_TITLE,
+                    MAIL_MESSAGE_ORDER_RENEW,
+                    user_orders,
+                )
+
+                for order in user_orders:
+                    await _insert_log_message(
+                        crud,
+                        user_id=SYSTEM_USER_ID,
+                        order=order,
+                        message=LOG_MESSAGES.RENEWAL_SENT,
+                    )
+
                 num_renewal_emails += 1
-        except Exception:
-            cron_log.exception(f"Failed to send renewal email for order {order['order_id']}")
+            except Exception:
+                cron_log.exception(f"Failed to send renewal email for user {user_id}")
 
     return num_renewal_emails
 

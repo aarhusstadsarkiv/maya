@@ -308,3 +308,35 @@ async def send_order_message(title: str, message: str, order: dict):
 
     await api.mail_post(mail_dict)
     log.info(f"Sent mail message: {message} Order: {order['order_id']}")
+
+
+async def send_renew_order_message(title: str, message: str, orders: list[dict]):
+    """
+    Send a renewal mail covering multiple orders for the same user.
+    """
+    first_order = orders[0]
+    template_values = {
+        "title": title,
+        "message": message,
+        "orders": orders,
+        "user_display_name": first_order["user_display_name"],
+        "client_domain_url": settings["client_url"],
+        "client_name": settings["client_name"],
+    }
+
+    html_content = await get_template_content("mails/order_renew_mail.html", template_values)
+    reply_to_email = settings["client_email_orders_reply_to"] if settings.get("client_email_orders_reply_to") else settings["client_email"]
+
+    mail_dict = {
+        "data": {
+            "user_id": first_order["user_id"],
+            "subject": title,
+            "sender": {"email": settings["client_email"], "name": settings["client_name"]},
+            "reply_to": {"email": reply_to_email, "name": settings["client_name"]},
+            "html_content": html_content,
+            "text_content": html_content,
+        }
+    }
+
+    await api.mail_post(mail_dict)
+    log.info(f"Sent renewal mail message: {message} Orders: {[order['order_id'] for order in orders]}")
