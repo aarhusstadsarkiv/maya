@@ -4,9 +4,7 @@ import dataclasses
 from maya.core import date_format
 import arrow
 from maya.core import utils_core
-from maya.core import api
-from maya.core.templates import get_template_content
-from maya.core.dynamic_settings import settings
+from maya.orders import notifications
 from maya.records.meta_data_record import is_orderable_by_form
 
 log = get_log()
@@ -281,77 +279,15 @@ def get_current_date_time() -> str:
 
 
 async def send_ready_orders_message(title: str, message: str, orders: list[dict]):
-    """
-    Send a mail to the user when one or more orders are ready for review.
-    """
-    if not orders:
-        raise ValueError("orders must contain at least one order")
-
-    first_order = orders[0]
-    user_ids = {order["user_id"] for order in orders}
-    if len(user_ids) != 1:
-        raise ValueError("orders must belong to the same user")
-
-    template_values = {
-        "title": title,
-        "message": message,
-        "orders": orders,
-        "client_domain_url": settings["client_url"],
-        "client_name": settings["client_name"],
-    }
-
-    html_content = await get_template_content("mails/order_mail.html", template_values)
-    reply_to_email = settings["client_email_orders_reply_to"] if settings.get("client_email_orders_reply_to") else settings["client_email"]
-
-    mail_dict = {
-        "data": {
-            "user_id": first_order["user_id"],
-            "subject": title,
-            "sender": {"email": settings["client_email"], "name": settings["client_name"]},
-            "reply_to": {"email": reply_to_email, "name": settings["client_name"]},
-            "html_content": html_content,
-            "text_content": html_content,
-        }
-    }
-
-    await api.mail_post(mail_dict)
-    log.info(f"Sent mail message: {message} Orders: {[order['order_id'] for order in orders]}")
+    await notifications.send_ready_orders_message(title, message, orders)
 
 
 async def send_order_message(title: str, message: str, order: dict):
     """
     Backwards compatible wrapper for single-order callers.
     """
-    await send_ready_orders_message(title, message, [order])
+    await notifications.send_order_message(title, message, order)
 
 
 async def send_renew_order_message(title: str, message: str, orders: list[dict]):
-    """
-    Send a renewal mail covering multiple orders for the same user.
-    """
-    first_order = orders[0]
-    template_values = {
-        "title": title,
-        "message": message,
-        "orders": orders,
-        "user_display_name": first_order["user_display_name"],
-        "client_domain_url": settings["client_url"],
-        "client_name": settings["client_name"],
-    }
-
-    html_content = await get_template_content("mails/order_renew_mail.html", template_values)
-    reply_to_email = settings["client_email_orders_reply_to"] if settings.get("client_email_orders_reply_to") else settings["client_email"]
-
-    mail_dict = {
-        "data": {
-            "user_id": first_order["user_id"],
-            "subject": title,
-            "sender": {"email": settings["client_email"], "name": settings["client_name"]},
-            "reply_to": {"email": reply_to_email, "name": settings["client_name"]},
-            "html_content": html_content,
-            "text_content": html_content,
-        }
-    }
-
-    await api.mail_post(mail_dict)
-    log.info(f"Sent renewal mail message: {message} Orders: {[order['order_id'] for order in orders]}")
+    await notifications.send_renew_order_message(title, message, orders)

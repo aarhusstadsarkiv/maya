@@ -90,7 +90,7 @@ class TestOrdersBulkAdmin(unittest.TestCase):
         with (
             patch("maya.endpoints.endpoints_order.is_authenticated_json", new=AsyncMock(return_value=None)),
             patch("maya.endpoints.endpoints_order.api.users_me_get", new=AsyncMock(return_value=me)),
-            patch("maya.endpoints.endpoints_order.utils_orders.send_ready_orders_message", new=_send_ready_orders_message_stub),
+            patch("maya.orders.service.notifications.send_ready_orders_message", new=_send_ready_orders_message_stub),
         ):
             response = await endpoints_order.orders_admin_patch_multiple(request)
 
@@ -148,7 +148,7 @@ class TestOrdersBulkAdmin(unittest.TestCase):
         with (
             patch("maya.endpoints.endpoints_order.is_authenticated_json", new=AsyncMock(return_value=None)),
             patch("maya.endpoints.endpoints_order.api.users_me_get", new=AsyncMock(return_value=me)),
-            patch("maya.endpoints.endpoints_order.utils_orders.send_ready_orders_message", new=_send_ready_orders_message_stub),
+            patch("maya.orders.service.notifications.send_ready_orders_message", new=_send_ready_orders_message_stub),
         ):
             response = await endpoints_order.orders_admin_patch_multiple(request)
 

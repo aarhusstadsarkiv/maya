@@ -1,6 +1,5 @@
 from starlette.requests import Request
 from starlette.responses import JSONResponse, RedirectResponse
-from collections import defaultdict
 from maya.core.templates import templates
 from maya.core.context import get_context
 from maya.core import api
@@ -8,6 +7,7 @@ from maya.core.auth import is_authenticated, is_authenticated_json, AuthExceptio
 from maya.core.logging import get_log
 from maya.database import crud_orders
 from maya.database import utils_orders
+from maya.orders import service as orders_service
 from maya.core import flash
 from maya.core.api import OpenAwsException
 from maya.endpoints.endpoints_utils import get_record_data
@@ -222,36 +222,9 @@ async def orders_admin_patch_multiple(request: Request):
         await is_authenticated_json(request, must_be_verified=True, permissions=["employee"])
         me = await api.users_me_get(request)
 
-        # Mutiple orders can be updated at once
         orders_and_locations: list = await request.json()
-        num_orders = len(orders_and_locations)
-        ready_orders_by_user: dict[str, list[dict]] = defaultdict(list)
-
-        for order_location in orders_and_locations:
-
-            # Single update value is e.g. {'order_id': '22', 'location': '2'}
-            order_id = order_location["order_id"]
-            assert isinstance(order_id, int)
-            location = order_location["location"]
-            assert isinstance(location, int)
-
-            ready_order = await crud_orders.update_order(
-                user_id=me["id"],
-                order_id=order_id,
-                update_values={"location": location},  # No other values are updated than location
-                send_ready_mail=False,
-            )
-            if ready_order:
-                ready_orders_by_user[ready_order["user_id"]].append(ready_order)
-
-        for user_orders in ready_orders_by_user.values():
-            await utils_orders.send_ready_orders_message(
-                crud_orders.MAIL_MESSAGE_ORDER_READY_TITLE,
-                crud_orders.MAIL_MESSAGE_ORDER_READY,
-                user_orders,
-            )
-            for order in user_orders:
-                await crud_orders.mark_ready_order_message_sent(me["id"], order["order_id"])
+        result = await orders_service.bulk_update_locations(me["id"], orders_and_locations)
+        num_orders = result["num_orders"]
 
         if len(orders_and_locations) == 1:
             flash.set_message(request, "1 bestilling er blevet opdateret", type="success")
