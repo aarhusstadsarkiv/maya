@@ -9,6 +9,7 @@ from maya.orders import logging as orders_logging
 from maya.orders import notifications
 from maya.orders import repository
 from maya.orders import runtime
+from maya.orders.types import OrderFilter
 
 
 async def update_location_with_crud(
@@ -43,7 +44,7 @@ async def update_location_with_crud(
                     MAIL_MESSAGE_ORDER_READY,
                     [order],
                 )
-                order_update_values["message_sent"] = 1
+                order_update_values["message_sent"] = "1"
             else:
                 ready_order_to_notify = True
 
@@ -297,10 +298,7 @@ async def insert_order_with_crud(
     last_order_id = await crud.last_insert_id()
     last_inserted_order = await repository.get_order_one(crud, order_id=last_order_id)
 
-    if (
-        last_inserted_order["location"] == utils_orders.RECORD_LOCATION.READING_ROOM
-        and order_status == utils_orders.ORDER_STATUS.ORDERED
-    ):
+    if last_inserted_order["location"] == utils_orders.RECORD_LOCATION.READING_ROOM and order_status == utils_orders.ORDER_STATUS.ORDERED:
         expire_at = utils_orders.get_expire_at_date()
         last_inserted_order["expire_at"] = expire_at
         await crud.update(
@@ -718,7 +716,7 @@ async def renew_orders_user(user_id: str) -> int:
         return num_renewed
 
 
-async def get_orders_admin(filters) -> tuple[list, object]:
+async def get_orders_admin(filters: OrderFilter) -> tuple[list, object]:
     """
     Get admin order lists with pagination metadata.
     """
@@ -855,9 +853,7 @@ ORDER BY o.user_id, o.order_id
 
         for user_id, user_orders in renewal_orders_by_user.items():
             try:
-                runtime.cron_log.info(
-                    f"User {user_id} has {len(user_orders)} order(s) with expire_at indicating renewal. Sending mail"
-                )
+                runtime.cron_log.info(f"User {user_id} has {len(user_orders)} order(s) with expire_at indicating renewal. Sending mail")
 
                 await notifications.send_renew_order_message(
                     MAIL_MESSAGE_ORDER_RENEW_TITLE,

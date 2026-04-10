@@ -43,6 +43,7 @@ async def send_ready_orders_message(title: str, message: str, orders: list[dict]
     await api.mail_post(mail_dict)
     log.info(f"Sent mail message: {message} Orders: {[order['order_id'] for order in orders]}")
 
+
 async def send_renew_order_message(title: str, message: str, orders: list[dict]):
     """
     Send a renewal mail covering multiple orders for the same user.

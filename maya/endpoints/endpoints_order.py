@@ -192,7 +192,7 @@ async def _process_order_deletion(request: Request, id_key: str):
         log.exception("Error in orders_user_delete")
         return JSONResponse({"message": "Der opstod en fejl. Bestilling kunne ikke slettes.", "error": True})
 
-        updated_order = await orders_service.get_order(order_id)
+    updated_order = await orders_service.get_order(order_id)
     order_message = utils_orders.get_single_order_message(updated_order)
     return JSONResponse({"message": "Din bestilling er slettet", "order_message": order_message, "error": False})
 
@@ -337,7 +337,7 @@ async def orders_admin_get(request: Request):
     )
 
     # Pagination if added to filters
-    orders, filters = await orders_service.get_orders_admin(
+    orders, updated_filters = await orders_service.get_orders_admin(
         filters=filters,
     )
 
@@ -349,7 +349,7 @@ async def orders_admin_get(request: Request):
     context_values = {
         "title": "Bestillinger",
         "orders": orders,
-        "filters": filters,
+        "filters": updated_filters,
         "locations": utils_orders.RECORD_LOCATION_HUMAN,
         "ORDER_STATUS": utils_orders.ORDER_STATUS,
     }
