@@ -12,9 +12,11 @@ os.environ.setdefault("TEST", "TRUE")
 from maya.core.dynamic_settings import init_settings
 from maya.core.migration import Migration
 from maya.migrations.orders import migrations_orders
-from maya.database import crud_orders
 from maya.database import utils_orders
 from maya.endpoints import endpoints_order
+from maya.orders import service as orders_service
+from maya.orders.constants import LOG_MESSAGES
+from maya.orders import runtime as orders_runtime
 
 init_settings()
 
@@ -34,7 +36,7 @@ class TestOrdersBulkAdmin(unittest.TestCase):
         fd, db_path = tempfile.mkstemp(suffix=".db")
         os.close(fd)
         os.remove(db_path)
-        crud_orders.orders_url = db_path
+        orders_runtime.orders_url = db_path
         return db_path
 
     def get_test_data(self):
@@ -71,8 +73,8 @@ class TestOrdersBulkAdmin(unittest.TestCase):
 
         me, _, meta_data_1, record_and_types_1, meta_data_2, record_and_types_2 = self.get_test_data()
 
-        order_1 = await crud_orders.insert_order(meta_data_1, record_and_types_1, me)
-        order_2 = await crud_orders.insert_order(meta_data_2, record_and_types_2, me)
+        order_1 = await orders_service.insert_order(meta_data_1, record_and_types_1, me)
+        order_2 = await orders_service.insert_order(meta_data_2, record_and_types_2, me)
 
         sent_mail_calls: list[list[dict]] = []
 
@@ -100,24 +102,24 @@ class TestOrdersBulkAdmin(unittest.TestCase):
         self.assertEqual(len(sent_mail_calls[0]), 2)
         self.assertEqual({order["order_id"] for order in sent_mail_calls[0]}, {order_1["order_id"], order_2["order_id"]})
 
-        updated_order_1 = await crud_orders.get_order(order_1["order_id"])
-        updated_order_2 = await crud_orders.get_order(order_2["order_id"])
+        updated_order_1 = await orders_service.get_order(order_1["order_id"])
+        updated_order_2 = await orders_service.get_order(order_2["order_id"])
         self.assertEqual(updated_order_1["message_sent"], 1)
         self.assertEqual(updated_order_2["message_sent"], 1)
         self.assertIsNotNone(updated_order_1["expire_at"])
         self.assertIsNotNone(updated_order_2["expire_at"])
 
-        logs_1 = await crud_orders.get_logs(order_1["order_id"])
-        logs_2 = await crud_orders.get_logs(order_2["order_id"])
+        logs_1 = await orders_service.get_logs(order_1["order_id"])
+        logs_2 = await orders_service.get_logs(order_2["order_id"])
 
         self.assertEqual(len(logs_1), 3)
         self.assertEqual(len(logs_2), 3)
-        self.assertEqual(logs_1[0]["message"], crud_orders.LOG_MESSAGES.MAIL_SENT)
-        self.assertEqual(logs_1[1]["message"], crud_orders.LOG_MESSAGES.LOCATION_CHANGED)
-        self.assertEqual(logs_1[2]["message"], crud_orders.LOG_MESSAGES.ORDER_CREATED)
-        self.assertEqual(logs_2[0]["message"], crud_orders.LOG_MESSAGES.MAIL_SENT)
-        self.assertEqual(logs_2[1]["message"], crud_orders.LOG_MESSAGES.LOCATION_CHANGED)
-        self.assertEqual(logs_2[2]["message"], crud_orders.LOG_MESSAGES.ORDER_CREATED)
+        self.assertEqual(logs_1[0]["message"], LOG_MESSAGES.MAIL_SENT)
+        self.assertEqual(logs_1[1]["message"], LOG_MESSAGES.LOCATION_CHANGED)
+        self.assertEqual(logs_1[2]["message"], LOG_MESSAGES.ORDER_CREATED)
+        self.assertEqual(logs_2[0]["message"], LOG_MESSAGES.MAIL_SENT)
+        self.assertEqual(logs_2[1]["message"], LOG_MESSAGES.LOCATION_CHANGED)
+        self.assertEqual(logs_2[2]["message"], LOG_MESSAGES.ORDER_CREATED)
 
     def test_orders_admin_patch_multiple_sends_one_mail_per_user_group(self):
         asyncio.run(self._test_orders_admin_patch_multiple_sends_one_mail_per_user_group())
@@ -129,8 +131,8 @@ class TestOrdersBulkAdmin(unittest.TestCase):
 
         me, me_2, meta_data_1, record_and_types_1, meta_data_2, record_and_types_2 = self.get_test_data()
 
-        order_1 = await crud_orders.insert_order(meta_data_1, record_and_types_1, me)
-        order_2 = await crud_orders.insert_order(meta_data_2, record_and_types_2, me_2)
+        order_1 = await orders_service.insert_order(meta_data_1, record_and_types_1, me)
+        order_2 = await orders_service.insert_order(meta_data_2, record_and_types_2, me_2)
 
         sent_mail_calls: list[list[dict]] = []
 

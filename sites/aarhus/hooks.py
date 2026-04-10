@@ -4,8 +4,8 @@ from maya.records import record_utils
 from maya.records import record_alter
 from maya.core import api
 import json
-from maya.database import crud_orders
 from maya.database import utils_orders
+from maya.orders import service as orders_service
 
 log = get_log()
 
@@ -69,7 +69,7 @@ class Hooks(HooksSpec):
         me = await api.me_get(self.request)
         if me:
             user_id = me["id"]
-            has_active_order = await crud_orders.has_active_order(user_id=user_id, record_id=meta_data["id"])
+            has_active_order = await orders_service.has_active_order(user_id=user_id, record_id=meta_data["id"])
             meta_data["has_active_order"] = bool(has_active_order)
             if has_active_order:
                 message = utils_orders.get_single_order_message(has_active_order)

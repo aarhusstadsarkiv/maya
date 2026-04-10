@@ -11,8 +11,10 @@ from maya.core.dynamic_settings import init_settings
 from maya.core.logging import get_log
 from maya.core.migration import Migration
 from maya.migrations.orders import migrations_orders
-from maya.database import crud_orders
 from maya.database import utils_orders
+from maya.orders import service as orders_service
+from maya.orders import runtime as orders_runtime
+from maya.orders.types import OrderFilter
 
 init_settings()
 log = get_log()
@@ -24,7 +26,7 @@ class TestDB(unittest.TestCase):
         fd, db_path = tempfile.mkstemp(suffix=".db")
         os.close(fd)
         os.remove(db_path)
-        crud_orders.orders_url = db_path
+        orders_runtime.orders_url = db_path
         return db_path
 
     def get_test_data_application(self):
@@ -69,114 +71,114 @@ class TestDB(unittest.TestCase):
         utils_orders.send_ready_orders_message = _send_ready_orders_message_stub
 
         try:
-            await crud_orders.insert_order(meta_data, record_and_types, me)
-            await crud_orders.insert_order(meta_data, record_and_types, me_2)
-            logs = await crud_orders.get_logs(1)
+            await orders_service.insert_order(meta_data, record_and_types, me)
+            await orders_service.insert_order(meta_data, record_and_types, me_2)
+            logs = await orders_service.get_logs(1)
             self.assertIn("Bestilling oprettet", logs[0]["message"])
 
-            order = await crud_orders.get_order(1)
+            order = await orders_service.get_order(1)
             self.assertEqual(order["order_status"], utils_orders.ORDER_STATUS.APPLICATION)
 
-            orders_filter = crud_orders.OrderFilter(filter_status="active")
-            orders, _ = await crud_orders.get_orders_admin(filters=orders_filter)
+            orders_filter = OrderFilter(filter_status="active")
+            orders, _ = await orders_service.get_orders_admin(filters=orders_filter)
             self.assertEqual(len(orders), 2)
 
-            await crud_orders.update_order(
+            await orders_service.update_order(
                 me["id"],
                 order["order_id"],
                 {"location": utils_orders.RECORD_LOCATION.READING_ROOM},
             )
 
-            logs = await crud_orders.get_logs(1)
+            logs = await orders_service.get_logs(1)
             self.assertIn("Lokation ændret", logs[0]["message"])
 
-            order = await crud_orders.get_order(1)
+            order = await orders_service.get_order(1)
             self.assertIsNone(order["expire_at"])
 
-            await crud_orders.promote_application_order(me["id"], order["order_id"])
-            order = await crud_orders.get_order(1)
+            await orders_service.promote_application_order(me["id"], order["order_id"])
+            order = await orders_service.get_order(1)
             self.assertEqual(order["order_status"], utils_orders.ORDER_STATUS.ORDERED)
             self.assertIsNotNone(order["expire_at"])
 
-            logs = await crud_orders.get_logs(1)
+            logs = await orders_service.get_logs(1)
             self.assertIn("Mail sendt", logs[0]["message"])
             self.assertIn("Bruger status ændret", logs[1]["message"])
             self.assertEqual(len(logs), 4)
 
             with self.assertRaises(Exception) as cm:
-                await crud_orders.insert_order(meta_data, record_and_types, me)
+                await orders_service.insert_order(meta_data, record_and_types, me)
             self.assertIn("User is already active on this record", str(cm.exception))
 
-            has_active_order = await crud_orders.has_active_order(me["id"], meta_data["id"])
+            has_active_order = await orders_service.has_active_order(me["id"], meta_data["id"])
             self.assertTrue(has_active_order)
 
-            logs_2 = await crud_orders.get_logs(2)
+            logs_2 = await orders_service.get_logs(2)
             self.assertIn("Bestilling oprettet", logs_2[0]["message"])
 
-            order_2 = await crud_orders.get_order(2)
-            await crud_orders.promote_application_order(me_2["id"], order_2["order_id"])
-            order_2 = await crud_orders.get_order(2)
+            order_2 = await orders_service.get_order(2)
+            await orders_service.promote_application_order(me_2["id"], order_2["order_id"])
+            order_2 = await orders_service.get_order(2)
             self.assertEqual(order_2["order_status"], utils_orders.ORDER_STATUS.QUEUED)
 
-            orders_filter = crud_orders.OrderFilter(filter_status="active", filter_show_queued="on")
-            orders, _ = await crud_orders.get_orders_admin(filters=orders_filter)
+            orders_filter = OrderFilter(filter_status="active", filter_show_queued="on")
+            orders, _ = await orders_service.get_orders_admin(filters=orders_filter)
             self.assertEqual(len(orders), 2)
 
-            orders_filter = crud_orders.OrderFilter(filter_status="order_history")
-            orders, _ = await crud_orders.get_orders_admin(filters=orders_filter)
+            orders_filter = OrderFilter(filter_status="order_history")
+            orders, _ = await orders_service.get_orders_admin(filters=orders_filter)
             self.assertEqual(len(orders), 0)
 
-            orders_filter = crud_orders.OrderFilter(filter_status="active")
-            orders, _ = await crud_orders.get_orders_admin(filters=orders_filter)
+            orders_filter = OrderFilter(filter_status="active")
+            orders, _ = await orders_service.get_orders_admin(filters=orders_filter)
             self.assertEqual(len(orders), 1)
 
-            await crud_orders.update_order(
+            await orders_service.update_order(
                 me["id"],
                 order["order_id"],
                 {"order_status": utils_orders.ORDER_STATUS.COMPLETED},
             )
 
-            order = await crud_orders.get_order(1)
+            order = await orders_service.get_order(1)
             self.assertEqual(order["order_status"], utils_orders.ORDER_STATUS.COMPLETED)
 
-            logs = await crud_orders.get_logs(1)
+            logs = await orders_service.get_logs(1)
             self.assertEqual(utils_orders.ORDER_STATUS.COMPLETED, logs[0]["order_status"])
 
-            order_2 = await crud_orders.get_order(2)
+            order_2 = await orders_service.get_order(2)
             self.assertEqual(order_2["order_status"], utils_orders.ORDER_STATUS.ORDERED)
 
-            logs_2 = await crud_orders.get_logs(2)
+            logs_2 = await orders_service.get_logs(2)
             self.assertIn("Mail sendt", logs_2[0]["message"])
             self.assertIn("Bruger status ændret", logs_2[1]["message"])
 
-            orders_filter = crud_orders.OrderFilter(filter_status="active", filter_show_queued="on")
-            orders, _ = await crud_orders.get_orders_admin(filters=orders_filter)
+            orders_filter = OrderFilter(filter_status="active", filter_show_queued="on")
+            orders, _ = await orders_service.get_orders_admin(filters=orders_filter)
             self.assertEqual(len(orders), 1)
 
-            orders_filter = crud_orders.OrderFilter(filter_status="completed")
-            orders, _ = await crud_orders.get_orders_admin(filters=orders_filter)
+            orders_filter = OrderFilter(filter_status="completed")
+            orders, _ = await orders_service.get_orders_admin(filters=orders_filter)
             self.assertEqual(len(orders), 0)
 
-            orders_filter = crud_orders.OrderFilter(filter_status="order_history")
-            orders, _ = await crud_orders.get_orders_admin(filters=orders_filter)
+            orders_filter = OrderFilter(filter_status="order_history")
+            orders, _ = await orders_service.get_orders_admin(filters=orders_filter)
             self.assertEqual(len(orders), 1)
 
-            await crud_orders.update_order(
+            await orders_service.update_order(
                 me_2["id"],
                 order_2["order_id"],
                 {"order_status": utils_orders.ORDER_STATUS.COMPLETED},
             )
 
-            orders_filter = crud_orders.OrderFilter(filter_status="active", filter_show_queued="on")
-            orders, _ = await crud_orders.get_orders_admin(filters=orders_filter)
+            orders_filter = OrderFilter(filter_status="active", filter_show_queued="on")
+            orders, _ = await orders_service.get_orders_admin(filters=orders_filter)
             self.assertEqual(len(orders), 0)
 
-            orders_filter = crud_orders.OrderFilter(filter_status="completed")
-            orders, _ = await crud_orders.get_orders_admin(filters=orders_filter)
+            orders_filter = OrderFilter(filter_status="completed")
+            orders, _ = await orders_service.get_orders_admin(filters=orders_filter)
             self.assertEqual(len(orders), 1)
 
-            orders_filter = crud_orders.OrderFilter(filter_status="order_history")
-            orders, _ = await crud_orders.get_orders_admin(filters=orders_filter)
+            orders_filter = OrderFilter(filter_status="order_history")
+            orders, _ = await orders_service.get_orders_admin(filters=orders_filter)
             self.assertEqual(len(orders), 2)
         finally:
             utils_orders.send_ready_orders_message = original_send_ready_orders_message

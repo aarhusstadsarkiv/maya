@@ -12,8 +12,9 @@ from maya.core.dynamic_settings import init_settings
 from maya.core.logging import get_log
 from maya.core.migration import Migration
 from maya.migrations.orders import migrations_orders
-from maya.database import crud_orders
 from maya.database import utils_orders
+from maya.orders import service as orders_service
+from maya.orders import runtime as orders_runtime
 
 init_settings()
 log = get_log()
@@ -25,7 +26,7 @@ class TestDB(unittest.TestCase):
         fd, db_path = tempfile.mkstemp(suffix=".db")
         os.close(fd)
         os.remove(db_path)
-        crud_orders.orders_url = db_path
+        orders_runtime.orders_url = db_path
         return db_path
 
     def get_test_data(self):
@@ -71,46 +72,46 @@ class TestDB(unittest.TestCase):
         utils_orders.send_renew_order_message = _send_renew_order_message_stub
 
         try:
-            order_1 = await crud_orders.insert_order(meta_data, record_and_types, me)
-            order_2 = await crud_orders.insert_order(meta_data, record_and_types, me_2)
+            order_1 = await orders_service.insert_order(meta_data, record_and_types, me)
+            order_2 = await orders_service.insert_order(meta_data, record_and_types, me_2)
             self.assertEqual(order_2["order_status"], utils_orders.ORDER_STATUS.QUEUED)
-            await crud_orders.update_order(
+            await orders_service.update_order(
                 me["id"],
                 order_1["order_id"],
                 update_values={"order_status": utils_orders.ORDER_STATUS.ORDERED},
             )
 
-            num_renewal_emails = await crud_orders.cron_renewal_emails()
+            num_renewal_emails = await orders_service.cron_renewal_emails()
             self.assertEqual(num_renewal_emails, 0)
 
-            await crud_orders.update_order(
+            await orders_service.update_order(
                 me["id"],
                 order_1["order_id"],
                 update_values={"location": utils_orders.RECORD_LOCATION.READING_ROOM},
             )
 
-            num_renewal_emails = await crud_orders.cron_renewal_emails()
+            num_renewal_emails = await orders_service.cron_renewal_emails()
             self.assertEqual(num_renewal_emails, 0)
 
             utc_now = arrow.utcnow()
             expire_at_date = utc_now.floor("day").shift(days=utils_orders.DEADLINE_DAYS_RENEWAL + 1)
             expire_at_str = expire_at_date.format("YYYY-MM-DD HH:mm:ss")
-            await crud_orders.update_order(
+            await orders_service.update_order(
                 me["id"],
                 order_1["order_id"],
                 update_values={"expire_at": expire_at_str},
             )
 
-            num_renewal_emails = await crud_orders.cron_renewal_emails()
+            num_renewal_emails = await orders_service.cron_renewal_emails()
             self.assertEqual(num_renewal_emails, 0)
 
-            await crud_orders.update_order(
+            await orders_service.update_order(
                 me_2["id"],
                 order_2["order_id"],
                 update_values={"order_status": utils_orders.ORDER_STATUS.COMPLETED},
             )
 
-            num_renewal_emails = await crud_orders.cron_renewal_emails()
+            num_renewal_emails = await orders_service.cron_renewal_emails()
             self.assertEqual(num_renewal_emails, 1)
         finally:
             utils_orders.send_ready_orders_message = original_send_ready_orders_message
@@ -132,13 +133,13 @@ class TestDB(unittest.TestCase):
         me, me_2, meta_data, record_and_types = self.get_test_data()
 
         # insert order
-        order = await crud_orders.insert_order(meta_data, record_and_types, me)
-        order_2 = await crud_orders.insert_order(meta_data, record_and_types, me_2)
+        order = await orders_service.insert_order(meta_data, record_and_types, me)
+        order_2 = await orders_service.insert_order(meta_data, record_and_types, me_2)
 
         self.assertEqual(order["order_status"], utils_orders.ORDER_STATUS.ORDERED)
         self.assertEqual(order_2["order_status"], utils_orders.ORDER_STATUS.QUEUED)
 
-        num_expired_orders = await crud_orders.cron_orders_expire()
+        num_expired_orders = await orders_service.cron_orders_expire()
         self.assertEqual(num_expired_orders, 0)
 
         # set expire_at to today
@@ -147,27 +148,27 @@ class TestDB(unittest.TestCase):
         expire_at_str = expire_at_date.format("YYYY-MM-DD HH:mm:ss")
 
         log.info(f"Setting expire_at to {expire_at_str} for order {order['order_id']}")
-        await crud_orders.update_order(
+        await orders_service.update_order(
             me["id"],
             order["order_id"],
             update_values={"expire_at": expire_at_str},
         )
 
         # This is queued order - should not be expired
-        await crud_orders.update_order(
+        await orders_service.update_order(
             me_2["id"],
             order_2["order_id"],
             update_values={"expire_at": expire_at_str},
         )
 
-        num_expired_orders = await crud_orders.cron_orders_expire()
+        num_expired_orders = await orders_service.cron_orders_expire()
         self.assertEqual(num_expired_orders, 1)
 
         # First order is expired now so we can expire the second order
-        num_expired_orders = await crud_orders.cron_orders_expire()
+        num_expired_orders = await orders_service.cron_orders_expire()
         self.assertEqual(num_expired_orders, 1)
 
-        num_expired_orders = await crud_orders.cron_orders_expire()
+        num_expired_orders = await orders_service.cron_orders_expire()
         self.assertEqual(num_expired_orders, 0)
 
     def test_cron_expire_orders(self):
@@ -195,15 +196,15 @@ class TestDB(unittest.TestCase):
         utils_orders.send_ready_orders_message = _send_ready_orders_message_stub
 
         try:
-            renewable_order = await crud_orders.insert_order(meta_data, record_and_types, me)
-            not_renewable_order = await crud_orders.insert_order(meta_data_2, record_and_types_2, me)
+            renewable_order = await orders_service.insert_order(meta_data, record_and_types, me)
+            not_renewable_order = await orders_service.insert_order(meta_data_2, record_and_types_2, me)
 
-            await crud_orders.update_order(
+            await orders_service.update_order(
                 me["id"],
                 renewable_order["order_id"],
                 update_values={"location": utils_orders.RECORD_LOCATION.READING_ROOM},
             )
-            await crud_orders.update_order(
+            await orders_service.update_order(
                 me["id"],
                 not_renewable_order["order_id"],
                 update_values={"location": utils_orders.RECORD_LOCATION.READING_ROOM},
@@ -213,22 +214,22 @@ class TestDB(unittest.TestCase):
             renewable_expire_at = utc_now.floor("day").shift(days=utils_orders.DEADLINE_DAYS_RENEWAL + 1).format("YYYY-MM-DD HH:mm:ss")
             not_renewable_expire_at = utc_now.floor("day").shift(days=utils_orders.DEADLINE_DAYS_RENEWAL + 10).format("YYYY-MM-DD HH:mm:ss")
 
-            await crud_orders.update_order(
+            await orders_service.update_order(
                 me["id"],
                 renewable_order["order_id"],
                 update_values={"expire_at": renewable_expire_at},
             )
-            await crud_orders.update_order(
+            await orders_service.update_order(
                 me["id"],
                 not_renewable_order["order_id"],
                 update_values={"expire_at": not_renewable_expire_at},
             )
 
-            num_renewed = await crud_orders.renew_orders_user(me["id"])
+            num_renewed = await orders_service.renew_orders_user(me["id"])
             self.assertEqual(num_renewed, 1)
 
-            renewed_order = await crud_orders.get_order(renewable_order["order_id"])
-            skipped_order = await crud_orders.get_order(not_renewable_order["order_id"])
+            renewed_order = await orders_service.get_order(renewable_order["order_id"])
+            skipped_order = await orders_service.get_order(not_renewable_order["order_id"])
 
             self.assertEqual(renewed_order["expire_at"], utils_orders.get_expire_at_date())
             self.assertEqual(skipped_order["expire_at"], not_renewable_expire_at)

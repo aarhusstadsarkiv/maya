@@ -149,7 +149,7 @@ async def _run_cron_tasks() -> None:
     - Expire orders
     - Send renewal emails
     """
-    from maya.database.crud_orders import cron_orders_expire, cron_renewal_emails
+    from maya.orders.service import cron_orders_expire, cron_renewal_emails
 
     # Expire orders
     try:

@@ -5,9 +5,9 @@ from maya.core.context import get_context
 from maya.core import api
 from maya.core.auth import is_authenticated, is_authenticated_json, AuthExceptionJSON
 from maya.core.logging import get_log
-from maya.database import crud_orders
 from maya.database import utils_orders
 from maya.orders import service as orders_service
+from maya.orders.types import OrderFilter
 from maya.core import flash
 from maya.core.api import OpenAwsException
 from maya.endpoints.endpoints_utils import get_record_data
@@ -22,7 +22,7 @@ async def _is_order_owner(request: Request, order_id: int) -> bool:
     Check if user is owner of order
     """
     me = await api.users_me_get(request)
-    is_owner = await crud_orders.is_owner(user_id=me["id"], order_id=order_id)
+    is_owner = await orders_service.is_owner(user_id=me["id"], order_id=order_id)
     return is_owner
 
 
@@ -36,7 +36,7 @@ async def orders_get_orders_user(request: Request):
         me = await api.users_me_get(request)
 
         status = request.path_params.get("status_type", "active")
-        orders = await crud_orders.get_orders_user(user_id=me["id"], status=status)
+        orders = await orders_service.get_orders_user(user_id=me["id"], status=status)
 
         title = "Tilgængelig i læsesal"
         if status == "reserved":
@@ -71,7 +71,7 @@ async def orders_user_renew_by_order_id(request: Request):
             raise AuthExceptionJSON(message="Du har ikke rettigheder til at forny denne bestilling")
 
         # This also checks if it is possible to renew
-        await crud_orders.renew_order(me["id"], order_id)
+        await orders_service.renew_order(me["id"], order_id)
         flash.set_message(request, "Din bestilling er blevet fornyet", type="success")
         return JSONResponse({"message": "Din bestilling er blevet fornyet", "error": False})
     except Exception:
@@ -93,7 +93,7 @@ async def orders_user_renew_all(request: Request):
     me = await api.users_me_get(request)
 
     try:
-        num_renewed = await crud_orders.renew_orders_user(me["id"])
+        num_renewed = await orders_service.renew_orders_user(me["id"])
         if num_renewed == 0:
             return JSONResponse(
                 {
@@ -129,8 +129,8 @@ async def orders_post(request: Request):
         record = await api.proxies_record_get_by_id(request, record_id)
         record, meta_data, record_and_types = await get_record_data(request, record)
 
-        is_ordered = await crud_orders.has_active_order(user_id=me["id"], record_id=meta_data["id"])
-        orders_user_count = await crud_orders.get_orders_user_count(user_id=me["id"])
+        is_ordered = await orders_service.has_active_order(user_id=me["id"], record_id=meta_data["id"])
+        orders_user_count = await orders_service.get_orders_user_count(user_id=me["id"])
         if orders_user_count >= utils_orders.MAX_ACTIVE_ORDERS_PER_USER:
             return JSONResponse(
                 {"message": f"Du kan maksimalt have {utils_orders.MAX_ACTIVE_ORDERS_PER_USER} aktive bestillinger ad gangen", "error": True}
@@ -139,7 +139,7 @@ async def orders_post(request: Request):
         if is_ordered:
             return JSONResponse({"message": "Bestilling på dette materiale eksisterer allerede", "error": True})
         else:
-            inserted_order = await crud_orders.insert_order(meta_data, record_and_types, me)
+            inserted_order = await orders_service.insert_order(meta_data, record_and_types, me)
             order_message = utils_orders.get_single_order_message(inserted_order)
             return JSONResponse({"message": "Din bestilling er blevet oprettet", "order_message": order_message, "error": False})
     except Exception as e:
@@ -162,7 +162,7 @@ async def _process_order_deletion(request: Request, id_key: str):
         # Get the order_id based on the provided key
         target_id = request.path_params[id_key]
         if id_key == "record_id":
-            order = await crud_orders.get_order_by_record_id(user_id, target_id)
+            order = await orders_service.get_order_by_record_id(user_id, target_id)
             order_id = order["order_id"]
         else:
             order_id = target_id
@@ -182,7 +182,7 @@ async def _process_order_deletion(request: Request, id_key: str):
             "order_status": utils_orders.ORDER_STATUS.COMPLETED,
         }
 
-        await crud_orders.update_order(
+        await orders_service.update_order(
             user_id=user_id,
             order_id=order_id,
             update_values=update_values,
@@ -192,7 +192,7 @@ async def _process_order_deletion(request: Request, id_key: str):
         log.exception("Error in orders_user_delete")
         return JSONResponse({"message": "Der opstod en fejl. Bestilling kunne ikke slettes.", "error": True})
 
-    updated_order = await crud_orders.get_order(order_id)
+        updated_order = await orders_service.get_order(order_id)
     order_message = utils_orders.get_single_order_message(updated_order)
     return JSONResponse({"message": "Din bestilling er slettet", "order_message": order_message, "error": False})
 
@@ -253,7 +253,7 @@ async def orders_admin_patch_single(request: Request):
         order_id = request.path_params["order_id"]
         update_values: dict = await request.json()
 
-        await crud_orders.update_order(
+        await orders_service.update_order(
             user_id=me["id"],
             order_id=order_id,
             update_values=update_values,
@@ -292,7 +292,7 @@ async def orders_admin_promote_application(request: Request):
 
         order_id = request.path_params["order_id"]
 
-        await crud_orders.promote_application_order(
+        await orders_service.promote_application_order(
             user_id=me["id"],
             order_id=order_id,
         )
@@ -324,9 +324,9 @@ async def orders_admin_get(request: Request):
     await is_authenticated(request, permissions=["employee"])
 
     me = await api.users_me_get(request)
-    await crud_orders.replace_employee(me)
+    await orders_service.replace_employee(me)
 
-    filters = crud_orders.OrderFilter(
+    filters = OrderFilter(
         filter_status=request.query_params.get("filter_status", "active"),
         filter_location=request.query_params.get("filter_location", ""),
         filter_email=request.query_params.get("filter_email", ""),
@@ -337,7 +337,7 @@ async def orders_admin_get(request: Request):
     )
 
     # Pagination if added to filters
-    orders, filters = await crud_orders.get_orders_admin(
+    orders, filters = await orders_service.get_orders_admin(
         filters=filters,
     )
 
@@ -365,7 +365,7 @@ async def orders_admin_get_edit(request: Request):
     await is_authenticated(request, permissions=["employee"])
 
     order_id = request.path_params["order_id"]
-    order = await crud_orders.get_order(order_id)
+    order = await orders_service.get_order(order_id)
 
     context_values = {
         "title": "Opdater bestilling",
@@ -410,7 +410,7 @@ async def orders_logs(request: Request):
     offset = max(int(request.query_params.get("offset", "0")), 0)
     order_id = request.query_params.get("order_id", "0")
 
-    logs = await crud_orders.get_logs(order_id=int(order_id), limit=limit + 1, offset=offset)
+    logs = await orders_service.get_logs(order_id=int(order_id), limit=limit + 1, offset=offset)
     has_next = len(logs) > limit
     logs = logs[:limit]
     context_variables = {
@@ -451,7 +451,7 @@ async def order_admin_print(request: Request):
 
 
 async def _get_print_data(request: Request, order_id: int = 0) -> dict:
-    order = await crud_orders.get_order(order_id)
+    order = await orders_service.get_order(order_id)
     record_id = order["record_id"]
 
     record = await api.proxies_record_get_by_id(request, record_id)

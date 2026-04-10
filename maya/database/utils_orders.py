@@ -282,12 +282,5 @@ async def send_ready_orders_message(title: str, message: str, orders: list[dict]
     await notifications.send_ready_orders_message(title, message, orders)
 
 
-async def send_order_message(title: str, message: str, order: dict):
-    """
-    Backwards compatible wrapper for single-order callers.
-    """
-    await notifications.send_order_message(title, message, order)
-
-
 async def send_renew_order_message(title: str, message: str, orders: list[dict]):
     await notifications.send_renew_order_message(title, message, orders)

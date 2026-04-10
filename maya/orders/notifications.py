@@ -43,19 +43,18 @@ async def send_ready_orders_message(title: str, message: str, orders: list[dict]
     await api.mail_post(mail_dict)
     log.info(f"Sent mail message: {message} Orders: {[order['order_id'] for order in orders]}")
 
-
-async def send_order_message(title: str, message: str, order: dict):
-    """
-    Backwards compatible wrapper for single-order callers.
-    """
-    await send_ready_orders_message(title, message, [order])
-
-
 async def send_renew_order_message(title: str, message: str, orders: list[dict]):
     """
     Send a renewal mail covering multiple orders for the same user.
     """
+    if not orders:
+        raise ValueError("orders must contain at least one order")
+
     first_order = orders[0]
+    user_ids = {order["user_id"] for order in orders}
+    if len(user_ids) != 1:
+        raise ValueError("orders must belong to the same user")
+
     template_values = {
         "title": title,
         "message": message,
