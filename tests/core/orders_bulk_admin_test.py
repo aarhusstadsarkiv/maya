@@ -78,7 +78,7 @@ class TestOrdersBulkAdmin(unittest.TestCase):
 
         sent_mail_calls: list[list[dict]] = []
 
-        async def _send_ready_orders_message_stub(title: str, message: str, orders: list[dict]):
+        async def _send_ready_orders_message_stub(title: str, orders: list[dict]):
             sent_mail_calls.append(orders)
             return None
 
@@ -136,7 +136,7 @@ class TestOrdersBulkAdmin(unittest.TestCase):
 
         sent_mail_calls: list[list[dict]] = []
 
-        async def _send_ready_orders_message_stub(title: str, message: str, orders: list[dict]):
+        async def _send_ready_orders_message_stub(title: str, orders: list[dict]):
             sent_mail_calls.append(orders)
             return None
 
