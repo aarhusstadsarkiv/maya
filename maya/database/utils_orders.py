@@ -282,5 +282,5 @@ async def send_ready_orders_message(title: str, orders: list[dict]):
     await notifications.send_ready_orders_message(title, orders)
 
 
-async def send_renew_order_message(title: str, message: str, orders: list[dict]):
-    await notifications.send_renew_order_message(title, message, orders)
+async def send_renew_order_message(title: str, orders: list[dict]):
+    await notifications.send_renew_order_message(title, orders)

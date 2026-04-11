@@ -4,7 +4,7 @@ from maya.database import utils_orders
 from maya.database.crud import CRUD
 from maya.database.utils import DatabaseConnection
 from maya.orders.constants import LOG_MESSAGES, MAIL_MESSAGE_ORDER_READY_TITLE
-from maya.orders.constants import MAIL_MESSAGE_ORDER_RENEW_TITLE, SYSTEM_USER_ID, get_mail_message_order_renew
+from maya.orders.constants import MAIL_MESSAGE_ORDER_RENEW_TITLE, SYSTEM_USER_ID
 from maya.orders import logging as orders_logging
 from maya.orders import notifications
 from maya.orders import repository
@@ -852,7 +852,6 @@ ORDER BY o.user_id, o.order_id
 
                 await notifications.send_renew_order_message(
                     MAIL_MESSAGE_ORDER_RENEW_TITLE,
-                    get_mail_message_order_renew(),
                     user_orders,
                 )
 

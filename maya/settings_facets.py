@@ -2,10 +2,7 @@
 Basic settings for facets in the search interface.
 """
 
-from maya.core.logging import get_log
 import typing
-
-log = get_log()
 
 settings_facets: dict[str, typing.Any] = {
     "content_types": {

@@ -23,14 +23,20 @@ Supports both YAML (.yml) and Python (.py) formats, with preference given to YAM
 from maya.settings import settings
 from maya.settings_facets import settings_facets
 from maya.core.paths import get_base_dir_path
-from maya.core.logging import get_log
 from maya.core.module_loader import load_attr_from_file
 import importlib
+import logging
 import os
 import yaml
 import copy
 
-log = get_log()
+
+def _debug(message: str) -> None:
+    """
+    Log debug messages without importing maya.core.logging during module import.
+    """
+    logger = logging.getLogger("main")
+    logger.debug(message)
 
 
 def _load_yaml_settings(file_name):
@@ -43,9 +49,9 @@ def _load_yaml_settings(file_name):
             with open(get_base_dir_path(file_name), "r", encoding="utf-8") as stream:
                 settings_yml = yaml.safe_load(stream)
                 settings.update(settings_yml)
-                log.debug(f"Local {file_name} loaded: {get_base_dir_path(file_name)}")
+                _debug(f"Local {file_name} loaded: {get_base_dir_path(file_name)}")
         except Exception:
-            log.debug(f"Local {file_name} NOT loaded: {get_base_dir_path(file_name)}")
+            _debug(f"Local {file_name} NOT loaded: {get_base_dir_path(file_name)}")
 
 
 def _load_py_settings(file_name):
@@ -57,9 +63,9 @@ def _load_py_settings(file_name):
         try:
             settings_config = load_attr_from_file("settings_config", "settings", get_base_dir_path(file_name))
             settings.update(settings_config)
-            log.debug(f"Local {file_name} loaded: {get_base_dir_path(file_name)}")
+            _debug(f"Local {file_name} loaded: {get_base_dir_path(file_name)}")
         except Exception:
-            log.debug(f"Local {file_name} NOT loaded: {get_base_dir_path(file_name)}")
+            _debug(f"Local {file_name} NOT loaded: {get_base_dir_path(file_name)}")
 
 
 # load settings from .yml file or .py
@@ -79,21 +85,21 @@ elif os.path.exists(get_base_dir_path("settings_local.py")):
 # load local settings_facets (overrides settings_facets)
 if os.path.exists(get_base_dir_path("facets.yml")):
     try:
-        with open(get_base_dir_path("facets.yml"), "r", encoding="utf-8") as stream:
-            settings_facets_local = yaml.safe_load(stream)
-            settings_facets.update(settings_facets_local)
-            log.debug(f"Local facets.yml loaded: {get_base_dir_path('facets.yml')}")
+            with open(get_base_dir_path("facets.yml"), "r", encoding="utf-8") as stream:
+                settings_facets_local = yaml.safe_load(stream)
+                settings_facets.update(settings_facets_local)
+            _debug(f"Local facets.yml loaded: {get_base_dir_path('facets.yml')}")
     except Exception:
-        log.debug(f"Local facets.yml NOT loaded: {get_base_dir_path('facets.yml')}")
+        _debug(f"Local facets.yml NOT loaded: {get_base_dir_path('facets.yml')}")
 
 elif os.path.exists(get_base_dir_path("facets.py")):
     try:
         settings_facets_local = load_attr_from_file("settings_facets_local", "settings_facets", get_base_dir_path("facets.py"))
         settings_facets.update(settings_facets_local)
-        log.debug(f"Local facets.py loaded: {get_base_dir_path('facets.py')}")
+        _debug(f"Local facets.py loaded: {get_base_dir_path('facets.py')}")
 
     except Exception:
-        log.debug(f"Local facets.py file NOT loaded: {get_base_dir_path('facets.py')}")
+        _debug(f"Local facets.py file NOT loaded: {get_base_dir_path('facets.py')}")
 
 
 # load settings for tests (overrides settings)

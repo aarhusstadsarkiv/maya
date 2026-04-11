@@ -1,11 +1,21 @@
 {% extends "mails/mail_template.html" %}
 
 {% block content %}
-<p>Kære {{ user_display_name }},</p>
+<p>Kære {{ orders[0].user_display_name }},</p>
 
-<p>{{ message|safe }}</p>
-
+{% if orders|length == 1 %}
+<p>
+    Din bestilling udløber om {{ deadline_days }} dage.
+    Login og forny dit materiale på <a href="{{ renew_orders_url }}">www.aarhusarkivet.dk</a>.
+</p>
+<p>Denne mail gælder fornyelse af følgende materiale:</p>
+{% else %}
+<p>
+    Dine bestillinger udløber om {{ deadline_days }} dage.
+    Login og forny dine materialer på <a href="{{ renew_orders_url }}">www.aarhusarkivet.dk</a>.
+</p>
 <p>Denne mail gælder fornyelse af følgende materialer:</p>
+{% endif %}
 
 <ul>
     {% for order in orders %}

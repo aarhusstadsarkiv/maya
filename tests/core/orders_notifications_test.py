@@ -43,7 +43,7 @@ class TestOrdersNotifications(unittest.TestCase):
 
     async def _test_send_renew_order_message_rejects_empty_orders(self):
         with self.assertRaises(ValueError) as error:
-            await notifications.send_renew_order_message("Titel", "Besked", [])
+            await notifications.send_renew_order_message("Titel", [])
 
         self.assertIn("orders must contain at least one order", str(error.exception))
 
@@ -57,7 +57,7 @@ class TestOrdersNotifications(unittest.TestCase):
         ]
 
         with self.assertRaises(ValueError) as error:
-            await notifications.send_renew_order_message("Titel", "Besked", orders)
+            await notifications.send_renew_order_message("Titel", orders)
 
         self.assertIn("orders must belong to the same user", str(error.exception))
 
@@ -74,7 +74,7 @@ class TestOrdersNotifications(unittest.TestCase):
             patch("maya.orders.notifications.get_template_content", new=AsyncMock(return_value="<html>mail</html>")),
             patch("maya.orders.notifications.api.mail_post", new=AsyncMock(return_value=None)) as mail_post_mock,
         ):
-            await notifications.send_renew_order_message("Forny", "Din bestilling udløber", orders)
+            await notifications.send_renew_order_message("Forny", orders)
 
         mail_post_mock.assert_awaited_once()
         mail_payload = mail_post_mock.await_args.args[0]

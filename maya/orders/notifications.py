@@ -2,6 +2,7 @@ from maya.core import api
 from maya.core.dynamic_settings import settings
 from maya.core.logging import get_log
 from maya.core.templates import get_template_content
+from maya.database import utils_orders
 
 log = get_log()
 
@@ -43,7 +44,7 @@ async def send_ready_orders_message(title: str, orders: list[dict]):
     log.info(f"Sent ready mail Orders: {[order['order_id'] for order in orders]}")
 
 
-async def send_renew_order_message(title: str, message: str, orders: list[dict]):
+async def send_renew_order_message(title: str, orders: list[dict]):
     """
     Send a renewal mail covering multiple orders for the same user.
     """
@@ -57,10 +58,10 @@ async def send_renew_order_message(title: str, message: str, orders: list[dict])
 
     template_values = {
         "title": title,
-        "message": message,
         "orders": orders,
-        "user_display_name": first_order["user_display_name"],
         "client_domain_url": settings["client_url"],
+        "renew_orders_url": f'{settings["client_url"]}/auth/orders/active',
+        "deadline_days": utils_orders.DEADLINE_DAYS_RENEWAL,
         "client_name": settings["client_name"],
     }
 
@@ -79,4 +80,4 @@ async def send_renew_order_message(title: str, message: str, orders: list[dict])
     }
 
     await api.mail_post(mail_dict)
-    log.info(f"Sent renewal mail message: {message} Orders: {[order['order_id'] for order in orders]}")
+    log.info(f"Sent renewal mail Orders: {[order['order_id'] for order in orders]}")
