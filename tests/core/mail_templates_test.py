@@ -11,6 +11,26 @@ init_settings()
 
 
 class TestMailTemplates(unittest.TestCase):
+    def test_order_mail_renders_single_order_wording(self):
+        asyncio.run(self._test_order_mail_renders_single_order_wording())
+
+    async def _test_order_mail_renders_single_order_wording(self):
+        html_content = await get_template_content(
+            "mails/order_mail.html",
+            {
+                "title": "Din bestilling er klar til gennemsyn",
+                "client_domain_url": "https://example.com",
+                "client_name": "Aarhus Stadsarkiv",
+                "orders": [
+                    {"record_id": "0001", "label": "Materiale 1", "user_display_name": "Test User"},
+                ],
+            },
+        )
+
+        self.assertIn("Kære Test User", html_content)
+        self.assertIn("Du har bestilt et arkivalie", html_content)
+        self.assertIn("Materialet er nu tilgængeligt", html_content)
+        self.assertNotIn("Du har bestilt flere arkivalier", html_content)
 
     def test_order_mail_renders_multiple_orders(self):
         asyncio.run(self._test_order_mail_renders_multiple_orders())
@@ -20,7 +40,6 @@ class TestMailTemplates(unittest.TestCase):
             "mails/order_mail.html",
             {
                 "title": "Din bestilling er klar til gennemsyn",
-                "message": "Du har materiale klar.",
                 "client_domain_url": "https://example.com",
                 "client_name": "Aarhus Stadsarkiv",
                 "orders": [
@@ -31,6 +50,8 @@ class TestMailTemplates(unittest.TestCase):
         )
 
         self.assertIn("Kære Test User", html_content)
+        self.assertIn("Du har bestilt flere arkivalier", html_content)
+        self.assertIn("Materialerne er nu tilgængelige", html_content)
         self.assertIn("Materiale 1", html_content)
         self.assertIn("Materiale 2", html_content)
         self.assertIn('href="https://example.com/records/0001"', html_content)

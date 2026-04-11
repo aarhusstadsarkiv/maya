@@ -6,7 +6,7 @@ from maya.core.templates import get_template_content
 log = get_log()
 
 
-async def send_ready_orders_message(title: str, message: str, orders: list[dict]):
+async def send_ready_orders_message(title: str, orders: list[dict]):
     """
     Send a mail to the user when one or more orders are ready for review.
     """
@@ -20,7 +20,6 @@ async def send_ready_orders_message(title: str, message: str, orders: list[dict]
 
     template_values = {
         "title": title,
-        "message": message,
         "orders": orders,
         "client_domain_url": settings["client_url"],
         "client_name": settings["client_name"],
@@ -41,7 +40,7 @@ async def send_ready_orders_message(title: str, message: str, orders: list[dict]
     }
 
     await api.mail_post(mail_dict)
-    log.info(f"Sent mail message: {message} Orders: {[order['order_id'] for order in orders]}")
+    log.info(f"Sent ready mail Orders: {[order['order_id'] for order in orders]}")
 
 
 async def send_renew_order_message(title: str, message: str, orders: list[dict]):

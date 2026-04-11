@@ -20,7 +20,7 @@ class TestOrdersNotifications(unittest.TestCase):
 
     async def _test_send_ready_orders_message_rejects_empty_orders(self):
         with self.assertRaises(ValueError) as error:
-            await notifications.send_ready_orders_message("Titel", "Besked", [])
+            await notifications.send_ready_orders_message("Titel", [])
 
         self.assertIn("orders must contain at least one order", str(error.exception))
 
@@ -34,7 +34,7 @@ class TestOrdersNotifications(unittest.TestCase):
         ]
 
         with self.assertRaises(ValueError) as error:
-            await notifications.send_ready_orders_message("Titel", "Besked", orders)
+            await notifications.send_ready_orders_message("Titel", orders)
 
         self.assertIn("orders must belong to the same user", str(error.exception))
 

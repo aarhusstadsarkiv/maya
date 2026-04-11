@@ -3,7 +3,7 @@ from collections import defaultdict
 from maya.database import utils_orders
 from maya.database.crud import CRUD
 from maya.database.utils import DatabaseConnection
-from maya.orders.constants import LOG_MESSAGES, MAIL_MESSAGE_ORDER_READY, MAIL_MESSAGE_ORDER_READY_TITLE
+from maya.orders.constants import LOG_MESSAGES, MAIL_MESSAGE_ORDER_READY_TITLE
 from maya.orders.constants import MAIL_MESSAGE_ORDER_RENEW_TITLE, SYSTEM_USER_ID, get_mail_message_order_renew
 from maya.orders import logging as orders_logging
 from maya.orders import notifications
@@ -41,7 +41,6 @@ async def update_location_with_crud(
             if send_ready_mail:
                 await notifications.send_ready_orders_message(
                     MAIL_MESSAGE_ORDER_READY_TITLE,
-                    MAIL_MESSAGE_ORDER_READY,
                     [order],
                 )
                 order_update_values["message_sent"] = "1"
@@ -129,7 +128,6 @@ async def update_order_status_with_crud(
             next_queued_order = await repository.get_order_one(crud, order_id=next_queued_order["order_id"])
             await notifications.send_ready_orders_message(
                 MAIL_MESSAGE_ORDER_READY_TITLE,
-                MAIL_MESSAGE_ORDER_READY,
                 [next_queued_order],
             )
 
@@ -230,7 +228,6 @@ async def promote_application_order_with_crud(
         if not order.get("message_sent"):
             await notifications.send_ready_orders_message(
                 MAIL_MESSAGE_ORDER_READY_TITLE,
-                MAIL_MESSAGE_ORDER_READY,
                 [order],
             )
             update_values["message_sent"] = 1
@@ -308,7 +305,6 @@ async def insert_order_with_crud(
         )
         await notifications.send_ready_orders_message(
             MAIL_MESSAGE_ORDER_READY_TITLE,
-            MAIL_MESSAGE_ORDER_READY,
             [last_inserted_order],
         )
 
@@ -420,7 +416,6 @@ async def bulk_update_locations(user_id: str, orders_and_locations: list[dict]):
     for user_orders in ready_orders_by_user.values():
         await notifications.send_ready_orders_message(
             MAIL_MESSAGE_ORDER_READY_TITLE,
-            MAIL_MESSAGE_ORDER_READY,
             user_orders,
         )
         for order in user_orders:

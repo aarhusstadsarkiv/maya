@@ -17,8 +17,6 @@ class LogMessages:
 LOG_MESSAGES = LogMessages()
 SYSTEM_USER_ID = "SYSTEM"
 
-MAIL_MESSAGE_ORDER_READY = """Du har bestilt et arkivalie til gennemsyn på Aarhus Stadsarkiv.
-Materialet er tilgængeligt, og kan ses på studiepladser i Stadsarkivets Værksted på Dokk1."""
 MAIL_MESSAGE_ORDER_READY_TITLE = "Din bestilling er klar til gennemsyn"
 MAIL_MESSAGE_ORDER_RENEW_TITLE = "Udløb af materiale"
 

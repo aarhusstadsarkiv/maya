@@ -278,8 +278,8 @@ def get_current_date_time() -> str:
     return arrow.utcnow().format("YYYY-MM-DD HH:mm:ss")
 
 
-async def send_ready_orders_message(title: str, message: str, orders: list[dict]):
-    await notifications.send_ready_orders_message(title, message, orders)
+async def send_ready_orders_message(title: str, orders: list[dict]):
+    await notifications.send_ready_orders_message(title, orders)
 
 
 async def send_renew_order_message(title: str, message: str, orders: list[dict]):

@@ -3,7 +3,17 @@
 {% block content %}
 <p>Kære {{ orders[0].user_display_name }},</p>
 
-<p>{{ message|safe }}</p>
+{% if orders|length == 1 %}
+<p>
+    Du har bestilt et arkivalie til gennemsyn på Aarhus Stadsarkiv.
+    Materialet er nu tilgængeligt og kan ses på en studieplads i Stadsarkivets Værksted på Dokk1.
+</p>
+{% else %}
+<p>
+    Du har bestilt arkivalier til gennemsyn på Aarhus Stadsarkiv.
+    Materialerne er nu tilgængelige og kan ses på studiepladser i Stadsarkivets Værksted på Dokk1.
+</p>
+{% endif %}
 
 <p>Denne mail gælder bestilling af følgende materiale:</p>
 
