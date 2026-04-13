@@ -4,6 +4,8 @@ import json
 import tempfile
 import unittest
 
+from unittest.mock import AsyncMock, patch
+
 os.environ.setdefault("BASE_DIR", "sites/aarhus")
 os.environ.setdefault("TEST", "TRUE")
 
@@ -53,6 +55,9 @@ class TestDB(unittest.TestCase):
 
     def test_insert_application_order(self):
         asyncio.run(self._test_order_application_workflow())
+
+    def test_promote_application_order_logs_mail_sent_when_ready_mail_is_sent(self):
+        asyncio.run(self._test_promote_application_order_logs_mail_sent_when_ready_mail_is_sent())
 
     async def _test_order_application_workflow(self):
         """
@@ -182,6 +187,37 @@ class TestDB(unittest.TestCase):
             self.assertEqual(len(orders), 2)
         finally:
             utils_orders.send_ready_orders_message = original_send_ready_orders_message
+
+    async def _test_promote_application_order_logs_mail_sent_when_ready_mail_is_sent(self):
+        db_path = self.get_db_path()
+        migration = Migration(db_path=db_path, migrations=migrations_orders)
+        migration.run_migrations()
+
+        me, _, meta_data, record_and_types = self.get_test_data_application()
+        order = await orders_service.insert_order(meta_data, record_and_types, me)
+
+        await orders_service.update_order(
+            me["id"],
+            order["order_id"],
+            {"location": utils_orders.RECORD_LOCATION.READING_ROOM},
+        )
+
+        with patch("maya.orders.service.notifications.send_ready_orders_message", new=AsyncMock()) as send_ready_mail_mock:
+            await orders_service.promote_application_order(me["id"], order["order_id"])
+
+        send_ready_mail_mock.assert_awaited_once()
+
+        updated_order = await orders_service.get_order(order["order_id"])
+        self.assertEqual(updated_order["order_status"], utils_orders.ORDER_STATUS.ORDERED)
+        self.assertEqual(updated_order["message_sent"], 1)
+        self.assertIsNotNone(updated_order["expire_at"])
+
+        logs = await orders_service.get_logs(order["order_id"])
+        self.assertEqual(len(logs), 4)
+        self.assertEqual(logs[0]["message"], "Mail sendt")
+        self.assertEqual(logs[1]["message"], "Bruger status ændret")
+        self.assertEqual(logs[2]["message"], "Lokation ændret")
+        self.assertEqual(logs[3]["message"], "Bestilling oprettet")
 
 
 if __name__ == "__main__":

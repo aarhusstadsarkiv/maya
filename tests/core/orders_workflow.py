@@ -4,6 +4,8 @@ import json
 import tempfile
 import unittest
 
+from unittest.mock import AsyncMock, patch
+
 os.environ.setdefault("BASE_DIR", "sites/aarhus")
 os.environ.setdefault("TEST", "TRUE")
 
@@ -52,6 +54,9 @@ class TestDB(unittest.TestCase):
 
     def test_insert_order(self):
         asyncio.run(self._test_order_workflow())
+
+    def test_update_order_deferred_ready_mail_does_not_log_mail_sent(self):
+        asyncio.run(self._test_update_order_deferred_ready_mail_does_not_log_mail_sent())
 
     async def _test_order_workflow(self):
         """
@@ -196,6 +201,36 @@ class TestDB(unittest.TestCase):
             self.assertEqual(len(orders), 2)
         finally:
             utils_orders.send_ready_orders_message = original_send_ready_orders_message
+
+    async def _test_update_order_deferred_ready_mail_does_not_log_mail_sent(self):
+        db_path = self.get_db_path()
+        migration = Migration(db_path=db_path, migrations=migrations_orders)
+        migration.run_migrations()
+
+        me, _, meta_data, record_and_types = self.get_test_data()
+
+        order = await orders_service.insert_order(meta_data, record_and_types, me)
+
+        with patch("maya.orders.service.notifications.send_ready_orders_message", new=AsyncMock()) as send_ready_mail_mock:
+            ready_order = await orders_service.update_order(
+                me["id"],
+                order["order_id"],
+                {"location": utils_orders.RECORD_LOCATION.READING_ROOM},
+                send_ready_mail=False,
+            )
+
+        send_ready_mail_mock.assert_not_awaited()
+        self.assertIsNotNone(ready_order)
+        self.assertEqual(ready_order["order_id"], order["order_id"])
+
+        updated_order = await orders_service.get_order(order["order_id"])
+        self.assertFalse(updated_order["message_sent"])
+        self.assertIsNotNone(updated_order["expire_at"])
+
+        logs = await orders_service.get_logs(order["order_id"])
+        self.assertEqual(len(logs), 2)
+        self.assertEqual(logs[0]["message"], "Lokation ændret")
+        self.assertEqual(logs[1]["message"], "Bestilling oprettet")
 
 
 if __name__ == "__main__":
