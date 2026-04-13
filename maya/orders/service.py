@@ -29,11 +29,12 @@ async def update_location_with_crud(
     await repository.allow_location_change(crud, order["record_id"], raise_exception=True)
     await crud.update(table="records", update_values={"location": new_location}, filters={"record_id": order["record_id"]})
 
-    order_update_values = {
+    order_update_values: dict[str, str | int] = {
         "updated_at": utils_orders.get_current_date_time(),
     }
 
     ready_order_to_notify = None
+    mail_sent = False
     if new_location == utils_orders.RECORD_LOCATION.READING_ROOM and order["order_status"] == utils_orders.ORDER_STATUS.ORDERED:
         order_update_values["expire_at"] = utils_orders.get_expire_at_date()
 
@@ -43,7 +44,8 @@ async def update_location_with_crud(
                     MAIL_MESSAGE_ORDER_READY_TITLE,
                     [order],
                 )
-                order_update_values["message_sent"] = "1"
+                order_update_values["message_sent"] = 1
+                mail_sent = True
             else:
                 ready_order_to_notify = True
 
@@ -55,7 +57,7 @@ async def update_location_with_crud(
         order=updated_order,
         message=LOG_MESSAGES.LOCATION_CHANGED,
     )
-    if send_ready_mail and updated_order.get("message_sent") and not order.get("message_sent"):
+    if mail_sent:
         await repository.insert_log_message(
             crud,
             user_id=user_id,
@@ -95,6 +97,8 @@ async def update_order_status_with_crud(
     """
     Update an order status using an existing CRUD/transaction context.
     If a queued order is promoted, send/log ready mail when relevant.
+    This only supports status changes to COMPLETED and DELETED
+    Check if a queued order is to be promoted
     """
     order = await repository.get_order_one(crud, order_id=order_id)
 
@@ -146,21 +150,6 @@ async def update_order_status_with_crud(
             )
 
     return None
-
-
-async def update_order_status(user_id: str, order_id: int, new_status: int):
-    """
-    Update an order status in its own transaction.
-    """
-    database_connection = DatabaseConnection(runtime.orders_url)
-    async with database_connection.write_transaction_scope_async() as connection:
-        crud = CRUD(connection)
-        return await update_order_status_with_crud(
-            crud=crud,
-            user_id=user_id,
-            order_id=order_id,
-            new_status=new_status,
-        )
 
 
 async def is_owner(user_id: str, order_id: int) -> bool:
@@ -217,10 +206,11 @@ async def promote_application_order_with_crud(
     )
 
     target_status = utils_orders.ORDER_STATUS.QUEUED if existing_ordered else utils_orders.ORDER_STATUS.ORDERED
-    update_values: dict = {
+    update_values: dict[str, str | int] = {
         "order_status": target_status,
         "updated_at": utils_orders.get_current_date_time(),
     }
+    mail_sent = False
 
     if target_status == utils_orders.ORDER_STATUS.ORDERED and order["location"] == utils_orders.RECORD_LOCATION.READING_ROOM:
         update_values["expire_at"] = utils_orders.get_expire_at_date()
@@ -231,6 +221,7 @@ async def promote_application_order_with_crud(
                 [order],
             )
             update_values["message_sent"] = 1
+            mail_sent = True
 
     await crud.update(
         table="orders",
@@ -245,7 +236,7 @@ async def promote_application_order_with_crud(
         order=updated_order,
         message=LOG_MESSAGES.STATUS_CHANGED,
     )
-    if updated_order.get("message_sent") and not order.get("message_sent"):
+    if mail_sent:
         await repository.insert_log_message(
             crud,
             user_id=user_id,
