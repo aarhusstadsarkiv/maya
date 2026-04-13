@@ -2,7 +2,7 @@ from maya.core import api
 from maya.core.dynamic_settings import settings
 from maya.core.logging import get_log
 from maya.core.templates import get_template_content
-from maya.database import utils_orders
+from maya.orders import utils_orders
 
 log = get_log()
 

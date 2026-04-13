@@ -1,4 +1,4 @@
-from maya.database import utils_orders
+from maya.orders import utils_orders
 from maya.records.meta_data_record import is_orderable_by_form
 
 

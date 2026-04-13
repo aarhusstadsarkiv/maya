@@ -11,7 +11,7 @@ from maya.core.dynamic_settings import init_settings
 from maya.core.logging import get_log
 from maya.core.migration import Migration
 from maya.migrations.orders import migrations_orders
-from maya.database import utils_orders
+from maya.orders import utils_orders
 from maya.orders import service as orders_service
 from maya.orders import runtime as orders_runtime
 from maya.orders.types import OrderFilter

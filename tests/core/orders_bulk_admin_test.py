@@ -12,7 +12,7 @@ os.environ.setdefault("TEST", "TRUE")
 from maya.core.dynamic_settings import init_settings
 from maya.core.migration import Migration
 from maya.migrations.orders import migrations_orders
-from maya.database import utils_orders
+from maya.orders import utils_orders
 from maya.endpoints import endpoints_order
 from maya.orders import service as orders_service
 from maya.orders.constants import LOG_MESSAGES

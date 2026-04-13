@@ -4,7 +4,7 @@ from maya.records import record_utils
 from maya.records import record_alter
 from maya.core import api
 import json
-from maya.database import utils_orders
+from maya.orders import utils_orders
 from maya.orders import service as orders_service
 
 log = get_log()

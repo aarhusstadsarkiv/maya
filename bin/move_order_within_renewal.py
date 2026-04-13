@@ -12,7 +12,7 @@ import arrow
 sys.path.append(".")
 
 from maya.core.dynamic_settings import settings
-from maya.database.utils_orders import DEADLINE_DAYS_RENEWAL
+from maya.orders.utils_orders import DEADLINE_DAYS_RENEWAL
 
 
 def main() -> int:

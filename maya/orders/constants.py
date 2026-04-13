@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from maya.database import utils_orders
+from maya.orders import utils_orders
 
 
 @dataclass

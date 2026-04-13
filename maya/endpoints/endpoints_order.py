@@ -5,7 +5,7 @@ from maya.core.context import get_context
 from maya.core import api
 from maya.core.auth import is_authenticated, is_authenticated_json, AuthExceptionJSON
 from maya.core.logging import get_log
-from maya.database import utils_orders
+from maya.orders import utils_orders
 from maya.orders import service as orders_service
 from maya.orders.types import OrderFilter
 from maya.core import flash

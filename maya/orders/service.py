@@ -1,6 +1,6 @@
 from collections import defaultdict
 
-from maya.database import utils_orders
+from maya.orders import utils_orders
 from maya.database.crud import CRUD
 from maya.database.utils import DatabaseConnection
 from maya.orders.constants import LOG_MESSAGES, MAIL_MESSAGE_ORDER_READY_TITLE
@@ -811,6 +811,8 @@ async def cron_renewal_emails() -> int:
     """
     Send grouped renewal emails per user for renewable orders.
     """
+    runtime.cron_log.info("Starting cron_renewal_emails")
+
     renewal_orders = []
     database_connection = DatabaseConnection(runtime.orders_url)
     async with database_connection.transaction_scope_async() as connection:
