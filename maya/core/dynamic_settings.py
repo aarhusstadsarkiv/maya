@@ -85,10 +85,10 @@ elif os.path.exists(get_base_dir_path("settings_local.py")):
 # load local settings_facets (overrides settings_facets)
 if os.path.exists(get_base_dir_path("facets.yml")):
     try:
-            with open(get_base_dir_path("facets.yml"), "r", encoding="utf-8") as stream:
-                settings_facets_local = yaml.safe_load(stream)
-                settings_facets.update(settings_facets_local)
-            _debug(f"Local facets.yml loaded: {get_base_dir_path('facets.yml')}")
+        with open(get_base_dir_path("facets.yml"), "r", encoding="utf-8") as stream:
+            settings_facets_local = yaml.safe_load(stream)
+            settings_facets.update(settings_facets_local)
+        _debug(f"Local facets.yml loaded: {get_base_dir_path('facets.yml')}")
     except Exception:
         _debug(f"Local facets.yml NOT loaded: {get_base_dir_path('facets.yml')}")
 

@@ -10,7 +10,7 @@ async def mark_ready_order_message_sent(user_id: str, order_id: int):
     Mark a ready-order mail as sent and write the corresponding log message.
     """
     database_connection = DatabaseConnection(runtime.orders_url)
-    async with database_connection.transaction_scope_async() as connection:
+    async with database_connection.write_transaction_scope_async() as connection:
         crud = CRUD(connection)
         order = await repository.get_order_one(crud, order_id=order_id)
         if order.get("message_sent"):

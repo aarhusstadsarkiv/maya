@@ -119,7 +119,7 @@ async def auth_bookmarks_post(request: Request):
         insert_values = filters.copy()
 
         database_connection = DatabaseConnection(database_url)
-        async with database_connection.transaction_scope_async() as connection:
+        async with database_connection.write_transaction_scope_async() as connection:
             crud_default = CRUD(connection)
             exists = await crud_default.exists(table="bookmarks", filters=filters)
             if json_data["action"] == "delete" and exists:

@@ -1,7 +1,5 @@
 from dataclasses import dataclass
 
-from maya.orders import utils_orders
-
 
 @dataclass
 class LogMessages:

@@ -26,7 +26,7 @@ async def test_get(request: Request):
     has_result = False
 
     database_connection = DatabaseConnection(database_url)
-    async with database_connection.transaction_scope_async() as connection:
+    async with database_connection.write_transaction_scope_async() as connection:
         cache = DatabaseCache(connection)
         result = await cache.get("test", cache_expire)
 

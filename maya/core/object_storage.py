@@ -80,7 +80,7 @@ async def _get_presigned_url(url: str):
 
     cache_key = f"boto3_{url}"
     database_connection = DatabaseConnection(database_url)
-    async with database_connection.transaction_scope_async() as connection:
+    async with database_connection.write_transaction_scope_async() as connection:
 
         database_cache = DatabaseCache(connection)
         cached_url = await database_cache.get(cache_key, expire_in=BOTO3_EXPIRE)

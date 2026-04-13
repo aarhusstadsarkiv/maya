@@ -75,7 +75,7 @@ async def update_location(user_id: str, order_id: int, new_location: int, send_r
     Returns the updated order when it became ready but mail sending is deferred.
     """
     database_connection = DatabaseConnection(runtime.orders_url)
-    async with database_connection.transaction_scope_async() as connection:
+    async with database_connection.write_transaction_scope_async() as connection:
         crud = CRUD(connection)
         return await update_location_with_crud(
             crud=crud,
@@ -153,7 +153,7 @@ async def update_order_status(user_id: str, order_id: int, new_status: int):
     Update an order status in its own transaction.
     """
     database_connection = DatabaseConnection(runtime.orders_url)
-    async with database_connection.transaction_scope_async() as connection:
+    async with database_connection.write_transaction_scope_async() as connection:
         crud = CRUD(connection)
         return await update_order_status_with_crud(
             crud=crud,
@@ -191,7 +191,7 @@ async def replace_employee(me: dict):
     Insert or update employee details.
     """
     database_connection = DatabaseConnection(runtime.orders_url)
-    async with database_connection.transaction_scope_async() as connection:
+    async with database_connection.write_transaction_scope_async() as connection:
         crud = CRUD(connection)
         user_data = utils_orders.get_insert_user_data(me)
         await crud.replace("users", user_data, {"user_id": me["id"]})
@@ -261,7 +261,7 @@ async def promote_application_order(user_id: str, order_id: int):
     Promote an application order in its own transaction.
     """
     database_connection = DatabaseConnection(runtime.orders_url)
-    async with database_connection.transaction_scope_async() as connection:
+    async with database_connection.write_transaction_scope_async() as connection:
         crud = CRUD(connection)
         return await promote_application_order_with_crud(
             crud=crud,
@@ -330,7 +330,7 @@ async def insert_order(meta_data: dict, record_and_types: dict, me: dict) -> dic
     Insert an order in its own transaction.
     """
     database_connection = DatabaseConnection(runtime.orders_url)
-    async with database_connection.transaction_scope_async() as connection:
+    async with database_connection.write_transaction_scope_async() as connection:
         crud = CRUD(connection)
         return await insert_order_with_crud(
             crud=crud,
@@ -361,7 +361,7 @@ async def update_order(
     Update one supported aspect of an order.
     """
     database_connection = DatabaseConnection(runtime.orders_url)
-    async with database_connection.transaction_scope_async() as connection:
+    async with database_connection.write_transaction_scope_async() as connection:
         crud = CRUD(connection)
 
         comment = update_values.get("comment")
@@ -677,7 +677,7 @@ async def renew_order(user_id: str, order_id: int):
     Renew a single order.
     """
     database_connection = DatabaseConnection(runtime.orders_url)
-    async with database_connection.transaction_scope_async() as connection:
+    async with database_connection.write_transaction_scope_async() as connection:
         crud = CRUD(connection)
         await renew_order_with_crud(crud, user_id, order_id)
 
@@ -687,7 +687,7 @@ async def renew_orders_user(user_id: str) -> int:
     Renew all qualifying active user orders.
     """
     database_connection = DatabaseConnection(runtime.orders_url)
-    async with database_connection.transaction_scope_async() as connection:
+    async with database_connection.write_transaction_scope_async() as connection:
         crud = CRUD(connection)
         query = f"""
         SELECT o.*
@@ -791,7 +791,7 @@ async def cron_orders_expire() -> int:
     for order in orders_expire:
         try:
             database_connection = DatabaseConnection(runtime.orders_url)
-            async with database_connection.transaction_scope_async() as connection:
+            async with database_connection.write_transaction_scope_async() as connection:
                 crud = CRUD(connection)
                 runtime.log.info(f"Order {order['order_id']} has passed expire_at. Setting status to COMPLETED")
                 await update_order_status_with_crud(
@@ -834,7 +834,7 @@ ORDER BY o.user_id, o.order_id
 
     num_renewal_emails = 0
     database_connection = DatabaseConnection(runtime.orders_url)
-    async with database_connection.transaction_scope_async() as connection:
+    async with database_connection.write_transaction_scope_async() as connection:
         crud = CRUD(connection)
         renewal_orders_by_user = defaultdict(list)
 

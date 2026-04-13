@@ -33,7 +33,7 @@ class TestDB(unittest.TestCase):
         migration.run_migrations()
 
         database_transaction = utils.DatabaseConnection(db_path)
-        async with database_transaction.transaction_scope_async() as connection:
+        async with database_transaction.write_transaction_scope_async() as connection:
             crud_instance = crud.CRUD(connection)
 
             # Insert a user
@@ -101,7 +101,7 @@ class TestDB(unittest.TestCase):
 
         try:
             database_transaction = utils.DatabaseConnection(db_path)
-            async with database_transaction.transaction_scope_async() as connection:
+            async with database_transaction.write_transaction_scope_async() as connection:
                 crud_instance = crud.CRUD(connection)
 
                 # Insert multiple users

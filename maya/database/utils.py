@@ -27,6 +27,7 @@ async def get_user(user_id: int):
 """
 
 import sqlite3
+import aiosqlite
 from contextlib import asynccontextmanager, contextmanager
 from maya.core.logging import get_log
 
@@ -49,6 +50,22 @@ class DatabaseConnection:
     @contextmanager
     def transaction_scope_sync(self):
         """
+        Synchronous deferred transaction scope context manager.
+        """
+        with self._transaction_scope_sync("BEGIN") as connection:
+            yield connection
+
+    @contextmanager
+    def write_transaction_scope_sync(self):
+        """
+        Synchronous write transaction scope context manager.
+        """
+        with self._transaction_scope_sync("BEGIN IMMEDIATE") as connection:
+            yield connection
+
+    @contextmanager
+    def _transaction_scope_sync(self, begin_statement):
+        """
         Synchronous transaction scope context manager.
         """
         if not self.database_url:
@@ -56,7 +73,7 @@ class DatabaseConnection:
 
         connection = self.get_db_connection_sync()
         try:
-            connection.execute("BEGIN IMMEDIATE")
+            connection.execute(begin_statement)
             yield connection
             connection.commit()
         except sqlite3.Error:
@@ -68,33 +85,49 @@ class DatabaseConnection:
         finally:
             connection.close()
 
-    async def get_db_connection_async(self) -> sqlite3.Connection:
+    async def get_db_connection_async(self) -> aiosqlite.Connection:
         """
         Create an asynchronous database connection.
         """
         if not self.database_url:
             raise ValueError("Database URL was not set")
 
-        connection = sqlite3.connect(self.database_url)
+        connection = await aiosqlite.connect(self.database_url)
         connection.row_factory = sqlite3.Row
-        connection.execute("PRAGMA journal_mode=WAL;")
+        await connection.execute("PRAGMA journal_mode=WAL;")
         return connection
 
     @asynccontextmanager
     async def transaction_scope_async(self):
         """
+        Asynchronous deferred transaction scope context manager.
+        """
+        async with self._transaction_scope_async("BEGIN") as connection:
+            yield connection
+
+    @asynccontextmanager
+    async def write_transaction_scope_async(self):
+        """
+        Asynchronous write transaction scope context manager.
+        """
+        async with self._transaction_scope_async("BEGIN IMMEDIATE") as connection:
+            yield connection
+
+    @asynccontextmanager
+    async def _transaction_scope_async(self, begin_statement):
+        """
         Asynchronous transaction scope context manager.
         """
         connection = await self.get_db_connection_async()
         try:
-            connection.execute("BEGIN IMMEDIATE")
+            await connection.execute(begin_statement)
             yield connection
-            connection.commit()
-        except sqlite3.Error:
-            connection.rollback()
+            await connection.commit()
+        except (sqlite3.Error, aiosqlite.Error):
+            await connection.rollback()
             raise
         except Exception:
-            connection.rollback()
+            await connection.rollback()
             raise
         finally:
-            connection.close()
+            await connection.close()

@@ -33,14 +33,14 @@ async def test_get(request: Request):
 ```
 """
 
-import sqlite3
+import aiosqlite
 import json
 import time
 from typing import Any
 
 
 class DatabaseCache:
-    def __init__(self, connection: sqlite3.Connection):
+    def __init__(self, connection: aiosqlite.Connection):
         """
         Initialize the DatabaseCache with a connection.
         The connection is expected to be managed externally (e.g., with async with).
@@ -52,7 +52,7 @@ class DatabaseCache:
         Set a cache value for a key using a single-row upsert.
         """
         json_data = json.dumps(data)
-        self.connection.execute(
+        await self.connection.execute(
             """
             INSERT INTO cache (key, value, unix_timestamp)
             VALUES (?, ?, ?)
@@ -70,10 +70,11 @@ class DatabaseCache:
         Will return None if the key does not exist or if the key is expired.
         If expire_in is 0, the value will never expire.
         """
-        result = self.connection.execute(
+        cursor = await self.connection.execute(
             "SELECT id, value, unix_timestamp FROM cache WHERE key = ?",
             (key,),
-        ).fetchone()
+        )
+        result = await cursor.fetchone()
 
         if result:
             if expire_in == 0:
@@ -82,14 +83,14 @@ class DatabaseCache:
             current_time = int(time.time())
             if current_time - result["unix_timestamp"] < expire_in:
                 return json.loads(result["value"])
-            self.connection.execute("DELETE FROM cache WHERE key = ?", (key,))
+            await self.connection.execute("DELETE FROM cache WHERE key = ?", (key,))
         return None
 
     async def delete(self, id: int) -> None:
         """
         Delete a cache value by id
         """
-        self.connection.execute("DELETE FROM cache WHERE id = ?", (id,))
+        await self.connection.execute("DELETE FROM cache WHERE id = ?", (id,))
         return None
 
     async def delete_expired(self, expire_in: int) -> int:
@@ -100,7 +101,7 @@ class DatabaseCache:
             return 0
 
         cutoff = int(time.time()) - expire_in
-        cursor = self.connection.execute(
+        cursor = await self.connection.execute(
             "DELETE FROM cache WHERE unix_timestamp <= ?",
             (cutoff,),
         )

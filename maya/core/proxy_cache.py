@@ -35,7 +35,7 @@ async def proxy_cache_set(key: str, data: typing.Any) -> None:
     if not database_url or PROXY_CACHE_EXPIRE is None:
         return None
 
-    async with database_connection.transaction_scope_async() as connection:
+    async with database_connection.write_transaction_scope_async() as connection:
         database_cache = DatabaseCache(connection)
         await database_cache.set(key, data)
 
