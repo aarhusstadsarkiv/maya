@@ -20,6 +20,7 @@
 
 {# Select active, completed, order_history #}
 <form class="filters" method="GET" action="/admin/orders">
+    <input type="hidden" name="filter_offset" id="filter_offset" value="{{ filters.filter_offset }}">
 
     <select name="filter_status" id="filter_status">
         <option title="Aktive bestillinger" value="active" {% if filters.filter_status=='active' %}selected{% endif %}>
@@ -42,6 +43,7 @@
 
     Per side: 
     <select name="filter_limit" id="filter_limit">
+        <option value="2" {% if filters.filter_limit == 2 %}selected{% endif %}>2</option>
         <option value="50" {% if filters.filter_limit == 50 %}selected{% endif %}>50</option>
         <option value="100" {% if filters.filter_limit == 100 %}selected{% endif %}>100</option>
         <option value="200" {% if filters.filter_limit == 200 %}selected{% endif %}>200</option>
@@ -57,12 +59,12 @@
 
     <p>
     {% if filters.filter_has_prev %}
-    <a id="filter-prev" class="action-link" href="#" data-prev="{{ filters.filter_prev_offset }}">&lt;&lt; Forrige</a>
+    <a class="action-link filter-pagination" href="#" data-offset="{{ filters.filter_prev_offset }}">&lt;&lt; Forrige</a>
     {% else %}
     <span class="action-link disabled">&lt;&lt; Forrige</span>
     {% endif %}
     {% if filters.filter_has_next %}
-    <a id="filter-next" class="action-link" href="#" data-next="{{ filters.filter_next_offset }}">Næste &gt;&gt;</a>
+    <a class="action-link filter-pagination" href="#" data-offset="{{ filters.filter_next_offset }}">Næste &gt;&gt;</a>
     {% else %}
     <span class="action-link disabled">Næste &gt;&gt;</span>
     {% endif %}
@@ -228,12 +230,12 @@ at benytte det. Du må først afslutte den aktive bestilling, før du kan ændre
 <div>
 
 {% if filters.filter_has_prev %}
-<a id="filter-prev" class="action-link" href="#" data-prev="{{ filters.filter_prev_offset }}">&lt;&lt; Forrige</a>
+<a class="action-link filter-pagination" href="#" data-offset="{{ filters.filter_prev_offset }}">&lt;&lt; Forrige</a>
 {% else %}
 <span class="action-link disabled">&lt;&lt; Forrige</span>
 {% endif %}
 {% if filters.filter_has_next %}
-<a id="filter-next" class="action-link" href="#" data-next="{{ filters.filter_next_offset }}">Næste &gt;&gt;</a>
+<a class="action-link filter-pagination" href="#" data-offset="{{ filters.filter_next_offset }}">Næste &gt;&gt;</a>
 {% else %}
 <span class="action-link disabled">Næste &gt;&gt;</span>
 {% endif %}
@@ -252,6 +254,8 @@ at benytte det. Du må først afslutte den aktive bestilling, før du kan ændre
     import { config } from "/static/js/config.js";
 
     const spinner = document.querySelector('.loadingspinner');
+    const filterForm = document.querySelector('.filters');
+    const filterOffsetInput = document.querySelector('#filter_offset');
 
     /**
      * Section that handles FINISHED (afsluttet) and PROMOTE_APPLICATION (godkend ansøgning) actions for orders
@@ -382,8 +386,9 @@ at benytte det. Du må først afslutte den aktive bestilling, før du kan ændre
                     return;
                 }
 
-                // Redirect to same page to update view
-                window.location.reload();
+                // Preserve filters but reset pagination after updating locations.
+                resetFilterOffset();
+                submitFilteredForm();
             } catch (e) {
                 Flash.setMessage(config.jsExceptionMessage, 'error');
                 asyncLogError(e);
@@ -397,8 +402,6 @@ at benytte det. Du må først afslutte den aktive bestilling, før du kan ændre
     /**
      * Section that handles filtering and pagination
      */
-    const filterForm = document.querySelector('form');
-
     function submitFilteredForm() {
         const formData = new FormData(filterForm);
         const params = new URLSearchParams();
@@ -413,6 +416,12 @@ at benytte det. Du må først afslutte den aktive bestilling, før du kan ændre
         window.location.href = url;
     }
 
+    function resetFilterOffset() {
+        if (filterOffsetInput) {
+            filterOffsetInput.value = '0';
+        }
+    }
+
     // Submit form on form submission
     filterForm.addEventListener('submit', function (event) {
         event.preventDefault();
@@ -421,7 +430,10 @@ at benytte det. Du må først afslutte den aktive bestilling, før du kan ændre
 
     // Submit form when select elements change
     document.querySelectorAll('.filters > select').forEach(select => {
-        select.addEventListener('change', submitFilteredForm);
+        select.addEventListener('change', function () {
+            resetFilterOffset();
+            submitFilteredForm();
+        });
     });
 
     // Submit form when pressing Enter in input fields
@@ -429,6 +441,7 @@ at benytte det. Du må først afslutte den aktive bestilling, før du kan ændre
         input.addEventListener('keypress', function (e) {
             if (e.key === 'Enter') {
                 e.preventDefault();
+                resetFilterOffset();
                 submitFilteredForm();
             }
         });
@@ -444,51 +457,28 @@ at benytte det. Du må først afslutte den aktive bestilling, før du kan ændre
             }
         });
 
+        resetFilterOffset();
         submitFilteredForm();
     });
 
     // Submit form when filter_show_queued checkbox changes
     const filterShowQueued = document.querySelector('#filter_show_queued');
     if (filterShowQueued) {
-        filterShowQueued.addEventListener('change', submitFilteredForm);
+        filterShowQueued.addEventListener('change', function () {
+            resetFilterOffset();
+            submitFilteredForm();
+        });
     }
 
-    // Function to apply existing filters to pagination
-    function applyFiltersToPagination(offsetKey, offsetValue) {
-        const formData = new FormData(filterForm);
-        const params = new URLSearchParams();
-
-        for (const [key, value] of formData.entries()) {
-            if (value.trim() !== '') { // Keep existing filters
-                params.append(key, value);
+    document.querySelectorAll('.filter-pagination').forEach(link => {
+        link.addEventListener('click', function (event) {
+            event.preventDefault();
+            if (filterOffsetInput) {
+                filterOffsetInput.value = this.dataset.offset;
             }
-        }
-
-        params.append(offsetKey, offsetValue); // Add pagination offset
-
-        const url = '/admin/orders?' + params.toString();
-        window.location.href = url;
-    }
-
-    // Handle next pagination
-    const filterNext = document.querySelector('#filter-next');
-    if (filterNext) {
-        filterNext.addEventListener('click', function (event) {
-            event.preventDefault();
-            const next = event.target.dataset.next;
-            applyFiltersToPagination('filter_offset', next);
+            filterForm.requestSubmit();
         });
-    }
-
-    // Handle previous pagination
-    const filterPrev = document.querySelector('#filter-prev');
-    if (filterPrev) {
-        filterPrev.addEventListener('click', function (event) {
-            event.preventDefault();
-            const prev = event.target.dataset.prev;
-            applyFiltersToPagination('filter_offset', prev);
-        });
-    }
+    });
 
     /**
      * Section that handles printing multiple orders in a hidden iframe
