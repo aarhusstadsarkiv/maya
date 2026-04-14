@@ -22,7 +22,7 @@ from maya.core.object_storage import set_presigned_urls_search
 log = get_log()
 
 
-def get_api_acceptable_query_params() -> list:
+def _get_api_acceptable_query_params() -> list:
     api_accept_query_params = []
     for key, value in settings_query_params.items():
         if value.get("search_filter"):
@@ -306,7 +306,7 @@ async def get_search_context_values(request: Request, extra_query_params: list =
     q = query.get_search(request)
     size, sort, view = get_size_sort_view(request)
 
-    api_accept_query_params = get_api_acceptable_query_params()
+    api_accept_query_params = _get_api_acceptable_query_params()
 
     # date_to, date_from, created_at, start, direction are read from query params
     default_query_params = _get_default_query_params(request)

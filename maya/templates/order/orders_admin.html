@@ -51,18 +51,22 @@
     Vis bestillinger i kø: <input type="checkbox" name="filter_show_queued" id="filter_show_queued" {% if
         filters.filter_show_queued %}checked{% endif %}>
     {% endif %}
-
+    
     <a href="#" class="clear-search-filters action-link">Ryd filtre</a>
     <a title="Se logs for alle bestillinger" class="action-link" href="/admin/orders/logs">Logs</a>
+
+    <p>
     {% if filters.filter_has_prev %}
     <a id="filter-prev" class="action-link" href="#" data-prev="{{ filters.filter_prev_offset }}">&lt;&lt; Forrige</a>
+    {% else %}
+    <span class="action-link disabled">&lt;&lt; Forrige</span>
     {% endif %}
     {% if filters.filter_has_next %}
     <a id="filter-next" class="action-link" href="#" data-next="{{ filters.filter_next_offset }}">Næste &gt;&gt;</a>
+    {% else %}
+    <span class="action-link disabled">Næste &gt;&gt;</span>
     {% endif %}
-
-    <br>
-
+    </p>
 </form>
 
 {% if orders|length == 0 %}
@@ -221,6 +225,22 @@ at benytte det. Du må først afslutte den aktive bestilling, før du kan ændre
         </tbody>
     </table>
 </div>
+<div>
+
+{% if filters.filter_has_prev %}
+<a id="filter-prev" class="action-link" href="#" data-prev="{{ filters.filter_prev_offset }}">&lt;&lt; Forrige</a>
+{% else %}
+<span class="action-link disabled">&lt;&lt; Forrige</span>
+{% endif %}
+{% if filters.filter_has_next %}
+<a id="filter-next" class="action-link" href="#" data-next="{{ filters.filter_next_offset }}">Næste &gt;&gt;</a>
+{% else %}
+<span class="action-link disabled">Næste &gt;&gt;</span>
+{% endif %}
+
+</div>
+
+
 {% endif %}
 <div class="loadingspinner hidden"></div>
 
