@@ -43,7 +43,9 @@
 
     Per side: 
     <select name="filter_limit" id="filter_limit">
+        {% if get_setting('environment') == 'development' %}
         <option value="2" {% if filters.filter_limit == 2 %}selected{% endif %}>2</option>
+        {% endif %}
         <option value="50" {% if filters.filter_limit == 50 %}selected{% endif %}>50</option>
         <option value="100" {% if filters.filter_limit == 100 %}selected{% endif %}>100</option>
         <option value="200" {% if filters.filter_limit == 200 %}selected{% endif %}>200</option>
