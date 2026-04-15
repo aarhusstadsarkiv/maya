@@ -51,7 +51,8 @@ Error. Request Timeout: Error. Request Timeout
 Error. Server Error: Der skete en system fejl.
 Failed to get schemas: Det var ikke muligt at hente skemaer
 First Name: Fornavn
-First name and last name should be at least 2 characters long: Fornavn og efternavn skal være mindst 2 tegn langt
+First name and last name should be at least 2 characters long: Fornavn og efternavn
+  skal være mindst 2 tegn langt
 First page: Første
 Forgot your password: Glemt password
 Gallery view: Galleri
@@ -110,6 +111,7 @@ Register to get access to speciel functions: Opret bruger for at få adgang til 
 Relavance: Relevans
 Remember me: Husk login på denne computer
 Remove facet: Fjern filter
+Renew order: Forny bestilling
 Repeat Password: Gentag password
 Reset: Reset
 Reset password: Nulstil password
