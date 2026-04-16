@@ -134,7 +134,7 @@
                     href="">{{ translate('Order online') }}</a>
                 {% endif %}
 
-                {% if meta_data.is_order_renew_possible %}
+                {% if meta_data.has_active_order and meta_data.is_order_renew_possible %}
                 <a  id="record-renew-order"
                     data-action="renew" 
                     data-orderid="{{ meta_data.active_order_id }}" 
