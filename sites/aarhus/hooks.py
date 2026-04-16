@@ -70,7 +70,10 @@ class Hooks(HooksSpec):
         if me:
             user_id = me["id"]
             has_active_order = await orders_service.has_active_order(user_id=user_id, record_id=meta_data["id"])
+            is_order_renew_possible = await orders_service.is_order_renew_possible_user(user_id=user_id, record_id=meta_data["id"])
             meta_data["has_active_order"] = bool(has_active_order)
+            meta_data["is_order_renew_possible"] = is_order_renew_possible
+            meta_data["active_order_id"] = has_active_order["order_id"] if has_active_order else None
             if has_active_order:
                 message = utils_orders.get_single_order_message(has_active_order)
                 meta_data["active_order_message"] = message

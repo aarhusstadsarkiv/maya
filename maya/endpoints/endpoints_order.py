@@ -61,10 +61,10 @@ async def orders_user_renew_by_order_id(request: Request):
     Checks if order can be renewed
     """
 
-    await is_authenticated_json(request, must_be_verified=True)
-    me = await api.users_me_get(request)
-
     try:
+        await is_authenticated_json(request, must_be_verified=True)
+        me = await api.users_me_get(request)
+
         order_id = request.path_params["order_id"]
         is_owner = await _is_order_owner(request, order_id)
         if not is_owner:
@@ -74,6 +74,14 @@ async def orders_user_renew_by_order_id(request: Request):
         await orders_service.renew_order(me["id"], order_id)
         flash.set_message(request, "Din bestilling er blevet fornyet", type="success")
         return JSONResponse({"message": "Din bestilling er blevet fornyet", "error": False})
+
+    except AuthExceptionJSON as e:
+        log.warning(f"Unauthorized attempt to renew order: {str(e)}")
+        return JSONResponse(
+            {"message": "Du er ikke logget ind eller har ikke rettigheder til at forny denne bestilling", "error": True},
+            status_code=403,
+        )
+
     except Exception:
 
         log.exception("Error in auth_orders_post")

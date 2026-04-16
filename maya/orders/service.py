@@ -619,7 +619,7 @@ ORDER BY o.order_id DESC
         return orders
 
 
-async def is_order_renew_possible(crud: "CRUD", order: dict):
+async def is_order_renew_possible(crud: "CRUD", order: dict) -> bool:
     """
     Check whether an order qualifies for renewal.
     """
@@ -638,6 +638,20 @@ async def is_order_renew_possible(crud: "CRUD", order: dict):
         return False
 
     return True
+
+
+async def is_order_renew_possible_user(user_id: str, record_id: str) -> bool:
+    """
+    Check whether a user has an order that qualifies for renewal on a record.
+    """
+    database_connection = DatabaseConnection(runtime.orders_url)
+    async with database_connection.transaction_scope_async() as connection:
+        crud = CRUD(connection)
+        order = await repository.get_order_one(crud, user_id=user_id, record_id=record_id)
+        if not order:
+            return False
+
+        return await is_order_renew_possible(crud, order=order)
 
 
 async def renew_order_with_crud(crud: "CRUD", user_id: str, order_id: int) -> bool:

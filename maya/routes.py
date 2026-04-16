@@ -163,7 +163,7 @@ if settings["allow_online_ordering"]:
         Route("/auth/orders/{status_type:str}", endpoint=endpoints_order.orders_get_orders_user, name="orders_get_orders_user"),
         Route("/order/{record_id:str}", endpoint=endpoints_order.orders_post, name="orders_post_order", methods=["POST"]),
         Route("/admin/orders", endpoint=endpoints_order.orders_admin_get, name="orders_admin_get"),
-        Route("/admin/orders/{order_id:str}/edit", endpoint=endpoints_order.orders_admin_get_edit, name="orders_admin_get_edit"),
+        Route("/admin/orders/{order_id:int}/edit", endpoint=endpoints_order.orders_admin_get_edit, name="orders_admin_get_edit"),
         Route(
             "/order/patch/{order_id:int}/order-id",
             endpoint=endpoints_order.orders_user_delete_by_order_id,
@@ -177,7 +177,7 @@ if settings["allow_online_ordering"]:
             methods=["POST"],
         ),
         Route(
-            "/order/patch/{order_id:str}/renew",
+            "/order/patch/{order_id:int}/renew",
             endpoint=endpoints_order.orders_user_renew_by_order_id,
             name="orders_user_patch_renew",
             methods=["POST"],

@@ -126,13 +126,21 @@
                     class="delete-order"
                     data-action="delete"
                     data-id="{{ record_and_types.id.value }}" 
-                    href="/order/{{ record_and_types.id.value }}">{{ translate('Delete order') }}</a>
+                    href="">{{ translate('Delete order') }}</a>
                 {% else %}
                 <a  id="record-order"
                     data-action="create" 
                     data-id="{{ record_and_types.id.value }}" 
-                    href="/order/{{ record_and_types.id.value }}">{{ translate('Order online') }}</a>
+                    href="">{{ translate('Order online') }}</a>
                 {% endif %}
+
+                {% if meta_data.is_order_renew_possible %}
+                <a  id="record-renew-order"
+                    data-action="renew" 
+                    data-orderid="{{ meta_data.active_order_id }}" 
+                    href="">{{ translate('Renew order') }}</a>
+                {% endif %}
+
 
             {% endif %}
             </div>
