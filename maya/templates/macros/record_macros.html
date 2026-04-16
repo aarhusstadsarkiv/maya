@@ -114,7 +114,16 @@
         {% for key in block_keys %}
 
         {% if key == 'user_actions' %}
-            <div class="action-links">
+            <div class="action-links"
+                {% if is_verified and meta_data.orderable and get_setting('allow_online_ordering') %}
+                data-order-record-id="{{ record_and_types.id.value }}"
+                data-order-id="{{ meta_data.get('active_order_id', '') }}"
+                data-has-active-order="{{ 'true' if meta_data.has_active_order else 'false' }}"
+                data-can-renew-order="{{ 'true' if meta_data.has_active_order and meta_data.is_order_renew_possible else 'false' }}"
+                data-create-label="{{ translate('Order online') }}"
+                data-delete-label="{{ translate('Delete order') }}"
+                data-renew-label="{{ translate('Renew order') }}"
+                {% endif %}>
             {% if has_permission('user', permissions_list) and get_setting('allow_save_bookmarks') %}
             <a id="bookmark-action" data-id="{{ meta_data['id']}}" href="#"></a>
             {% endif %}
