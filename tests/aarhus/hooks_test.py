@@ -34,11 +34,14 @@ class TestAarhusHooks(unittest.TestCase):
         with (
             patch("sites.aarhus.hooks.api.me_get", new=AsyncMock(return_value={"id": "USER_1"})),
             patch("sites.aarhus.hooks.orders_service.has_active_order", new=AsyncMock(return_value=active_order)),
+            patch("sites.aarhus.hooks.orders_service.is_order_renew_possible_user", new=AsyncMock(return_value=True)),
             patch("sites.aarhus.hooks.utils_orders.get_single_order_message", return_value="Bestilling aktiv"),
         ):
             _, updated_meta_data = await hooks.after_get_record(record, meta_data)
 
         self.assertTrue(updated_meta_data["has_active_order"])
+        self.assertTrue(updated_meta_data["is_order_renew_possible"])
+        self.assertEqual(updated_meta_data["active_order_id"], 17)
         self.assertEqual(updated_meta_data["active_order_message"], "Bestilling aktiv")
 
 
