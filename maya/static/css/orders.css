@@ -77,7 +77,7 @@ tbody tr {
 }
 
 tbody tr:hover {
-    background-color: var(--button-base);
+    background-color: var(--border);
 }
 
 td, th { 

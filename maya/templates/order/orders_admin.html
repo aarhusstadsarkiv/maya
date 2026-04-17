@@ -89,6 +89,7 @@
             <tr>
                 <th>ID</th>
                 <th>Lokation</th>
+                <th><a href="#" title="Vælg alle til print" class="action-link print-select-all">Alle</a> </th>
                 <th>Materiale</th>
                 <th>Arkivskaber</th>
                 <th>Titel</th>
@@ -100,7 +101,6 @@
                 <th>Deadline</th>
                 <th title="Antal brugere som står i kø">I Kø</th>
                 <th></th><!-- has note indicator -->
-                <th><a href="#" title="Vælg alle til print" class="action-link print-select-all">Alle</a> </th>
                 <th>Handling</th>
             </tr>
         </thead>
@@ -134,6 +134,16 @@ at benytte det. Du må først afslutte den aktive bestilling, før du kan ændre
                         {% endfor %}
                     </select>
                 </td>
+
+                <td class="width-50">
+                    <input
+                        type="checkbox"
+                        class="print-checkbox"
+                        data-order-id="{{ order.order_id }}"
+                        aria-label="Vælg bestilling {{ order.order_id }} til udskrift"
+                    >
+                </td>
+
                 <td class="record-link">
                     <a title="{{ order.record_and_types_title }}"
                         href="/admin/orders/{{order.record_id}}/html">{{order.record_id}}</a>
@@ -169,15 +179,6 @@ at benytte det. Du må først afslutte den aktive bestilling, før du kan ændre
                     </span>
                 </td>
 
-                <td class="width-50">
-                    <input
-                        type="checkbox"
-                        class="print-checkbox"
-                        data-order-id="{{ order.order_id }}"
-                        aria-label="Vælg bestilling {{ order.order_id }} til udskrift"
-                    >
-                </td>
-
                 <td>
                     <span>
                         <a title="Indtast noter" class="action-link" href="/admin/orders/{{order.order_id}}/edit">Noter</a>
@@ -208,22 +209,21 @@ at benytte det. Du må først afslutte den aktive bestilling, før du kan ændre
                     {% endif %}
                 </td>
 
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-
                 <td>
                     <a href="#" title="Udskriv valgte bestillinger" class="action-link print-multiple">Print</a>
                 </td>
 
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
                 <td></td>
             </tr>
         </tbody>
