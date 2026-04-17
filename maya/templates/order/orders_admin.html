@@ -342,14 +342,8 @@ at benytte det. Du må først afslutte den aktive bestilling, før du kan ændre
     /**
      * Section that handles location updates
      */
-    const locationElements = document.querySelectorAll('.location');
-
-    // Get initial vales in order to only update changed values
-    const initialLocationValues = [];
-    locationElements.forEach(element => {
-        const selected = element.options[element.selectedIndex].value;
-        initialLocationValues.push(selected);
-    });
+    const locationElements = [...document.querySelectorAll('.location')];
+    const initialLocationValues = locationElements.map(element => element.value);
 
     // Function that on submit checks if any location has changed to RecordLocation.READING_ROOM 
     // If this is the case make a confirm dialog, as this will send mails to users with access to the record(s)
@@ -362,12 +356,9 @@ at benytte det. Du må først afslutte den aktive bestilling, før du kan ændre
             return true;
         }
 
-        for (let i = 0; i < locationElements.length; i++) {
-            const element = locationElements[i];
-            const selected = element.options[element.selectedIndex].value;
-
-            if (selected == RecordLocation.READING_ROOM && initialLocationValues[i] != RecordLocation.READING_ROOM) {
-                let confirmMessage = `Er du sikker på at du vil ændre lokation til læsesal? Mail(s) vil blive sendt til bruger(e) om at materiale er tilgængeligt i læsesalen.`;
+        for (const [index, element] of locationElements.entries()) {
+            if (element.value == RecordLocation.READING_ROOM && initialLocationValues[index] != RecordLocation.READING_ROOM) {
+                const confirmMessage = `Er du sikker på at du vil ændre lokation til læsesal? Mail(s) vil blive sendt til bruger(e) om at materiale er tilgængeligt i læsesalen.`;
                 return confirm(confirmMessage);
             }
         }
@@ -375,56 +366,56 @@ at benytte det. Du må først afslutte den aktive bestilling, før du kan ændre
         return true;
     }
 
-    const updateLocations = document.querySelectorAll('.update-locations');
-    if (updateLocations.length) {
-        const handleUpdateLocationsClick = async function (event) {
-            event.preventDefault();
-            const data = [];
+    function getChangedLocations() {
+        return locationElements.flatMap((element, index) => {
+            if (element.value === initialLocationValues[index]) {
+                return [];
+            }
 
-            // Add to data values that have changed compared to initial values
-            locationElements.forEach((element, index) => {
-                let selected = element.options[element.selectedIndex].value;
-                if (selected !== initialLocationValues[index]) {
+            return [{
+                'order_id': parseInt(element.dataset.id, 10),
+                'location': parseInt(element.value, 10),
+            }];
+        });
+    }
 
-                    data.push({
-                        'order_id': parseInt(element.dataset.id),
-                        'location': parseInt(selected)
-                    });
-                }
-            });
+    async function handleUpdateLocationsClick(event) {
+        event.preventDefault();
 
-            const url = '/admin/orders/patch';
-            spinner.classList.toggle('hidden');
+        const data = getChangedLocations();
+        if (!data.length) {
+            Flash.setMessage('Ingen lokationer blev opdateret', 'success');
+            return;
+        }
 
-            if (!checkReadingRoomChange()) {
-                spinner.classList.toggle('hidden');
+        if (!checkReadingRoomChange()) {
+            return;
+        }
+
+        spinner.classList.toggle('hidden');
+
+        try {
+            const res = await Requests.asyncPostJson('/admin/orders/patch', data);
+            if (res.error) {
+                Flash.setMessage(res.message, 'error');
                 return;
             }
 
-            try {
-                const res = await Requests.asyncPostJson(url, data);
-                if (res.error) {
-                    Flash.setMessage(res.message, 'error');
-                    spinner.classList.toggle('hidden');
-                    return;
-                }
-
-                // Preserve filters but reset pagination after updating locations.
-                resetFilterOffset();
-                submitFilteredForm();
-            } catch (e) {
-                Flash.setMessage(config.jsExceptionMessage, 'error');
-                asyncLogError(e);
-                console.error(e);
-            } finally {
-                spinner.classList.toggle('hidden');
-            }
-        };
-
-        updateLocations.forEach(element => {
-            element.addEventListener('click', handleUpdateLocationsClick);
-        });
+            // Preserve filters but reset pagination after updating locations.
+            resetFilterOffset();
+            submitFilteredForm();
+        } catch (e) {
+            Flash.setMessage(config.jsExceptionMessage, 'error');
+            asyncLogError(e);
+            console.error(e);
+        } finally {
+            spinner.classList.toggle('hidden');
+        }
     }
+
+    document.querySelectorAll('.update-locations').forEach(element => {
+        element.addEventListener('click', handleUpdateLocationsClick);
+    });
 
     /**
      * Section that handles filtering and pagination
