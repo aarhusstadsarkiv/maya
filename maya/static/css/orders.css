@@ -50,7 +50,7 @@ select, input {
     color: var(--form-text);
     background-color: var(--background);
     margin-right: 6px;
-    margin-bottom: 6px;
+    margin-bottom: 2px;
     padding: 2px;
     border: unset;
     border-radius: unset;
@@ -74,6 +74,10 @@ tbody tr:nth-child(even) {
 
 tbody tr {
     border-top: 1px solid #e0e0e0;
+}
+
+tbody tr:hover {
+    background-color: var(--button-base);
 }
 
 td, th { 
