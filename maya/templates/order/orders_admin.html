@@ -88,7 +88,13 @@
         <thead>
             <tr>
                 <th>ID</th>
-                <th>Lokation</th>
+                <th>
+                    {% if filters.filter_status != 'order_history' %}
+                    <a href="#" title="Opdatér lokationer" class="action-link update-locations">Opdatér</a>
+                    {% else %}
+                    Lokation
+                    {% endif %}
+                </th>
                 <th>
                     <input
                         type="checkbox"
@@ -96,6 +102,7 @@
                         title="Vælg alle til print"
                         aria-label="Vælg alle bestillinger til udskrift"
                     >
+                    <a href="#" title="Udskriv valgte bestillinger" class="action-link print-multiple">Print</a>
                 </th>
                 <th>Materiale</th>
                 <th>Arkivskaber</th>
@@ -212,11 +219,17 @@ at benytte det. Du må først afslutte den aktive bestilling, før du kan ændre
 
                 <td>
                     {% if filters.filter_status != 'order_history' %}
-                    <a href="#" title="Opdatér lokationer for valgte bestillinger" class="action-link update-locations">Opdatér</a>
+                    <a href="#" title="Opdatér lokationer" class="action-link update-locations">Opdatér</a>
                     {% endif %}
                 </td>
 
                 <td>
+                    <input
+                        type="checkbox"
+                        class="print-select-all"
+                        title="Vælg alle til print"
+                        aria-label="Vælg alle bestillinger til udskrift"
+                    >
                     <a href="#" title="Udskriv valgte bestillinger" class="action-link print-multiple">Print</a>
                 </td>
 
@@ -362,9 +375,10 @@ at benytte det. Du må først afslutte den aktive bestilling, før du kan ændre
         return true;
     }
 
-    const updateLocations = document.querySelector('.update-locations');
-    if (updateLocations) {
-        updateLocations.addEventListener('click', async function () {
+    const updateLocations = document.querySelectorAll('.update-locations');
+    if (updateLocations.length) {
+        const handleUpdateLocationsClick = async function (event) {
+            event.preventDefault();
             const data = [];
 
             // Add to data values that have changed compared to initial values
@@ -405,6 +419,10 @@ at benytte det. Du må først afslutte den aktive bestilling, før du kan ændre
             } finally {
                 spinner.classList.toggle('hidden');
             }
+        };
+
+        updateLocations.forEach(element => {
+            element.addEventListener('click', handleUpdateLocationsClick);
         });
     }
 
@@ -496,8 +514,10 @@ at benytte det. Du må først afslutte den aktive bestilling, før du kan ændre
         const iframe = this;
 
         const cleanup = () => {
-            printMultiple.style.pointerEvents = '';
-            printMultiple.classList.remove('disabled');
+            printMultipleButtons.forEach(button => {
+                button.style.pointerEvents = '';
+                button.classList.remove('disabled');
+            });
             spinner.classList.add('hidden');
             
             if (iframe.parentNode) iframe.parentNode.removeChild(iframe);
@@ -511,9 +531,9 @@ at benytte det. Du må først afslutte den aktive bestilling, før du kan ændre
         iframe.contentWindow.print();
     }
 
-    const printMultiple = document.querySelector('.print-multiple');
-    if (printMultiple) {
-        printMultiple.addEventListener('click', async function (event) {
+    const printMultipleButtons = Array.from(document.querySelectorAll('.print-multiple'));
+    if (printMultipleButtons.length > 0) {
+        printMultipleButtons.forEach(printMultiple => printMultiple.addEventListener('click', async function (event) {
             event.preventDefault();
 
             const checked = Array.from(document.querySelectorAll('.print-checkbox:checked'));
@@ -524,8 +544,10 @@ at benytte det. Du må først afslutte den aktive bestilling, før du kan ændre
 
             // Show spinner and yield to the browser so it can paint
             console.log('Starting print process for', checked.length, 'orders'); 
-            printMultiple.classList.add('disabled');
-            printMultiple.style.pointerEvents = 'none';
+            printMultipleButtons.forEach(button => {
+                button.classList.add('disabled');
+                button.style.pointerEvents = 'none';
+            });
             
             spinner.classList.remove('hidden');
             
@@ -542,28 +564,39 @@ at benytte det. Du må først afslutte den aktive bestilling, før du kan ændre
             iframe.style.display = "none";
             iframe.src = url;
             document.body.appendChild(iframe);
-        });
+        }));
     }
 
-    const printSelectAll = document.querySelector('.print-select-all');
+    const printSelectAll = Array.from(document.querySelectorAll('.print-select-all'));
     const printCheckboxes = Array.from(document.querySelectorAll('.print-checkbox'));
 
     function syncPrintSelectAllState() {
-        if (!printSelectAll) {
+        if (printSelectAll.length === 0) {
             return;
         }
 
         const checkedCount = printCheckboxes.filter(cb => cb.checked).length;
-        printSelectAll.checked = printCheckboxes.length > 0 && checkedCount === printCheckboxes.length;
-        printSelectAll.indeterminate = checkedCount > 0 && checkedCount < printCheckboxes.length;
+        const isChecked = printCheckboxes.length > 0 && checkedCount === printCheckboxes.length;
+        const isIndeterminate = checkedCount > 0 && checkedCount < printCheckboxes.length;
+
+        printSelectAll.forEach(checkbox => {
+            checkbox.checked = isChecked;
+            checkbox.indeterminate = isIndeterminate;
+        });
     }
 
-    if (printSelectAll) {
-        printSelectAll.addEventListener('change', function () {
-            printCheckboxes.forEach(cb => {
-                cb.checked = printSelectAll.checked;
+    if (printSelectAll.length > 0) {
+        printSelectAll.forEach(selectAll => {
+            selectAll.addEventListener('change', function () {
+                printCheckboxes.forEach(cb => {
+                    cb.checked = selectAll.checked;
+                });
+
+                printSelectAll.forEach(checkbox => {
+                    checkbox.checked = selectAll.checked;
+                    checkbox.indeterminate = false;
+                });
             });
-            printSelectAll.indeterminate = false;
         });
 
         printCheckboxes.forEach(cb => {
