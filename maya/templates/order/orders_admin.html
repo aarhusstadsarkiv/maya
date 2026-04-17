@@ -89,7 +89,14 @@
             <tr>
                 <th>ID</th>
                 <th>Lokation</th>
-                <th><a href="#" title="Vælg alle til print" class="action-link print-select-all">Alle</a> </th>
+                <th>
+                    <input
+                        type="checkbox"
+                        class="print-select-all"
+                        title="Vælg alle til print"
+                        aria-label="Vælg alle bestillinger til udskrift"
+                    >
+                </th>
                 <th>Materiale</th>
                 <th>Arkivskaber</th>
                 <th>Titel</th>
@@ -539,17 +546,31 @@ at benytte det. Du må først afslutte den aktive bestilling, før du kan ændre
     }
 
     const printSelectAll = document.querySelector('.print-select-all');
+    const printCheckboxes = Array.from(document.querySelectorAll('.print-checkbox'));
+
+    function syncPrintSelectAllState() {
+        if (!printSelectAll) {
+            return;
+        }
+
+        const checkedCount = printCheckboxes.filter(cb => cb.checked).length;
+        printSelectAll.checked = printCheckboxes.length > 0 && checkedCount === printCheckboxes.length;
+        printSelectAll.indeterminate = checkedCount > 0 && checkedCount < printCheckboxes.length;
+    }
+
     if (printSelectAll) {
-        printSelectAll.addEventListener('click', function (event) {
-            event.preventDefault();
-
-            const checkboxes = document.querySelectorAll('.print-checkbox');
-            const allChecked = Array.from(checkboxes).every(cb => cb.checked);
-
-            checkboxes.forEach(cb => {
-                cb.checked = !allChecked;
+        printSelectAll.addEventListener('change', function () {
+            printCheckboxes.forEach(cb => {
+                cb.checked = printSelectAll.checked;
             });
+            printSelectAll.indeterminate = false;
         });
+
+        printCheckboxes.forEach(cb => {
+            cb.addEventListener('change', syncPrintSelectAllState);
+        });
+
+        syncPrintSelectAllState();
     }
 
     // Click on content-copy icon copies email to clipboard
