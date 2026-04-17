@@ -13,6 +13,19 @@
     max-width: 800px;
 }
 
+.filter-pagination-row {
+    display: flex;
+    justify-content: flex-start;
+    gap: 10px;
+    width: 100%;
+    margin: 12px 0;
+}
+
+.filter-pagination {
+    padding-top: 0px;
+    padding-bottom: 0px;
+}
+
 a[disabled] {
     pointer-events: none;
 }
