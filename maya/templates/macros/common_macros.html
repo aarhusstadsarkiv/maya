@@ -1,18 +1,14 @@
 {% set search_base_url = get_setting('search_base_url') %}
 
 {% macro parse_record_label (label) %}
-<div class="label">
-    {{ label }}
-</div>
+<div class="label">{{ label }}</div>
 {% endmacro %}
 
 {% macro parse_string (key, value, label) %}
 <div class="record-content record_content_{{ key }}">
     {{ parse_record_label(label)}}
     <div class="content">
-        <p>
-            {{ value }}
-        </p>
+        <p>{{ value }}</p>
     </div>
 </div>
 {% endmacro %}
@@ -30,9 +26,7 @@
 <div class="record-content record_content_{{ key }}">
     {{ parse_record_label(label)}}
     <div class="content">
-        <p>
-            {{ date_format(value) }}
-        </p>
+        <p>{{ date_format(value) }}</p>
     </div>
 </div>
 {% endmacro %}
@@ -65,9 +59,7 @@
 <div class="record-content record_content_{{ key }}">
     {{ parse_record_label(label) }}
     <div class="content">
-        <p>
-            {{ _parse_link(value)}}
-        </p>
+        <p>{{ _parse_link(value)}}</p>
     </div>
 </div>
 {% endmacro %}
@@ -77,9 +69,7 @@
     {{ parse_record_label(label) }}
     <div class="content">
         {% for link in value %}
-        <p>
-            {{ _parse_link(link)}}
-        </p>
+        <p>{{ _parse_link(link)}}</p>
         {% endfor %}
     </div>
 </div>
@@ -90,9 +80,7 @@
     {{ parse_record_label(label) }}
     <div class="content">
             {% for link in value %}
-            <p>
-                {{ _parse_link(link)}}
-            </p>
+            <p>{{ _parse_link(link)}}</p>
             {% endfor %}
         </ul>
     </div>
@@ -169,9 +157,7 @@
 <div class="record-content record_content_{{ key }}">
     {{ parse_record_label(label)}}
     <div class="content">
-        <p>
-            {{ value["latitude"] }}, {{ value["longitude"] }}
-        </p>
+        <p>{{ value["latitude"] }}, {{ value["longitude"] }}</p>
     </div>
 </div>
 {% endif %}
@@ -349,4 +335,3 @@
 </div>
 
 {% endmacro %}
-
