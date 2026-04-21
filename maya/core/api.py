@@ -111,7 +111,7 @@ def _get_jwt_headers(request: Request, headers: dict = {}) -> dict:
     return headers
 
 
-async def auth_jwt_login_post(request: Request):
+async def auth_login_post(request: Request):
     """
     POST an email and password to the api in order to login
     """

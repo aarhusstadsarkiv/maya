@@ -43,7 +43,7 @@
 #             request.session[cookie_name] = cookie_value
 
 
-# async def auth_jwt_login_post(request: Request) -> dict:
+# async def auth_login_post(request: Request) -> dict:
 #     """
 #     Log in through the v2 `/users/login` endpoint.
 #     """

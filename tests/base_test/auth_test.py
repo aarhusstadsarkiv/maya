@@ -120,7 +120,7 @@ class TestAuth(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn('action="/auth/login?next=%2Fsearch"', response.text)
 
-    @patch("maya.endpoints.endpoints_auth.api.auth_jwt_login_post", new_callable=AsyncMock)
+    @patch("maya.endpoints.endpoints_auth.api.auth_login_post", new_callable=AsyncMock)
     def test_login_post_rejects_recursive_next(self, mock_auth_login_post):
         client = TestClient(app, headers=headers)
         response = client.post(

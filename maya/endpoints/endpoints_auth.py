@@ -61,7 +61,7 @@ async def auth_login_post(request: Request):
     next_url = sanitize_next_url(request.query_params.get("next"))
 
     try:
-        await api.auth_jwt_login_post(request)
+        await api.auth_login_post(request)
         flash.set_message(request, translate("You have been logged in."), type="success")
         if next_url:
             return JSONResponse({"error": False, "redirect": next_url})
