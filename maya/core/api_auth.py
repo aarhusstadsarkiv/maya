@@ -1,0 +1,193 @@
+"""
+Version-specific authentication adapters for the external API.
+"""
+
+from __future__ import annotations
+
+from abc import ABC, abstractmethod
+
+from starlette.requests import Request
+
+from maya.core import user
+from maya.core.api_client import get_api_profile, get_async_client
+from maya.core.dynamic_settings import settings
+from maya.core.api_error import (
+    OpenAwsException,
+    raise_openaws_exception,
+    validate_captcha,
+    validate_passwords,
+    validate_user_name,
+)
+from maya.core.hooks import get_hooks
+from maya.core.logging import get_log
+from maya.core.translate import translate
+
+log = get_log()
+
+V2_SESSION_COOKIE_NAMES = ("session", "client", "domain")
+
+
+class AuthAdapter(ABC):
+    def __init__(self, base_url: str):
+        self.base_url = base_url
+
+    @abstractmethod
+    async def login(self, request: Request) -> dict:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def register(self, request: Request) -> dict:
+        raise NotImplementedError
+
+
+class V1AuthAdapter(AuthAdapter):
+    async def login(self, request: Request) -> dict:
+        """
+        Log in through the v1 `/auth/jwt/login` endpoint.
+        """
+        hooks = get_hooks(request=request)
+        form = await request.form()
+        username = str(form.get("email"))
+        password = str(form.get("password"))
+
+        if not username or not password:
+            raise OpenAwsException(400, translate("Email and password are required to login."))
+
+        login_dict = {"username": username, "password": password}
+
+        async with get_async_client() as client:
+            url = self.base_url + "/auth/jwt/login"
+            headers = {"Content-Type": "application/x-www-form-urlencoded", "Accept": "application/json"}
+
+            response = await client.post(url, data=login_dict, headers=headers)
+            json_response = response.json()
+
+            if response.is_success:
+                access_token = json_response["access_token"]
+                token_type = json_response["token_type"]
+                user.set_user_jwt(request, access_token, token_type)
+                await hooks.after_login_success(json_response)
+                return json_response
+
+            await hooks.after_login_failure(json_response)
+            raise_openaws_exception(response.status_code, json_response)
+
+    async def register(self, request: Request) -> dict:
+        """
+        Register through the v1 `/auth/register` endpoint.
+        """
+        await validate_captcha(request)
+        await validate_user_name(request)
+        await validate_passwords(request)
+
+        form = await request.form()
+        display_name = _get_display_name(form)
+        email = str(form.get("email"))
+        password = str(form.get("password"))
+
+        async with get_async_client() as client:
+            url = self.base_url + "/auth/register"
+            headers = {"Content-Type": "application/json", "Accept": "application/json"}
+            json_post = {"email": email, "password": password, "display_name": display_name}
+            response = await client.post(url, json=json_post, headers=headers)
+
+            if not response.is_success:
+                json_response = response.json()
+                raise_openaws_exception(response.status_code, json_response)
+
+            return response.json()
+
+
+class V2AuthAdapter(AuthAdapter):
+    async def login(self, request: Request) -> dict:
+        """
+        Log in through the v2 `/users/login` endpoint.
+        """
+        hooks = get_hooks(request=request)
+        form = await request.form()
+        email = str(form.get("email", "")).strip()
+        password = str(form.get("password", ""))
+
+        if not email or not password:
+            raise OpenAwsException(400, translate("Email and password are required to login."))
+
+        async with get_async_client() as client:
+            url = self.base_url + "/users/login"
+            headers = {
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+                "User-Agent": _get_user_agent(request),
+            }
+            json_post = {"email": email, "password": password}
+
+            log.info(f"Logging in user {email} through v2 API at {url}")
+            response = await client.post(url, json=json_post, headers=headers)
+            json_response = response.json()
+
+            if response.is_success:
+                _store_v2_session_cookies(request, response)
+                await hooks.after_login_success(json_response)
+                return json_response
+
+            log.info(f"Failed to login user {email} through v2 API: {json_response}")
+            await hooks.after_login_failure(json_response)
+            raise_openaws_exception(response.status_code, json_response)
+
+    async def register(self, request: Request) -> dict:
+        """
+        Register through the v2 `/users/register` endpoint.
+        """
+        await validate_captcha(request)
+        await validate_user_name(request)
+        await validate_passwords(request)
+
+        form = await request.form()
+        name = _get_display_name(form)
+        email = str(form.get("email")).strip()
+        password = str(form.get("password"))
+
+        async with get_async_client() as client:
+            url = self.base_url + "/users/register"
+
+            log.info(f"Registering user {email} through v2 API at {url}")
+            headers = {"Content-Type": "application/json", "Accept": "application/json"}
+            json_post = {"name": name, "email": email, "password": password}
+            response = await client.post(url, json=json_post, headers=headers)
+
+            if not response.is_success:
+                json_response = response.json()
+                log.info(f"Failed to register user {email} through v2 API: {json_response}")
+                raise_openaws_exception(response.status_code, json_response)
+
+            return response.json()
+
+
+def get_auth_adapter() -> AuthAdapter:
+    profile = get_api_profile()
+    if profile.auth_backend == "session_cookie":
+        return V2AuthAdapter(profile.base_url)
+    return V1AuthAdapter(profile.base_url)
+
+
+def get_v2_auth_adapter() -> AuthAdapter:
+    return V2AuthAdapter(str(settings["api_base_url_v2"]))
+
+
+def _get_display_name(form) -> str:
+    first_name = str(form.get("first_name")).strip()
+    last_name = str(form.get("last_name")).strip()
+    return f"{first_name} {last_name}".strip()
+
+
+def _get_user_agent(request: Request) -> str:
+    user_agent = request.headers.get("user-agent", "").strip()
+    if not user_agent:
+        raise OpenAwsException(400, translate("User-Agent header is required to login."))
+    return user_agent
+
+
+def _store_v2_session_cookies(request: Request, response) -> None:
+    for cookie_name in V2_SESSION_COOKIE_NAMES:
+        cookie_value = response.cookies.get(cookie_name)
+        if cookie_value:
+            request.session[cookie_name] = cookie_value

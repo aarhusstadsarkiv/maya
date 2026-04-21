@@ -38,7 +38,7 @@ from starlette.middleware.gzip import GZipMiddleware
 from starlette.requests import Request
 from maya.core.dynamic_settings import settings
 from maya.core.logging import get_log, get_access_log
-from maya.core import api
+from maya.core import api, api_client
 import os
 import json
 import re
@@ -111,7 +111,7 @@ class ApiLogMiddleware(BaseHTTPMiddleware):
 
         total_response_time = api.get_time_used(request)
         log.debug(json.dumps(total_response_time, indent=4, ensure_ascii=False))
-        api.REQUEST_TIME_USED = {}
+        api_client.reset_time_used()
         return response
 
 

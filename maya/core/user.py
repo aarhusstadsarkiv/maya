@@ -30,6 +30,9 @@ def logout(request: Request):
     """
     request.session.pop("access_token", None)
     request.session.pop("token_type", None)
+    request.session.pop("session", None)
+    request.session.pop("client", None)
+    request.session.pop("domain", None)
 
 
 def permissions_as_list(permissions: dict) -> list[str]:

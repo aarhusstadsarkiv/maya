@@ -22,6 +22,8 @@ Internal helpers:
 - _get_error_string: Maps error codes to translated user-friendly error messages.
 """
 
+from typing import NoReturn
+
 from starlette.requests import Request
 from maya.core.translate import translate
 from maya.core.logging import get_log
@@ -52,13 +54,17 @@ class OpenAwsException(Exception):
         return self.message
 
 
-def raise_openaws_exception(status_code: int, error: dict):
+def raise_openaws_exception(status_code: int, error: dict) -> NoReturn:
     """
     This is used to raise an OpenAwsException when the API returns an error.
     Raise OpenAwsException based on status_code and error from the API error message.
     """
 
     raise_message = translate("Unknown error. Please try again later.")
+    api_error_message = _extract_api_error_message(error)
+
+    if api_error_message:
+        raise OpenAwsException(status_code, api_error_message)
 
     if status_code == 400:
         error_code = _extract_model_error(error)
@@ -69,6 +75,14 @@ def raise_openaws_exception(status_code: int, error: dict):
         raise_message = _get_error_string(error_code)
 
     raise OpenAwsException(status_code, raise_message)
+
+
+def _extract_api_error_message(error_dict: dict) -> str:
+    """
+    Extract a direct user-facing message from v2 API error responses.
+    """
+    error_details = error_dict.get("error_details")
+    return error_details if isinstance(error_details, str) else ""
 
 
 def _extract_validation_error(error_dict: dict) -> str:

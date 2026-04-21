@@ -67,6 +67,7 @@ class Settings(TypedDict, total=True):
 
     api_base_url: str
     api_base_url_v2: NotRequired[str]
+    api_profile: NotRequired[Literal["v1", "v2"]]
 
     pages: list[PageSettings]
     main_menu_top: list[MenuItemSettings]
