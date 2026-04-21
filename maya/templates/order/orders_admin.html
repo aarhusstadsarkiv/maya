@@ -163,6 +163,9 @@ at benytte det. Du må først afslutte den aktive bestilling, før du kan ændre
                 <td class="record-link">
                     <a title="{{ order.record_and_types_title }}"
                         href="/admin/orders/{{order.record_id}}/html">{{order.record_id}}</a>
+                    <a href="/records/{{order.record_id}}" target="_blank" title="Vis post i ny fane">
+                        <span class="open-new-window">{{ get_icon('open_in_new')|safe }}</span>
+                    </a>
                 </td>
                 <td class="width-300" title="{{ order.collectors }}">{{ order.collectors }} </td>
                 {% if order.is_application_order %}

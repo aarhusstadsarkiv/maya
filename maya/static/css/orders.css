@@ -21,11 +21,6 @@
     margin: 12px 0;
 }
 
-.filter-pagination {
-    padding-top: 0px;
-    padding-bottom: 0px;
-}
-
 a[disabled] {
     pointer-events: none;
 }
@@ -156,6 +151,12 @@ span.has-comment > svg {
 }
 
 span.content-copy > svg {
+    vertical-align: middle;
+    cursor: pointer;
+    fill: var(--svg-color);
+}
+
+span.open-new-window > svg {
     vertical-align: middle;
     cursor: pointer;
     fill: var(--svg-color);
