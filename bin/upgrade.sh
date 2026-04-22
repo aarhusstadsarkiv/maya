@@ -37,6 +37,6 @@ git pull
 git checkout $install_tag
 
 # Activate virtual environment and install requirements
-.venv/bin/uv sync
+.venv/bin/uv sync --no-dev
 
 echo "Maya has been successfully upgraded to the latest tag."
