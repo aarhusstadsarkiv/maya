@@ -43,6 +43,7 @@ dependencies = [
     "typing-extensions==4.12.2",
     "tzlocal==5.2",
     "urllib3==2.6.3",
+    "uv>=0.11.7",
     "uvicorn==0.30.6",
     "watchfiles==0.24.0",
 ]
@@ -101,5 +102,4 @@ dev = [
     "types-requests==2.28.11.15",
     "types-toml==0.10.8.7",
     "types-urllib3==1.26.25.8",
-    "uv==0.11.6",
 ]
