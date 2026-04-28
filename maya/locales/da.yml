@@ -200,9 +200,7 @@ Your password has been reset. You can now login.: Dit password er opdateret. Du 
 Your search results: Søgeresultater
 availability_availability_id_2: Materialet skal bestilles hjem til læsesalen, før
   det kan beses.
-availability_availability_id_3: Materialet er tilgængeligt på læsesalen. Der kræves
-  ikke forudgående bestilling for at se materialet på læsesalen. Man skal blot møde
-  op i åbningstiderne.
+availability_availability_id_3: Materialet er tilgængeligt på læsesalen.
 availability_common: 'Materialet er online her på Aarhusarkivet.dk, men det er det
   enkelte materiales ophavsretslige status, der fastsætter, hvad et givent materiale
   videre må bruges til. '
