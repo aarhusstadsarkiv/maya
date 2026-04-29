@@ -35,6 +35,7 @@ async def _request_custom_header(request: httpx.Request):
     request.headers["x-key"] = settings["api_key"]
     request.headers["x-client"] = settings["client_name"]
     request.headers["x-client-domain-url"] = settings["client_url"]
+    request.headers["Origin"] = settings["client_url"]
     return request
 
 
