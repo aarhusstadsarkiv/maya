@@ -10,7 +10,6 @@ from starlette.requests import Request
 
 from maya.core import user
 from maya.core.api_client import get_api_profile, get_async_client
-from maya.core.dynamic_settings import settings
 from maya.core.api_error import (
     OpenAwsException,
     raise_openaws_exception,
@@ -333,10 +332,6 @@ def get_auth_adapter() -> AuthAdapter:
     if profile.auth_backend == "session_cookie":
         return V2AuthAdapter(profile.base_url)
     return V1AuthAdapter(profile.base_url)
-
-
-def get_v2_auth_adapter() -> AuthAdapter:
-    return V2AuthAdapter(str(settings["api_base_url_v2"]))
 
 
 def _get_display_name(form) -> str:

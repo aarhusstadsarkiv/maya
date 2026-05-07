@@ -1,5 +1,9 @@
 """
-This module provides all API interactions with the external web service used by the application.
+Public API facade for the external web service used by the application.
+
+Application code should import this module rather than version-specific API
+modules. Version-specific behavior belongs in focused adapters/helpers and is
+selected at runtime from the configured API profile.
 """
 
 from starlette.requests import Request
