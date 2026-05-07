@@ -13,6 +13,7 @@ from maya.core.api_error import (
     raise_openaws_exception,
 )
 from maya.core.api_auth import get_auth_adapter
+from maya.core.api_user import get_user_adapter
 from maya.core import api_client
 from maya.core import user
 from maya.core.translate import translate
@@ -99,29 +100,7 @@ async def users_me_get(request: Request) -> dict:
     then return the user dict without calling the API. If not then call the API
     and store the user in the request state.
     """
-    if hasattr(request.state, "me"):
-        return request.state.me
-
-    headers = _get_auth_headers(request, {"Accept": "application/json"})
-
-    profile = api_client.get_api_profile()
-    url = profile.base_url + "/users/me" if profile.name == "v2" else base_url + "/users/me"
-
-    async with api_client.get_async_client() as client:
-        response = await client.get(
-            url=url,
-            follow_redirects=True,
-            headers=headers,
-        )
-
-        if response.is_success:
-            request.state.me = response.json()
-            return response.json()
-        else:
-            raise OpenAwsException(
-                422,
-                translate("You need to be logged in to view this page."),
-            )
+    return await get_user_adapter().me(request)
 
 
 def update_request_state_me(request: Request, me: dict) -> dict:

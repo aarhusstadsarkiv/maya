@@ -4,6 +4,7 @@ from unittest.mock import AsyncMock, patch
 
 from maya.core import api
 from maya.core.api_auth import V1AuthAdapter, V2AuthAdapter, get_auth_adapter
+from maya.core.api_user import V1UserAdapter, V2UserAdapter, get_user_adapter
 from maya.core.dynamic_settings import settings
 
 
@@ -36,6 +37,11 @@ class TestApiProfile(unittest.TestCase):
         self.assertEqual(headers["Cookie"], "session=s1; client=c1; domain=d1")
         self.assertNotIn("Authorization", headers)
         self.assertIsInstance(get_auth_adapter(), V2AuthAdapter)
+        self.assertIsInstance(get_user_adapter(), V2UserAdapter)
+
+    def test_v1_profile_uses_v1_user_adapter(self):
+        settings["api_profile"] = "v1"
+        self.assertIsInstance(get_user_adapter(), V1UserAdapter)
 
     @patch("maya.core.api.get_auth_adapter")
     def test_auth_verify_post_delegates_to_auth_adapter(self, mock_get_auth_adapter):
@@ -60,3 +66,16 @@ class TestApiProfile(unittest.TestCase):
         asyncio.run(api.auth_request_verify_post(request))
 
         adapter.request_verify.assert_awaited_once_with(request)
+
+    @patch("maya.core.api.get_user_adapter")
+    def test_users_me_get_delegates_to_user_adapter(self, mock_get_user_adapter):
+        request = SimpleNamespace()
+        adapter = SimpleNamespace(me=AsyncMock(return_value={"email": "user@example.com"}))
+        mock_get_user_adapter.return_value = adapter
+
+        import asyncio
+
+        me = asyncio.run(api.users_me_get(request))
+
+        self.assertEqual(me, {"email": "user@example.com"})
+        adapter.me.assert_awaited_once_with(request)
