@@ -21,7 +21,7 @@ class TestApiProfile(unittest.TestCase):
         settings["api_profile"] = "v1"
         request = SimpleNamespace(session={"access_token": "token"})
 
-        headers = api._get_jwt_headers(request, {"Accept": "application/json"})
+        headers = api._get_auth_headers(request, {"Accept": "application/json"})
 
         self.assertEqual(headers["Authorization"], "Bearer token")
         self.assertNotIn("Cookie", headers)
@@ -31,7 +31,7 @@ class TestApiProfile(unittest.TestCase):
         settings["api_profile"] = "v2"
         request = SimpleNamespace(session={"session": "s1", "client": "c1", "domain": "d1"})
 
-        headers = api._get_jwt_headers(request, {"Accept": "application/json"})
+        headers = api._get_auth_headers(request, {"Accept": "application/json"})
 
         self.assertEqual(headers["Cookie"], "session=s1; client=c1; domain=d1")
         self.assertNotIn("Authorization", headers)
