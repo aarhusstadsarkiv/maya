@@ -33,6 +33,14 @@ from maya.core.logging import get_log
 
 log = get_log()
 
+SQLITE_BUSY_TIMEOUT_MS = 30_000
+SQLITE_CONNECTION_TIMEOUT_SECONDS = SQLITE_BUSY_TIMEOUT_MS / 1000
+SQLITE_CONNECTION_PRAGMAS = (
+    "PRAGMA journal_mode=WAL;",
+    f"PRAGMA busy_timeout={SQLITE_BUSY_TIMEOUT_MS};",
+    "PRAGMA synchronous=NORMAL;",
+)
+
 
 class DatabaseConnection:
     def __init__(self, database_url):
@@ -42,10 +50,18 @@ class DatabaseConnection:
         """
         Create a synchronous database connection.
         """
-        connection = sqlite3.connect(self.database_url)
+        connection = sqlite3.connect(
+            self.database_url,
+            timeout=SQLITE_CONNECTION_TIMEOUT_SECONDS,
+            isolation_level=None,
+        )
         connection.row_factory = sqlite3.Row
-        connection.execute("PRAGMA journal_mode=WAL;")
+        self._configure_sync_connection(connection)
         return connection
+
+    def _configure_sync_connection(self, connection: sqlite3.Connection) -> None:
+        for pragma in SQLITE_CONNECTION_PRAGMAS:
+            connection.execute(pragma)
 
     @contextmanager
     def transaction_scope_sync(self):
@@ -92,10 +108,18 @@ class DatabaseConnection:
         if not self.database_url:
             raise ValueError("Database URL was not set")
 
-        connection = await aiosqlite.connect(self.database_url)
+        connection = await aiosqlite.connect(
+            self.database_url,
+            timeout=SQLITE_CONNECTION_TIMEOUT_SECONDS,
+            isolation_level=None,
+        )
         connection.row_factory = sqlite3.Row
-        await connection.execute("PRAGMA journal_mode=WAL;")
+        await self._configure_async_connection(connection)
         return connection
+
+    async def _configure_async_connection(self, connection: aiosqlite.Connection) -> None:
+        for pragma in SQLITE_CONNECTION_PRAGMAS:
+            await connection.execute(pragma)
 
     @asynccontextmanager
     async def transaction_scope_async(self):
