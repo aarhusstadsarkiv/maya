@@ -39,6 +39,22 @@ class AuthAdapter(ABC):
     async def register(self, request: Request) -> dict:
         raise NotImplementedError
 
+    @abstractmethod
+    async def verify(self, request: Request) -> None:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def request_verify(self, request: Request) -> None:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def forgot_password(self, request: Request) -> None:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def reset_password(self, request: Request) -> None:
+        raise NotImplementedError
+
 
 class V1AuthAdapter(AuthAdapter):
     async def login(self, request: Request) -> dict:
@@ -97,6 +113,74 @@ class V1AuthAdapter(AuthAdapter):
 
             return response.json()
 
+    async def forgot_password(self, request: Request) -> None:
+        """
+        Request a password reset through the v1 `/auth/forgot-password` endpoint.
+        """
+        form = await request.form()
+        email = str(form.get("email"))
+
+        async with get_async_client() as client:
+            url = self.base_url + "/auth/forgot-password"
+            headers = {"Content-Type": "application/json", "Accept": "application/json"}
+            response = await client.post(url, json={"email": email}, headers=headers)
+
+            if not response.is_success:
+                json_response = response.json()
+                raise_openaws_exception(response.status_code, json_response)
+
+    async def verify(self, request: Request) -> None:
+        """
+        Verify an email through the v1 `/auth/verify` endpoint.
+        """
+        token = request.path_params["token"]
+
+        async with get_async_client() as client:
+            url = self.base_url + "/auth/verify"
+            headers = {"Content-Type": "application/json", "Accept": "application/json"}
+            response = await client.post(url, json={"token": token}, headers=headers)
+
+            if not response.is_success:
+                json_response = response.json()
+                raise_openaws_exception(response.status_code, json_response)
+
+    async def request_verify(self, request: Request) -> None:
+        """
+        Request a new verification token through the v1 `/auth/request-verify-token` endpoint.
+        """
+        from maya.core.api import users_me_get
+
+        me = await users_me_get(request)
+        email = me["email"]
+
+        async with get_async_client() as client:
+            url = self.base_url + "/auth/request-verify-token"
+            headers = {"Content-Type": "application/json", "Accept": "application/json"}
+            response = await client.post(url, json={"email": email}, headers=headers)
+
+            if not response.is_success:
+                json_response = response.json()
+                raise_openaws_exception(response.status_code, json_response)
+
+    async def reset_password(self, request: Request) -> None:
+        """
+        Reset a password through the v1 `/auth/reset-password` endpoint.
+        """
+        await validate_passwords(request)
+
+        form = await request.form()
+        password = str(form.get("password"))
+        token = request.path_params["token"]
+
+        async with get_async_client() as client:
+            url = self.base_url + "/auth/reset-password"
+            headers = {"Content-Type": "application/json", "Accept": "application/json"}
+            response = await client.post(url, json={"password": password, "token": token}, headers=headers)
+
+            if not response.is_success:
+                json_response = response.json()
+                raise_openaws_exception(response.status_code, json_response)
+
 
 class V2AuthAdapter(AuthAdapter):
     async def login(self, request: Request) -> dict:
@@ -119,8 +203,9 @@ class V2AuthAdapter(AuthAdapter):
                 "User-Agent": _get_user_agent(request),
             }
             json_post = {"email": email, "password": password}
-
+            log.info(f"Json payload for login: {json_post}")
             log.info(f"Logging in user {email} through v2 API at {url}")
+
             response = await client.post(url, json=json_post, headers=headers)
             json_response = response.json()
 
@@ -160,6 +245,87 @@ class V2AuthAdapter(AuthAdapter):
                 raise_openaws_exception(response.status_code, json_response)
 
             return response.json()
+
+    async def forgot_password(self, request: Request) -> None:
+        """
+        Request a password reset through the v2 `/users/password-reset/request` endpoint.
+        """
+        form = await request.form()
+        email = str(form.get("email")).strip()
+
+        async with get_async_client() as client:
+            url = self.base_url + "/users/password-reset/request"
+            headers = {"Content-Type": "application/json", "Accept": "application/json"}
+
+            log.info(f"Requesting password reset for {email} through v2 API at {url}")
+            response = await client.post(url, json={"email": email}, headers=headers)
+
+            if not response.is_success:
+                json_response = response.json()
+                log.info(f"Failed to request password reset for {email} through v2 API: {json_response}")
+                raise_openaws_exception(response.status_code, json_response)
+
+    async def verify(self, request: Request) -> None:
+        """
+        Verify an email through the v2 `/users/verify` endpoint.
+        """
+        token = request.path_params["token"]
+
+        async with get_async_client() as client:
+            url = self.base_url + "/users/verify"
+            headers = {"Content-Type": "application/json", "Accept": "application/json"}
+
+            log.info(f"Verifying user through v2 API at {url}")
+            response = await client.post(url, json={"token": token}, headers=headers)
+
+            if not response.is_success:
+                json_response = response.json()
+                log.info(f"Failed to verify user through v2 API: {json_response}")
+                raise_openaws_exception(response.status_code, json_response)
+
+    async def request_verify(self, request: Request) -> None:
+        """
+        Request a new verification token through the v2 `/users/verify/request` endpoint.
+        """
+        from maya.core.api import users_me_get
+
+        me = await users_me_get(request)
+        email = me["email"]
+
+        async with get_async_client() as client:
+            url = self.base_url + "/users/verify/request"
+            headers = {"Content-Type": "application/json", "Accept": "application/json"}
+
+            log.info(f"Requesting verification token for {email} through v2 API at {url}")
+            response = await client.post(url, json={"email": email}, headers=headers)
+
+            if not response.is_success:
+                json_response = response.json()
+                log.info(f"Failed to request verification token for {email} through v2 API: {json_response}")
+                raise_openaws_exception(response.status_code, json_response)
+
+    async def reset_password(self, request: Request) -> None:
+        """
+        Reset a password through the v2 `/users/password-reset` endpoint.
+        """
+        await validate_passwords(request)
+
+        form = await request.form()
+        password = str(form.get("password"))
+        token = request.path_params["token"]
+
+        async with get_async_client() as client:
+            url = self.base_url + "/users/password-reset"
+            headers = {"Content-Type": "application/json", "Accept": "application/json"}
+
+            log.info(f"Resetting password through v2 API at {url}")
+            log.info(f"Using token: {token} and password of length {len(password)}")
+            response = await client.post(url, json={"password": password, "token": token}, headers=headers)
+
+            if not response.is_success:
+                json_response = response.json()
+                log.info(f"Failed to reset password through v2 API: {json_response}")
+                raise_openaws_exception(response.status_code, json_response)
 
 
 def get_auth_adapter() -> AuthAdapter:

@@ -1,5 +1,6 @@
 from types import SimpleNamespace
 import unittest
+from unittest.mock import AsyncMock, patch
 
 from maya.core import api
 from maya.core.api_auth import V1AuthAdapter, V2AuthAdapter, get_auth_adapter
@@ -35,3 +36,27 @@ class TestApiProfile(unittest.TestCase):
         self.assertEqual(headers["Cookie"], "session=s1; client=c1; domain=d1")
         self.assertNotIn("Authorization", headers)
         self.assertIsInstance(get_auth_adapter(), V2AuthAdapter)
+
+    @patch("maya.core.api.get_auth_adapter")
+    def test_auth_verify_post_delegates_to_auth_adapter(self, mock_get_auth_adapter):
+        request = SimpleNamespace()
+        adapter = SimpleNamespace(verify=AsyncMock())
+        mock_get_auth_adapter.return_value = adapter
+
+        import asyncio
+
+        asyncio.run(api.auth_verify_post(request))
+
+        adapter.verify.assert_awaited_once_with(request)
+
+    @patch("maya.core.api.get_auth_adapter")
+    def test_auth_request_verify_post_delegates_to_auth_adapter(self, mock_get_auth_adapter):
+        request = SimpleNamespace()
+        adapter = SimpleNamespace(request_verify=AsyncMock())
+        mock_get_auth_adapter.return_value = adapter
+
+        import asyncio
+
+        asyncio.run(api.auth_request_verify_post(request))
+
+        adapter.request_verify.assert_awaited_once_with(request)

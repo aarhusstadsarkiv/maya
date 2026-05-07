@@ -6,7 +6,6 @@ from starlette.requests import Request
 from starlette.exceptions import HTTPException
 from maya.core.api_error import (
     OpenAwsException,
-    validate_passwords,
     raise_openaws_exception,
 )
 from maya.core.api_auth import get_auth_adapter
@@ -87,16 +86,7 @@ async def auth_verify_post(request: Request):
     """
     POST a token to the api in order to verify an email
     """
-    token = request.path_params["token"]
-
-    async with api_client.get_async_client() as client:
-        url = base_url + "/auth/verify"
-        headers = {"Content-Type": "application/json", "Accept": "application/json"}
-        response = await client.post(url, json={"token": token}, headers=headers)
-
-        if not response.is_success:
-            json_response = response.json()
-            raise_openaws_exception(response.status_code, json_response)
+    await get_auth_adapter().verify(request)
 
 
 async def users_me_get(request: Request) -> dict:
@@ -293,55 +283,21 @@ async def auth_forgot_password(request: Request) -> None:
     """
     POST an email to the api in order to reset the password
     """
-    form = await request.form()
-    email = str(form.get("email"))
-
-    async with api_client.get_async_client() as client:
-        url = base_url + "/auth/forgot-password"
-        headers = {"Content-Type": "application/json", "Accept": "application/json"}
-
-        response = await client.post(url, json={"email": email}, headers=headers)
-
-        if not response.is_success:
-            json_response = response.json()
-            raise_openaws_exception(response.status_code, json_response)
+    await get_auth_adapter().forgot_password(request)
 
 
 async def auth_reset_password_post(request: Request) -> None:
     """
     POST a new password to the api in order to reset the password
     """
-    await validate_passwords(request)
-
-    form = await request.form()
-    password = str(form.get("password"))
-    token = request.path_params["token"]
-
-    async with api_client.get_async_client() as client:
-        url = base_url + "/auth/reset-password"
-        headers = {"Content-Type": "application/json", "Accept": "application/json"}
-        response = await client.post(url, json={"password": password, "token": token}, headers=headers)
-
-        if not response.is_success:
-            json_response = response.json()
-            raise_openaws_exception(response.status_code, json_response)
+    await get_auth_adapter().reset_password(request)
 
 
 async def auth_request_verify_post(request: Request) -> None:
     """
     Sends an email with a token to the user. Used to verify email.
     """
-    me = await users_me_get(request)
-    email = me["email"]
-
-    async with api_client.get_async_client() as client:
-        url = base_url + "/auth/request-verify-token"
-        headers = {"Content-Type": "application/json", "Accept": "application/json"}
-        response = await client.post(url, json={"email": email}, headers=headers)
-
-        if not response.is_success:
-            json_response = response.json()
-            raise_openaws_exception(response.status_code, json_response)
+    await get_auth_adapter().request_verify(request)
 
 
 async def is_logged_in(request: Request) -> bool:
