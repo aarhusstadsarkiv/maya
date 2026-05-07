@@ -31,7 +31,7 @@ dependencies = [
     "pycparser==2.20",
     "python-dateutil==2.9.0.post0",
     "python-dotenv==1.2.2",
-    "python-multipart==0.0.26",
+    "python-multipart==0.0.27",
     "pyyaml==6.0.2",
     "rfc3986==1.5.0",
     "six==1.17.0",
