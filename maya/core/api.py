@@ -124,6 +124,14 @@ async def users_me_get(request: Request) -> dict:
             )
 
 
+def update_request_state_me(request: Request, me: dict) -> dict:
+    """
+    Update the request state with the current user.
+    """
+    request.state.me = me
+    return me
+
+
 async def users_data_post(request: Request, id: str, data: dict):
     """
     POST user data to the api in order to update the user
