@@ -10,6 +10,7 @@ from starlette.requests import Request
 
 from maya.core.api_client import get_api_profile, get_async_client
 from maya.core.api_error import OpenAwsException
+from maya.core.api_request import get_auth_headers
 from maya.core.translate import translate
 
 
@@ -46,12 +47,10 @@ def get_user_adapter() -> UserAdapter:
 
 
 async def _fetch_me(request: Request, base_url: str) -> dict:
-    from maya.core.api import _get_auth_headers
-
     if hasattr(request.state, "me"):
         return request.state.me
 
-    headers = _get_auth_headers(request, {"Accept": "application/json"})
+    headers = get_auth_headers(request, {"Accept": "application/json"})
     url = base_url + "/users/me"
 
     async with get_async_client() as client:

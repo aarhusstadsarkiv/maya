@@ -4,6 +4,7 @@ from unittest.mock import AsyncMock, patch
 
 from maya.core import api
 from maya.core.api_auth import V1AuthAdapter, V2AuthAdapter, get_auth_adapter
+from maya.core.api_request import get_auth_headers
 from maya.core.api_user import V1UserAdapter, V2UserAdapter, get_user_adapter
 from maya.core.dynamic_settings import settings
 
@@ -22,7 +23,7 @@ class TestApiProfile(unittest.TestCase):
         settings["api_profile"] = "v1"
         request = SimpleNamespace(session={"access_token": "token"})
 
-        headers = api._get_auth_headers(request, {"Accept": "application/json"})
+        headers = get_auth_headers(request, {"Accept": "application/json"})
 
         self.assertEqual(headers["Authorization"], "Bearer token")
         self.assertNotIn("Cookie", headers)
@@ -32,7 +33,7 @@ class TestApiProfile(unittest.TestCase):
         settings["api_profile"] = "v2"
         request = SimpleNamespace(session={"session": "s1", "client": "c1", "domain": "d1"})
 
-        headers = api._get_auth_headers(request, {"Accept": "application/json"})
+        headers = get_auth_headers(request, {"Accept": "application/json"})
 
         self.assertEqual(headers["Cookie"], "session=s1; client=c1; domain=d1")
         self.assertNotIn("Authorization", headers)

@@ -13,6 +13,7 @@ from maya.core.api_error import (
     raise_openaws_exception,
 )
 from maya.core.api_auth import get_auth_adapter
+from maya.core.api_request import get_auth_headers
 from maya.core.api_user import get_user_adapter
 from maya.core import api_client
 from maya.core import user
@@ -47,30 +48,6 @@ def get_time_used(request: Request) -> typing.Any:
     }
 
     return time_table
-
-
-def _get_auth_headers(request: Request, headers: typing.Optional[dict] = None) -> dict:
-    """
-    Get authenticated request headers for the active API profile.
-    """
-    headers = headers or {}
-    profile = api_client.get_api_profile()
-    if profile.auth_backend == "session_cookie":
-        cookie_names = ("session", "client", "domain")
-        missing_cookies = [name for name in cookie_names if name not in request.session]
-        if missing_cookies:
-            raise OpenAwsException(401, translate("You need to be logged in to view this page."))
-
-        cookies = [f"{name}={request.session[name]}" for name in cookie_names]
-        headers["Cookie"] = "; ".join(cookies)
-        return headers
-
-    if "access_token" not in request.session:
-        raise OpenAwsException(401, translate("You need to be logged in to view this page."))
-
-    access_token = request.session["access_token"]
-    headers["Authorization"] = f"Bearer {access_token}"
-    return headers
 
 
 async def auth_login_post(request: Request):
@@ -118,7 +95,7 @@ async def users_data_post(request: Request, id: str, data: dict):
 
     async with api_client.get_async_client() as client:
         url = base_url + f"/users/{id}/data"
-        headers = _get_auth_headers(request, {"Content-Type": "application/json", "Accept": "application/json"})
+        headers = get_auth_headers(request, {"Content-Type": "application/json", "Accept": "application/json"})
         response = await client.post(url, json=data, headers=headers)
 
         if not response.is_success:
@@ -133,7 +110,7 @@ async def users_get(request: Request, query_str: str) -> dict:
     GET all users from the api:
     """
 
-    headers = _get_auth_headers(request, {"Accept": "application/json"})
+    headers = get_auth_headers(request, {"Accept": "application/json"})
 
     url = f"{base_url}/users/?{query_str}"
     async with api_client.get_async_client() as client:
@@ -154,7 +131,7 @@ async def users_permissions(request: Request) -> dict:
     """
     GET all permissions available from the api
     """
-    headers = _get_auth_headers(request, {"Accept": "application/json"})
+    headers = get_auth_headers(request, {"Accept": "application/json"})
     url = base_url + "/users/permissions"
 
     async with api_client.get_async_client() as client:
@@ -185,7 +162,7 @@ async def user_get_by_uuid(request: Request, uuid: str) -> dict:
     GET single user from the api by uuid
     """
 
-    headers = _get_auth_headers(request, {"Accept": "application/json"})
+    headers = get_auth_headers(request, {"Accept": "application/json"})
     url = base_url + "/users/" + uuid
 
     async with api_client.get_async_client() as client:
@@ -228,7 +205,7 @@ async def users_patch_permissions(request: Request) -> typing.Any:
     assert isinstance(grant_id, str)
 
     user_permission = [p for p in used_permissions if p["grant_id"] == int(grant_id)]
-    headers = _get_auth_headers(request, {"Content-Type": "application/json", "Accept": "application/json"})
+    headers = get_auth_headers(request, {"Content-Type": "application/json", "Accept": "application/json"})
     url = base_url + "/users/" + uuid + "/permissions"
 
     async with api_client.get_async_client() as client:
@@ -253,7 +230,7 @@ async def users_delete(request: Request) -> typing.Any:
 
     async with api_client.get_async_client() as client:
         url = base_url + "/users/" + uuid
-        headers = _get_auth_headers(request, {"Accept": "application/json"})
+        headers = get_auth_headers(request, {"Accept": "application/json"})
         response = await client.delete(url, headers=headers)
 
         if response.is_success:
@@ -459,7 +436,7 @@ async def proxies_post_relations(request: Request):
     async with api_client.get_async_client() as client:
         url = base_url + "/proxy/relations"
         headers = {"Content-Type": "application/x-www-form-urlencoded", "Accept": "application/json"}
-        headers = _get_auth_headers(request, headers)
+        headers = get_auth_headers(request, headers)
 
         response = await client.post(url, data=form_data, headers=headers)
         if response.is_success:
@@ -478,7 +455,7 @@ async def proxies_delete_relations(request: Request):
     async with api_client.get_async_client() as client:
         url = base_url + "/proxy/relations/" + rel_id
 
-        headers = _get_auth_headers(request, {"Accept": "application/json"})
+        headers = get_auth_headers(request, {"Accept": "application/json"})
         response = await client.delete(url, headers=headers)
         if response.is_success:
             return response.json()
