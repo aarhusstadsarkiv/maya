@@ -68,7 +68,7 @@ def has_permission(me: dict, permission: str) -> bool:
 
 def _permissions_from_v2_role(role: int | None) -> list[str]:
     if role is None:
-        return []
+        return ["user"]
 
     if role == V2UserRole.ADMIN:
         return ["admin", "employee", "user"]

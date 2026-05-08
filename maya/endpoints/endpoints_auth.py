@@ -208,7 +208,6 @@ async def auth_me_get(request: Request):
         sent_mail = request.query_params.get("sent_mail")
 
         me = await api.users_me_get(request)
-        me["token"] = request.session["access_token"]
         permissions = await api.me_permissions(request)
         permission_translated = user.permission_translated(permissions)
 

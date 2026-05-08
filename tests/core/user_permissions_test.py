@@ -18,6 +18,9 @@ class TestUserPermissions(unittest.TestCase):
     def test_permissions_from_v2_viewer_role_maps_to_user(self):
         self.assertEqual(user.permissions_from_me({"role": 0}), ["user"])
 
+    def test_permissions_from_v2_verified_user_without_role_maps_to_user(self):
+        self.assertEqual(user.permissions_from_me({"role": None}), ["user"])
+
     def test_permissions_from_v2_editor_role_maps_to_employee_and_user(self):
         self.assertEqual(user.permissions_from_me({"role": 10}), ["employee", "user"])
 

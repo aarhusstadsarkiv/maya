@@ -105,3 +105,39 @@ class TestApiProfile(unittest.TestCase):
 
         self.assertEqual(me, {"email": "user@example.com"})
         adapter.me.assert_awaited_once_with(request)
+
+    @patch("maya.core.api.users_me_get", new_callable=AsyncMock)
+    def test_me_verified_uses_v1_is_verified_flag(self, mock_users_me_get):
+        settings["api_profile"] = "v1"
+        request = SimpleNamespace()
+        mock_users_me_get.return_value = {"email": "user@example.com", "is_verified": True}
+
+        import asyncio
+
+        verified = asyncio.run(api.me_verified(request))
+
+        self.assertTrue(verified)
+
+    @patch("maya.core.api.users_me_get", new_callable=AsyncMock)
+    def test_me_verified_returns_false_when_v1_is_not_verified(self, mock_users_me_get):
+        settings["api_profile"] = "v1"
+        request = SimpleNamespace()
+        mock_users_me_get.return_value = {"email": "user@example.com", "is_verified": False}
+
+        import asyncio
+
+        verified = asyncio.run(api.me_verified(request))
+
+        self.assertFalse(verified)
+
+    @patch("maya.core.api.users_me_get", new_callable=AsyncMock)
+    def test_me_verified_treats_successful_v2_me_lookup_as_verified(self, mock_users_me_get):
+        settings["api_profile"] = "v2"
+        request = SimpleNamespace()
+        mock_users_me_get.return_value = {"email": "user@example.com"}
+
+        import asyncio
+
+        verified = asyncio.run(api.me_verified(request))
+
+        self.assertTrue(verified)

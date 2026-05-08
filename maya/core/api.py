@@ -11,7 +11,7 @@ from starlette.exceptions import HTTPException
 from maya.core.api_error import (
     raise_openaws_exception,
 )
-from maya.core.api_auth import get_auth_adapter
+from maya.core.api_auth import V2AuthAdapter, get_auth_adapter
 from maya.core.api_request import get_auth_headers
 from maya.core.api_user import get_user_adapter
 from maya.core import api_client
@@ -307,6 +307,9 @@ async def me_permissions(request: Request) -> list[str]:
 async def me_verified(request: Request) -> bool:
     try:
         me = await users_me_get(request)
+        if isinstance(get_auth_adapter(), V2AuthAdapter):
+            return True
+
         verified = me["is_verified"]
         if verified:
             return True
