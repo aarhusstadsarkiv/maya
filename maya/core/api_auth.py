@@ -8,7 +8,6 @@ from abc import ABC, abstractmethod
 
 from starlette.requests import Request
 
-from maya.core import user
 from maya.core.api_client import get_api_profile, get_async_client
 from maya.core.api_error import (
     OpenAwsException,
@@ -54,6 +53,10 @@ class AuthAdapter(ABC):
     async def reset_password(self, request: Request) -> None:
         raise NotImplementedError
 
+    @abstractmethod
+    def logout(self, request: Request) -> None:
+        raise NotImplementedError
+
 
 class V1AuthAdapter(AuthAdapter):
     async def login(self, request: Request) -> dict:
@@ -80,7 +83,7 @@ class V1AuthAdapter(AuthAdapter):
             if response.is_success:
                 access_token = json_response["access_token"]
                 token_type = json_response["token_type"]
-                user.set_user_jwt(request, access_token, token_type)
+                self._store_login_state(request, access_token, token_type)
                 await hooks.after_login_success(json_response)
                 return json_response
 
@@ -180,6 +183,13 @@ class V1AuthAdapter(AuthAdapter):
                 json_response = response.json()
                 raise_openaws_exception(response.status_code, json_response)
 
+    def logout(self, request: Request) -> None:
+        _clear_auth_session(request)
+
+    def _store_login_state(self, request: Request, access_token: str, token_type: str) -> None:
+        request.session["access_token"] = access_token
+        request.session["token_type"] = token_type
+
 
 class V2AuthAdapter(AuthAdapter):
     async def login(self, request: Request) -> dict:
@@ -209,7 +219,7 @@ class V2AuthAdapter(AuthAdapter):
             json_response = response.json()
 
             if response.is_success:
-                _store_v2_session_cookies(request, response)
+                self._store_login_state(request, response)
                 await hooks.after_login_success(json_response)
                 return json_response
 
@@ -326,6 +336,15 @@ class V2AuthAdapter(AuthAdapter):
                 log.info(f"Failed to reset password through v2 API: {json_response}")
                 raise_openaws_exception(response.status_code, json_response)
 
+    def logout(self, request: Request) -> None:
+        _clear_auth_session(request)
+
+    def _store_login_state(self, request: Request, response) -> None:
+        for cookie_name in V2_SESSION_COOKIE_NAMES:
+            cookie_value = response.cookies.get(cookie_name)
+            if cookie_value:
+                request.session[cookie_name] = cookie_value
+
 
 def get_auth_adapter() -> AuthAdapter:
     profile = get_api_profile()
@@ -347,8 +366,9 @@ def _get_user_agent(request: Request) -> str:
     return user_agent
 
 
-def _store_v2_session_cookies(request: Request, response) -> None:
-    for cookie_name in V2_SESSION_COOKIE_NAMES:
-        cookie_value = response.cookies.get(cookie_name)
-        if cookie_value:
-            request.session[cookie_name] = cookie_value
+def _clear_auth_session(request: Request) -> None:
+    request.session.pop("access_token", None)
+    request.session.pop("token_type", None)
+    request.session.pop("session", None)
+    request.session.pop("client", None)
+    request.session.pop("domain", None)

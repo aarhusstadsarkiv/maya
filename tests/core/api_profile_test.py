@@ -44,6 +44,22 @@ class TestApiProfile(unittest.TestCase):
         settings["api_profile"] = "v1"
         self.assertIsInstance(get_user_adapter(), V1UserAdapter)
 
+    def test_auth_logout_clears_v1_session_with_v1_profile(self):
+        settings["api_profile"] = "v1"
+        request = SimpleNamespace(session={"access_token": "token", "token_type": "bearer", "session": "s1"})
+
+        api.auth_logout(request)
+
+        self.assertEqual(request.session, {})
+
+    def test_auth_logout_clears_v2_session_with_v2_profile(self):
+        settings["api_profile"] = "v2"
+        request = SimpleNamespace(session={"session": "s1", "client": "c1", "domain": "d1", "access_token": "token"})
+
+        api.auth_logout(request)
+
+        self.assertEqual(request.session, {})
+
     @patch("maya.core.api.get_auth_adapter")
     def test_auth_verify_post_delegates_to_auth_adapter(self, mock_get_auth_adapter):
         request = SimpleNamespace()

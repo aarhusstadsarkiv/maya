@@ -69,6 +69,13 @@ async def auth_verify_post(request: Request):
     await get_auth_adapter().verify(request)
 
 
+def auth_logout(request: Request) -> None:
+    """
+    Clear authentication state for the active API profile.
+    """
+    get_auth_adapter().logout(request)
+
+
 async def users_me_get(request: Request) -> dict:
     """
     GET the current user from the api. If already found in the request state

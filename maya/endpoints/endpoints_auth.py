@@ -87,7 +87,7 @@ async def auth_logout_get(request: Request):
     Logout GET endpoint
     """
     try:
-        user.logout(request)
+        api.auth_logout(request)
         flash.set_message(request, translate("You have been logged out."), type="success")
 
     except OpenAwsException as e:
@@ -104,7 +104,7 @@ async def auth_logout_post(request: Request):
     Logout POST endpoint
     """
     try:
-        user.logout(request)
+        api.auth_logout(request)
         flash.set_message(request, translate("You have been logged out."), type="success")
 
     except OpenAwsException as e:
