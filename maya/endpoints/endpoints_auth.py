@@ -11,7 +11,7 @@ from maya.core import flash
 from maya.core.translate import translate
 from maya.core import user
 from maya.core.logging import get_log
-from maya.core.api import OpenAwsException
+from maya.core.api_error import OpenAwsException
 from maya.core import api
 from maya.endpoints import auth_data
 from maya.core import cookie

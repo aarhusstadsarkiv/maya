@@ -9,7 +9,7 @@ from maya.orders import utils_orders
 from maya.orders import service as orders_service
 from maya.orders.types import OrderFilter
 from maya.core import flash
-from maya.core.api import OpenAwsException
+from maya.core.api_error import OpenAwsException
 from maya.endpoints.endpoints_utils import get_record_data
 from maya.core import utils_core
 

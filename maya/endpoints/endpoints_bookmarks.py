@@ -10,7 +10,7 @@ from maya.core.auth import is_authenticated, is_authenticated_json
 from maya.core import flash
 from maya.core.translate import translate
 from maya.core.logging import get_log
-from maya.core.api import OpenAwsException
+from maya.core.api_error import OpenAwsException
 from maya.core import api
 from maya.records.meta_data_record import get_record_meta_data_resolve
 from maya.records import normalize_dates

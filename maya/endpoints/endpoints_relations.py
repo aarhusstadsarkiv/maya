@@ -1,7 +1,7 @@
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 from maya.core.logging import get_log
-from maya.core.api import OpenAwsException
+from maya.core.api_error import OpenAwsException
 from maya.core import api
 from maya.core.relations import format_relations, sort_data
 from maya.core.auth import is_authenticated
