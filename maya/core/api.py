@@ -8,9 +8,7 @@ selected at runtime from the configured API profile.
 
 from starlette.requests import Request
 from starlette.exceptions import HTTPException
-from maya.core.api_error import (
-    raise_openaws_exception,
-)
+from maya.core.api_error import raise_openaws_exception
 from maya.core.api_auth import get_auth_adapter
 from maya.core.api_request import get_auth_headers
 from maya.core.api_user import get_user_adapter
