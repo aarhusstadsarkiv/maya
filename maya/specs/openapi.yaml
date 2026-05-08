@@ -21,6 +21,51 @@ paths:
     get:
       description: Get list of clients the user has access to.
       responses:
+        200:
+          content:
+            application/json:
+              schema:
+                properties:
+                  data:
+                    items:
+                      properties:
+                        created_at:
+                          format: date-time
+                          title: Created At
+                          type: string
+                        created_by:
+                          format: uuid
+                          title: Created By
+                          type: string
+                        id:
+                          format: uuid
+                          title: Id
+                          type: string
+                        name:
+                          title: Name
+                          type: string
+                        type:
+                          enum:
+                          - 0
+                          - 1
+                          - 2
+                          title: ClientType
+                          type: integer
+                      required:
+                      - created_at
+                      - created_by
+                      - id
+                      - name
+                      - type
+                      title: Client
+                      type: object
+                    title: Data
+                    type: array
+                required:
+                - data
+                title: APIResponse
+                type: object
+          description: ''
         401:
           content:
             application/json:
@@ -41,6 +86,26 @@ paths:
                 title: APIResponseError
                 type: object
           description: AuthenticationError
+        403:
+          content:
+            application/json:
+              schema:
+                description: ForbiddenError
+                properties:
+                  error:
+                    default: ForbiddenError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: ForbiddenError
       security:
       - session: []
       tags:
@@ -57,6 +122,42 @@ paths:
           format: uuid
           type: string
       responses:
+        200:
+          content:
+            application/json:
+              schema:
+                properties:
+                  created_at:
+                    format: date-time
+                    title: Created At
+                    type: string
+                  created_by:
+                    format: uuid
+                    title: Created By
+                    type: string
+                  id:
+                    format: uuid
+                    title: Id
+                    type: string
+                  name:
+                    title: Name
+                    type: string
+                  type:
+                    enum:
+                    - 0
+                    - 1
+                    - 2
+                    title: ClientType
+                    type: integer
+                required:
+                - created_at
+                - created_by
+                - id
+                - name
+                - type
+                title: Client
+                type: object
+          description: ''
         400:
           content:
             application/json:
@@ -97,6 +198,26 @@ paths:
                 title: APIResponseError
                 type: object
           description: AuthenticationError
+        403:
+          content:
+            application/json:
+              schema:
+                description: ForbiddenError
+                properties:
+                  error:
+                    default: ForbiddenError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: ForbiddenError
       security:
       - session: []
       tags:
@@ -104,7 +225,81 @@ paths:
   /v2/clients/{id}/domains:
     get:
       description: Get list of domains tied to a client.
+      parameters:
+      - description: ''
+        in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
       responses:
+        200:
+          content:
+            application/json:
+              schema:
+                properties:
+                  data:
+                    items:
+                      properties:
+                        client_id:
+                          format: uuid
+                          title: Client Id
+                          type: string
+                        created_at:
+                          format: date-time
+                          title: Created At
+                          type: string
+                        created_by:
+                          format: uuid
+                          title: Created By
+                          type: string
+                        hostname:
+                          title: Hostname
+                          type: string
+                        id:
+                          format: uuid
+                          title: Id
+                          type: string
+                        verified:
+                          title: Verified
+                          type: boolean
+                      required:
+                      - created_at
+                      - created_by
+                      - id
+                      - client_id
+                      - hostname
+                      - verified
+                      title: Domain
+                      type: object
+                    title: Data
+                    type: array
+                required:
+                - data
+                title: APIResponse
+                type: object
+          description: ''
+        400:
+          content:
+            application/json:
+              schema:
+                description: ParameterError
+                properties:
+                  error:
+                    default: ParameterError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: ParameterError
         401:
           content:
             application/json:
@@ -152,7 +347,78 @@ paths:
   /v2/clients/{id}/domains/{domain}:
     get:
       description: Get a domain tied to a client.
+      parameters:
+      - description: ''
+        in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      - description: ''
+        in: path
+        name: domain
+        required: true
+        schema:
+          type: string
       responses:
+        200:
+          content:
+            application/json:
+              schema:
+                properties:
+                  client_id:
+                    format: uuid
+                    title: Client Id
+                    type: string
+                  created_at:
+                    format: date-time
+                    title: Created At
+                    type: string
+                  created_by:
+                    format: uuid
+                    title: Created By
+                    type: string
+                  hostname:
+                    title: Hostname
+                    type: string
+                  id:
+                    format: uuid
+                    title: Id
+                    type: string
+                  verified:
+                    title: Verified
+                    type: boolean
+                required:
+                - created_at
+                - created_by
+                - id
+                - client_id
+                - hostname
+                - verified
+                title: Domain
+                type: object
+          description: ''
+        400:
+          content:
+            application/json:
+              schema:
+                description: ParameterError
+                properties:
+                  error:
+                    default: ParameterError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: ParameterError
         401:
           content:
             application/json:
@@ -200,7 +466,47 @@ paths:
   /v2/clients/{id}/domains/{domain}/identity:
     get:
       description: Get the identification key for a domain.
+      parameters:
+      - description: ''
+        in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      - description: ''
+        in: path
+        name: domain
+        required: true
+        schema:
+          type: string
       responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: string
+          description: ''
+        400:
+          content:
+            application/json:
+              schema:
+                description: ParameterError
+                properties:
+                  error:
+                    default: ParameterError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: ParameterError
         401:
           content:
             application/json:
@@ -241,6 +547,26 @@ paths:
                 title: APIResponseError
                 type: object
           description: ForbiddenError
+        404:
+          content:
+            application/json:
+              schema:
+                description: NotFoundError
+                properties:
+                  error:
+                    default: NotFoundError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: NotFoundError
       security:
       - session: []
       tags:
@@ -248,7 +574,206 @@ paths:
   /v2/clients/{id}/domains/{domain}/verify:
     get:
       description: Get the verification key for a domain.
+      parameters:
+      - description: ''
+        in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      - description: ''
+        in: path
+        name: domain
+        required: true
+        schema:
+          type: string
       responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: string
+          description: ''
+        400:
+          content:
+            application/json:
+              schema:
+                description: ParameterError
+                properties:
+                  error:
+                    default: ParameterError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: ParameterError
+        401:
+          content:
+            application/json:
+              schema:
+                description: AuthenticationError
+                properties:
+                  error:
+                    default: AuthenticationError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: AuthenticationError
+        403:
+          content:
+            application/json:
+              schema:
+                description: ForbiddenError
+                properties:
+                  error:
+                    default: ForbiddenError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: ForbiddenError
+        404:
+          content:
+            application/json:
+              schema:
+                description: NotFoundError
+                properties:
+                  error:
+                    default: NotFoundError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: NotFoundError
+      security:
+      - session: []
+      tags:
+      - clients
+  /v2/clients/{id}/users:
+    get:
+      description: Get list of users that have a role in the client.
+      parameters:
+      - description: ''
+        in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                properties:
+                  data:
+                    items:
+                      properties:
+                        admin:
+                          title: Admin
+                          type: boolean
+                        client_id:
+                          format: uuid
+                          title: Client Id
+                          type: string
+                        created_at:
+                          format: date-time
+                          title: Created At
+                          type: string
+                        created_by:
+                          format: uuid
+                          title: Created By
+                          type: string
+                        email:
+                          title: Email
+                          type: string
+                        id:
+                          format: uuid
+                          title: Id
+                          type: string
+                        is_verified:
+                          title: Is Verified
+                          type: boolean
+                        name:
+                          title: Name
+                          type: string
+                        role:
+                          enum:
+                          - 0
+                          - 10
+                          - 20
+                          - 30
+                          title: UserRole
+                          type: integer
+                      required:
+                      - created_at
+                      - created_by
+                      - id
+                      - name
+                      - email
+                      - admin
+                      - is_verified
+                      - client_id
+                      - role
+                      title: ClientUser
+                      type: object
+                    title: Data
+                    type: array
+                required:
+                - data
+                title: APIResponse
+                type: object
+          description: ''
+        400:
+          content:
+            application/json:
+              schema:
+                description: ParameterError
+                properties:
+                  error:
+                    default: ParameterError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: ParameterError
         401:
           content:
             application/json:
@@ -293,10 +818,99 @@ paths:
       - session: []
       tags:
       - clients
-  /v2/clients/{id}/users:
+  /v2/clients/{id}/users/{user_id}:
     get:
-      description: Get list of users that have a role in the client.
+      description: Get a single user that has a role in the client.
+      parameters:
+      - description: ''
+        in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      - description: ''
+        in: path
+        name: user_id
+        required: true
+        schema:
+          format: uuid
+          type: string
       responses:
+        200:
+          content:
+            application/json:
+              schema:
+                properties:
+                  admin:
+                    title: Admin
+                    type: boolean
+                  client_id:
+                    format: uuid
+                    title: Client Id
+                    type: string
+                  created_at:
+                    format: date-time
+                    title: Created At
+                    type: string
+                  created_by:
+                    format: uuid
+                    title: Created By
+                    type: string
+                  email:
+                    title: Email
+                    type: string
+                  id:
+                    format: uuid
+                    title: Id
+                    type: string
+                  is_verified:
+                    title: Is Verified
+                    type: boolean
+                  name:
+                    title: Name
+                    type: string
+                  role:
+                    enum:
+                    - 0
+                    - 10
+                    - 20
+                    - 30
+                    title: UserRole
+                    type: integer
+                required:
+                - created_at
+                - created_by
+                - id
+                - name
+                - email
+                - admin
+                - is_verified
+                - client_id
+                - role
+                title: ClientUser
+                type: object
+          description: ''
+        400:
+          content:
+            application/json:
+              schema:
+                description: ParameterError
+                properties:
+                  error:
+                    default: ParameterError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: ParameterError
         401:
           content:
             application/json:
@@ -4528,7 +5142,20 @@ paths:
       tags:
       - users
     get:
-      description: Get the current user.
+      description: 'Get the current user.
+
+
+        User roles:
+
+        * VIEWER = 0
+
+        * EDITOR = 10
+
+        * MANAGER = 20
+
+        * ADMIN = 30
+
+        '
       responses:
         200:
           content:
