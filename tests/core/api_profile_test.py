@@ -40,6 +40,15 @@ class TestApiProfile(unittest.TestCase):
         self.assertIsInstance(get_auth_adapter(), V2AuthAdapter)
         self.assertIsInstance(get_user_adapter(), V2UserAdapter)
 
+    def test_v2_profile_uses_minimal_session_cookie_header(self):
+        settings["api_profile"] = "v2"
+        request = SimpleNamespace(session={"session": "s1"})
+
+        headers = get_auth_headers(request, {"Accept": "application/json"})
+
+        self.assertEqual(headers["Cookie"], "session=s1")
+        self.assertNotIn("Authorization", headers)
+
     def test_v1_profile_uses_v1_user_adapter(self):
         settings["api_profile"] = "v1"
         self.assertIsInstance(get_user_adapter(), V1UserAdapter)

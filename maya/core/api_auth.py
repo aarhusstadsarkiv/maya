@@ -22,7 +22,9 @@ from maya.core.translate import translate
 
 log = get_log()
 
-V2_SESSION_COOKIE_NAMES = ("session", "client", "domain")
+V2_REQUIRED_SESSION_COOKIE = "session"
+V2_OPTIONAL_SESSION_COOKIES = ("client", "domain")
+V2_SESSION_COOKIE_NAMES = (V2_REQUIRED_SESSION_COOKIE, *V2_OPTIONAL_SESSION_COOKIES)
 
 
 class AuthAdapter(ABC):
