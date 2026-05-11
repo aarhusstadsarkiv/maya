@@ -36,7 +36,12 @@
     <tr>
         <td><a href="/admin/orders/logs?order_id={{ log.order_id }}">{{ log.order_id}}</a></td>
         <td>{{ log.user_display_name }} ({{ log.user_email }})</td>
-        <td>{{ log.record_id }}</td>
+        <td class="record-link">
+            <a href="/admin/orders/{{log.record_id}}/html">{{log.record_id}}</a>
+            <a href="/records/{{log.record_id}}" target="_blank" title="Vis post i ny fane">
+                <span class="open-new-window">{{ get_icon('open_in_new')|safe }}</span>
+            </a>
+        </td>
         <td>{{ log.updated_location }}</td>
         <td>{{ log.updated_order_status }}</td>
         <td>{{ log.message }}</td>
