@@ -35,7 +35,10 @@
     {% for log in logs %}
     <tr>
         <td><a href="/admin/orders/logs?order_id={{ log.order_id }}">{{ log.order_id}}</a></td>
-        <td>{{ log.user_display_name }} ({{ log.user_email }})</td>
+        <td>
+            <span  title="{{ log.user_email }}" class="content-copy" data-email="{{ log.user_email }}">{{ get_icon('content_copy')|safe }}</span>
+            {{ log.user_display_name }}    
+        </td>
         <td class="record-link">
             <a href="/admin/orders/{{log.record_id}}/html">{{log.record_id}}</a>
             <a href="/records/{{log.record_id}}" target="_blank" title="Vis post i ny fane">
@@ -63,6 +66,23 @@
     {% endif %}
 </div>
 {% endif %}
+
+<script type="module" nonce="{{ request.state.csp_nonce }}">
+
+    import { Flash } from "/static/js/flash.js";
+
+    document.querySelectorAll('.content-copy').forEach(element => {
+        element.addEventListener('click', function () {
+            const email = this.dataset.email;
+            navigator.clipboard.writeText(email).then(function() {
+                Flash.setMessage('E-mail kopieret til udklipsholderen', 'success', 5);
+            }, function(err) {
+                Flash.setMessage('Kunne ikke kopiere e-mail: ' + err, 'error');
+            });
+        });
+    });
+
+</script>
 
 {% endblock content %}
 
