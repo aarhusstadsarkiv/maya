@@ -111,9 +111,8 @@ class RecordNormalizer:
                 label = last_label + serie["label"]
                 last_label = label + "/"
 
-                query_str = f"collection={str(record['collection']['id'])}&series={label}"
-                query_str_encoded = str(urllib.parse.quote(query_str))
-                search_query = f"{_search_base_url}?{query_str_encoded}"
+                series_query = urllib.parse.quote(label, safe="/")
+                search_query = f"{_search_base_url}?collection={str(record['collection']['id'])}&series={series_query}"
 
                 search_query, display_as_link = self._normalize_search_query(search_query)
                 serie["search_query"] = search_query
