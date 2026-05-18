@@ -25,46 +25,47 @@ paths:
           content:
             application/json:
               schema:
-                properties:
-                  data:
-                    items:
-                      properties:
-                        created_at:
-                          format: date-time
-                          title: Created At
-                          type: string
-                        created_by:
-                          format: uuid
-                          title: Created By
-                          type: string
-                        id:
-                          format: uuid
-                          title: Id
-                          type: string
-                        name:
-                          title: Name
-                          type: string
-                        type:
-                          enum:
-                          - 0
-                          - 1
-                          - 2
-                          title: ClientType
-                          type: integer
-                      required:
-                      - created_at
-                      - created_by
-                      - id
-                      - name
-                      - type
-                      title: Client
-                      type: object
-                    title: Data
-                    type: array
-                required:
-                - data
-                title: APIResponse
-                type: object
+                items:
+                  properties:
+                    created_at:
+                      format: date-time
+                      title: Created At
+                      type: string
+                    created_by:
+                      format: uuid
+                      title: Created By
+                      type: string
+                    id:
+                      format: uuid
+                      title: Id
+                      type: string
+                    name:
+                      title: Name
+                      type: string
+                    type:
+                      description: 'Client type:
+
+
+                        * BASE = 0
+
+                        * EDIT = 1
+
+                        * EXTERNAL = 2'
+                      enum:
+                      - 0
+                      - 1
+                      - 2
+                      title: ClientType
+                      type: integer
+                  required:
+                  - created_at
+                  - created_by
+                  - id
+                  - name
+                  - type
+                  title: Client
+                  type: object
+                type: array
           description: ''
         401:
           content:
@@ -143,6 +144,14 @@ paths:
                     title: Name
                     type: string
                   type:
+                    description: 'Client type:
+
+
+                      * BASE = 0
+
+                      * EDIT = 1
+
+                      * EXTERNAL = 2'
                     enum:
                     - 0
                     - 1
@@ -238,47 +247,40 @@ paths:
           content:
             application/json:
               schema:
-                properties:
-                  data:
-                    items:
-                      properties:
-                        client_id:
-                          format: uuid
-                          title: Client Id
-                          type: string
-                        created_at:
-                          format: date-time
-                          title: Created At
-                          type: string
-                        created_by:
-                          format: uuid
-                          title: Created By
-                          type: string
-                        hostname:
-                          title: Hostname
-                          type: string
-                        id:
-                          format: uuid
-                          title: Id
-                          type: string
-                        verified:
-                          title: Verified
-                          type: boolean
-                      required:
-                      - created_at
-                      - created_by
-                      - id
-                      - client_id
-                      - hostname
-                      - verified
-                      title: Domain
-                      type: object
-                    title: Data
-                    type: array
-                required:
-                - data
-                title: APIResponse
-                type: object
+                items:
+                  properties:
+                    client_id:
+                      format: uuid
+                      title: Client Id
+                      type: string
+                    created_at:
+                      format: date-time
+                      title: Created At
+                      type: string
+                    created_by:
+                      format: uuid
+                      title: Created By
+                      type: string
+                    hostname:
+                      title: Hostname
+                      type: string
+                    id:
+                      format: uuid
+                      title: Id
+                      type: string
+                    verified:
+                      title: Verified
+                      type: boolean
+                  required:
+                  - created_at
+                  - created_by
+                  - id
+                  - client_id
+                  - hostname
+                  - verified
+                  title: Domain
+                  type: object
+                type: array
           description: ''
         400:
           content:
@@ -344,7 +346,7 @@ paths:
       - session: []
       tags:
       - clients
-  /v2/clients/{id}/domains/{domain}:
+  /v2/clients/{id}/domains/{domain_id}:
     get:
       description: Get a domain tied to a client.
       parameters:
@@ -357,9 +359,10 @@ paths:
           type: string
       - description: ''
         in: path
-        name: domain
+        name: domain_id
         required: true
         schema:
+          format: uuid
           type: string
       responses:
         200:
@@ -463,7 +466,7 @@ paths:
       - session: []
       tags:
       - clients
-  /v2/clients/{id}/domains/{domain}/identity:
+  /v2/clients/{id}/domains/{domain_id}/identity:
     get:
       description: Get the identification key for a domain.
       parameters:
@@ -476,9 +479,10 @@ paths:
           type: string
       - description: ''
         in: path
-        name: domain
+        name: domain_id
         required: true
         schema:
+          format: uuid
           type: string
       responses:
         200:
@@ -571,7 +575,388 @@ paths:
       - session: []
       tags:
       - clients
-  /v2/clients/{id}/domains/{domain}/verify:
+  /v2/clients/{id}/domains/{domain_id}/templates:
+    get:
+      description: Get the templates of a client.
+      parameters:
+      - description: ''
+        in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      - description: ''
+        in: path
+        name: domain_id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                items:
+                  properties:
+                    created_at:
+                      format: date-time
+                      title: Created At
+                      type: string
+                    created_by:
+                      format: uuid
+                      title: Created By
+                      type: string
+                    domain_id:
+                      format: uuid
+                      title: Domain Id
+                      type: string
+                    subject:
+                      title: Subject
+                      type: string
+                    template:
+                      title: Template
+                      type: string
+                    type:
+                      description: 'Template types:
+
+
+                        * VERIFY = 0
+
+                        * PASSWORD_RESET = 1
+
+                        * DELETE_WARNING = 2
+
+                        * DELETE_SUCCESS = 3'
+                      enum:
+                      - 0
+                      - 1
+                      - 2
+                      - 3
+                      title: TemplateType
+                      type: integer
+                  required:
+                  - created_at
+                  - created_by
+                  - domain_id
+                  - type
+                  - template
+                  - subject
+                  title: DomainTemplate
+                  type: object
+                type: array
+          description: ''
+        400:
+          content:
+            application/json:
+              schema:
+                description: ParameterError
+                properties:
+                  error:
+                    default: ParameterError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: ParameterError
+        401:
+          content:
+            application/json:
+              schema:
+                description: AuthenticationError
+                properties:
+                  error:
+                    default: AuthenticationError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: AuthenticationError
+        403:
+          content:
+            application/json:
+              schema:
+                description: ForbiddenError
+                properties:
+                  error:
+                    default: ForbiddenError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: ForbiddenError
+        404:
+          content:
+            application/json:
+              schema:
+                description: NotFoundError
+                properties:
+                  error:
+                    default: NotFoundError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: NotFoundError
+      security:
+      - session: []
+      tags:
+      - clients
+    post:
+      description: Post a new domain template or edit an existing one.
+      parameters:
+      - description: ''
+        in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      - description: ''
+        in: path
+        name: domain_id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                created_at:
+                  format: date-time
+                  title: Created At
+                  type: string
+                created_by:
+                  format: uuid
+                  title: Created By
+                  type: string
+                domain_id:
+                  format: uuid
+                  title: Domain Id
+                  type: string
+                subject:
+                  title: Subject
+                  type: string
+                template:
+                  title: Template
+                  type: string
+                type:
+                  description: 'Template types:
+
+
+                    * VERIFY = 0
+
+                    * PASSWORD_RESET = 1
+
+                    * DELETE_WARNING = 2
+
+                    * DELETE_SUCCESS = 3'
+                  enum:
+                  - 0
+                  - 1
+                  - 2
+                  - 3
+                  title: TemplateType
+                  type: integer
+              required:
+              - created_at
+              - created_by
+              - domain_id
+              - type
+              - template
+              - subject
+              title: DomainTemplate
+              type: object
+        description: ''
+        required: true
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                properties:
+                  created_at:
+                    format: date-time
+                    title: Created At
+                    type: string
+                  created_by:
+                    format: uuid
+                    title: Created By
+                    type: string
+                  domain_id:
+                    format: uuid
+                    title: Domain Id
+                    type: string
+                  subject:
+                    title: Subject
+                    type: string
+                  template:
+                    title: Template
+                    type: string
+                  type:
+                    description: 'Template types:
+
+
+                      * VERIFY = 0
+
+                      * PASSWORD_RESET = 1
+
+                      * DELETE_WARNING = 2
+
+                      * DELETE_SUCCESS = 3'
+                    enum:
+                    - 0
+                    - 1
+                    - 2
+                    - 3
+                    title: TemplateType
+                    type: integer
+                required:
+                - created_at
+                - created_by
+                - domain_id
+                - type
+                - template
+                - subject
+                title: DomainTemplate
+                type: object
+          description: ''
+        400:
+          content:
+            application/json:
+              schema:
+                description: ParameterError
+                properties:
+                  error:
+                    default: ParameterError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: ParameterError
+        401:
+          content:
+            application/json:
+              schema:
+                description: AuthenticationError
+                properties:
+                  error:
+                    default: AuthenticationError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: AuthenticationError
+        403:
+          content:
+            application/json:
+              schema:
+                description: ForbiddenError
+                properties:
+                  error:
+                    default: ForbiddenError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: ForbiddenError
+        404:
+          content:
+            application/json:
+              schema:
+                description: NotFoundError
+                properties:
+                  error:
+                    default: NotFoundError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: NotFoundError
+        422:
+          content:
+            application/json:
+              schema:
+                description: BodyError
+                properties:
+                  error:
+                    default: BodyError
+                    title: Error
+                    type: string
+                  error_details:
+                    items:
+                      type: string
+                    title: Error Details
+                    type: array
+                required:
+                - error_details
+                title: APIResponseError
+                type: object
+          description: BodyError
+      security:
+      - session: []
+      tags:
+      - clients
+  /v2/clients/{id}/domains/{domain_id}/verify:
     get:
       description: Get the verification key for a domain.
       parameters:
@@ -584,9 +969,10 @@ paths:
           type: string
       - description: ''
         in: path
-        name: domain
+        name: domain_id
         required: true
         schema:
+          format: uuid
           type: string
       responses:
         200:
@@ -695,64 +1081,67 @@ paths:
           content:
             application/json:
               schema:
-                properties:
-                  data:
-                    items:
-                      properties:
-                        admin:
-                          title: Admin
-                          type: boolean
-                        client_id:
-                          format: uuid
-                          title: Client Id
-                          type: string
-                        created_at:
-                          format: date-time
-                          title: Created At
-                          type: string
-                        created_by:
-                          format: uuid
-                          title: Created By
-                          type: string
-                        email:
-                          title: Email
-                          type: string
-                        id:
-                          format: uuid
-                          title: Id
-                          type: string
-                        is_verified:
-                          title: Is Verified
-                          type: boolean
-                        name:
-                          title: Name
-                          type: string
-                        role:
-                          enum:
-                          - 0
-                          - 10
-                          - 20
-                          - 30
-                          title: UserRole
-                          type: integer
-                      required:
-                      - created_at
-                      - created_by
-                      - id
-                      - name
-                      - email
-                      - admin
-                      - is_verified
-                      - client_id
-                      - role
-                      title: ClientUser
-                      type: object
-                    title: Data
-                    type: array
-                required:
-                - data
-                title: APIResponse
-                type: object
+                items:
+                  properties:
+                    admin:
+                      title: Admin
+                      type: boolean
+                    client_id:
+                      format: uuid
+                      title: Client Id
+                      type: string
+                    created_at:
+                      format: date-time
+                      title: Created At
+                      type: string
+                    created_by:
+                      format: uuid
+                      title: Created By
+                      type: string
+                    email:
+                      title: Email
+                      type: string
+                    id:
+                      format: uuid
+                      title: Id
+                      type: string
+                    is_verified:
+                      title: Is Verified
+                      type: boolean
+                    name:
+                      title: Name
+                      type: string
+                    role:
+                      description: 'User roles:
+
+
+                        * VIEWER = 0
+
+                        * EDITOR = 10
+
+                        * MANAGER = 20
+
+                        * ADMIN = 30'
+                      enum:
+                      - 0
+                      - 10
+                      - 20
+                      - 30
+                      title: UserRole
+                      type: integer
+                  required:
+                  - created_at
+                  - created_by
+                  - id
+                  - name
+                  - email
+                  - admin
+                  - is_verified
+                  - client_id
+                  - role
+                  title: ClientUser
+                  type: object
+                type: array
           description: ''
         400:
           content:
@@ -871,6 +1260,16 @@ paths:
                     title: Name
                     type: string
                   role:
+                    description: 'User roles:
+
+
+                      * VIEWER = 0
+
+                      * EDITOR = 10
+
+                      * MANAGER = 20
+
+                      * ADMIN = 30'
                     enum:
                     - 0
                     - 10
@@ -1012,46 +1411,39 @@ paths:
           content:
             application/json:
               schema:
-                description: ControlledValueRow
                 properties:
+                  created_at:
+                    format: date-time
+                    title: Created At
+                    type: string
+                  created_by:
+                    format: uuid
+                    title: Created By
+                    type: string
                   data:
-                    properties:
-                      created_at:
-                        format: date-time
-                        title: Created At
-                        type: string
-                      created_by:
-                        format: uuid
-                        title: Created By
-                        type: string
-                      data:
-                        additionalProperties: true
-                        title: Data
-                        type: object
-                      id:
-                        format: uuid
-                        title: Id
-                        type: string
-                      name:
-                        title: Name
-                        type: string
-                      version:
-                        title: Version
-                        type: string
-                    required:
-                    - created_at
-                    - created_by
-                    - id
-                    - name
-                    - version
-                    - data
-                    title: ControlledValueRow
+                    additionalProperties: true
+                    title: Data
                     type: object
+                  id:
+                    format: uuid
+                    title: Id
+                    type: string
+                  name:
+                    title: Name
+                    type: string
+                  version:
+                    title: Version
+                    type: string
                 required:
+                - created_at
+                - created_by
+                - id
+                - name
+                - version
                 - data
-                title: APIResponse
+                title: ControlledValueRow
                 type: object
-          description: ControlledValueRow
+          description: ''
         401:
           content:
             application/json:
@@ -1132,46 +1524,39 @@ paths:
           content:
             application/json:
               schema:
-                description: ControlledValueRow
                 properties:
+                  created_at:
+                    format: date-time
+                    title: Created At
+                    type: string
+                  created_by:
+                    format: uuid
+                    title: Created By
+                    type: string
                   data:
-                    properties:
-                      created_at:
-                        format: date-time
-                        title: Created At
-                        type: string
-                      created_by:
-                        format: uuid
-                        title: Created By
-                        type: string
-                      data:
-                        additionalProperties: true
-                        title: Data
-                        type: object
-                      id:
-                        format: uuid
-                        title: Id
-                        type: string
-                      name:
-                        title: Name
-                        type: string
-                      version:
-                        title: Version
-                        type: string
-                    required:
-                    - created_at
-                    - created_by
-                    - id
-                    - name
-                    - version
-                    - data
-                    title: ControlledValueRow
+                    additionalProperties: true
+                    title: Data
                     type: object
+                  id:
+                    format: uuid
+                    title: Id
+                    type: string
+                  name:
+                    title: Name
+                    type: string
+                  version:
+                    title: Version
+                    type: string
                 required:
+                - created_at
+                - created_by
+                - id
+                - name
+                - version
                 - data
-                title: APIResponse
+                title: ControlledValueRow
                 type: object
-          description: ControlledValueRow
+          description: ''
         400:
           content:
             application/json:
@@ -1312,46 +1697,39 @@ paths:
           content:
             application/json:
               schema:
-                description: ControlledValueRow
                 properties:
+                  created_at:
+                    format: date-time
+                    title: Created At
+                    type: string
+                  created_by:
+                    format: uuid
+                    title: Created By
+                    type: string
                   data:
-                    properties:
-                      created_at:
-                        format: date-time
-                        title: Created At
-                        type: string
-                      created_by:
-                        format: uuid
-                        title: Created By
-                        type: string
-                      data:
-                        additionalProperties: true
-                        title: Data
-                        type: object
-                      id:
-                        format: uuid
-                        title: Id
-                        type: string
-                      name:
-                        title: Name
-                        type: string
-                      version:
-                        title: Version
-                        type: string
-                    required:
-                    - created_at
-                    - created_by
-                    - id
-                    - name
-                    - version
-                    - data
-                    title: ControlledValueRow
+                    additionalProperties: true
+                    title: Data
                     type: object
+                  id:
+                    format: uuid
+                    title: Id
+                    type: string
+                  name:
+                    title: Name
+                    type: string
+                  version:
+                    title: Version
+                    type: string
                 required:
+                - created_at
+                - created_by
+                - id
+                - name
+                - version
                 - data
-                title: APIResponse
+                title: ControlledValueRow
                 type: object
-          description: ControlledValueRow
+          description: ''
         401:
           content:
             application/json:
@@ -1515,47 +1893,40 @@ paths:
           content:
             application/json:
               schema:
-                properties:
-                  data:
-                    items:
-                      properties:
-                        created_at:
-                          format: date-time
-                          title: Created At
-                          type: string
-                        created_by:
-                          format: uuid
-                          title: Created By
-                          type: string
-                        data:
-                          additionalProperties: true
-                          title: Data
-                          type: object
-                        id:
-                          format: uuid
-                          title: Id
-                          type: string
-                        name:
-                          title: Name
-                          type: string
-                        version:
-                          title: Version
-                          type: string
-                      required:
-                      - created_at
-                      - created_by
-                      - id
-                      - name
-                      - version
-                      - data
-                      title: ControlledValueRow
+                items:
+                  properties:
+                    created_at:
+                      format: date-time
+                      title: Created At
+                      type: string
+                    created_by:
+                      format: uuid
+                      title: Created By
+                      type: string
+                    data:
+                      additionalProperties: true
+                      title: Data
                       type: object
-                    title: Data
-                    type: array
-                required:
-                - data
-                title: APIResponse
-                type: object
+                    id:
+                      format: uuid
+                      title: Id
+                      type: string
+                    name:
+                      title: Name
+                      type: string
+                    version:
+                      title: Version
+                      type: string
+                  required:
+                  - created_at
+                  - created_by
+                  - id
+                  - name
+                  - version
+                  - data
+                  title: ControlledValueRow
+                  type: object
+                type: array
           description: ''
         400:
           content:
@@ -1664,46 +2035,39 @@ paths:
           content:
             application/json:
               schema:
-                description: ControlledValueRow
                 properties:
+                  created_at:
+                    format: date-time
+                    title: Created At
+                    type: string
+                  created_by:
+                    format: uuid
+                    title: Created By
+                    type: string
                   data:
-                    properties:
-                      created_at:
-                        format: date-time
-                        title: Created At
-                        type: string
-                      created_by:
-                        format: uuid
-                        title: Created By
-                        type: string
-                      data:
-                        additionalProperties: true
-                        title: Data
-                        type: object
-                      id:
-                        format: uuid
-                        title: Id
-                        type: string
-                      name:
-                        title: Name
-                        type: string
-                      version:
-                        title: Version
-                        type: string
-                    required:
-                    - created_at
-                    - created_by
-                    - id
-                    - name
-                    - version
-                    - data
-                    title: ControlledValueRow
+                    additionalProperties: true
+                    title: Data
                     type: object
+                  id:
+                    format: uuid
+                    title: Id
+                    type: string
+                  name:
+                    title: Name
+                    type: string
+                  version:
+                    title: Version
+                    type: string
                 required:
+                - created_at
+                - created_by
+                - id
+                - name
+                - version
                 - data
-                title: APIResponse
+                title: ControlledValueRow
                 type: object
-          description: ControlledValueRow
+          description: ''
         400:
           content:
             application/json:
@@ -2042,6 +2406,16 @@ paths:
                   title: Context
                   type: object
                 template:
+                  description: 'Template types:
+
+
+                    * VERIFY = 0
+
+                    * PASSWORD_RESET = 1
+
+                    * DELETE_WARNING = 2
+
+                    * DELETE_SUCCESS = 3'
                   enum:
                   - 0
                   - 1
@@ -2359,54 +2733,47 @@ paths:
           content:
             application/json:
               schema:
-                description: EntityRow
                 properties:
+                  created_at:
+                    format: date-time
+                    title: Created At
+                    type: string
+                  created_by:
+                    format: uuid
+                    title: Created By
+                    type: string
                   data:
-                    properties:
-                      created_at:
-                        format: date-time
-                        title: Created At
-                        type: string
-                      created_by:
-                        format: uuid
-                        title: Created By
-                        type: string
-                      data:
-                        additionalProperties: true
-                        title: Data
-                        type: object
-                      deleted:
-                        title: Deleted
-                        type: boolean
-                      id:
-                        format: uuid
-                        title: Id
-                        type: string
-                      restricted:
-                        title: Restricted
-                        type: boolean
-                      schema_name:
-                        title: Schema Name
-                        type: string
-                      schema_version:
-                        title: Schema Version
-                        type: string
-                    required:
-                    - created_at
-                    - created_by
-                    - id
-                    - schema_name
-                    - schema_version
-                    - deleted
-                    - restricted
-                    - data
-                    title: EntityRow
+                    additionalProperties: true
+                    title: Data
                     type: object
+                  deleted:
+                    title: Deleted
+                    type: boolean
+                  id:
+                    format: uuid
+                    title: Id
+                    type: string
+                  restricted:
+                    title: Restricted
+                    type: boolean
+                  schema_name:
+                    title: Schema Name
+                    type: string
+                  schema_version:
+                    title: Schema Version
+                    type: string
                 required:
+                - created_at
+                - created_by
+                - id
+                - schema_name
+                - schema_version
+                - deleted
+                - restricted
                 - data
-                title: APIResponse
+                title: EntityRow
                 type: object
-          description: EntityRow
+          description: ''
         400:
           content:
             application/json:
@@ -2470,67 +2837,60 @@ paths:
           content:
             application/json:
               schema:
-                description: EntityUpdate
                 properties:
-                  data:
+                  entity:
                     properties:
-                      entity:
-                        properties:
-                          created_at:
-                            format: date-time
-                            title: Created At
-                            type: string
-                          created_by:
-                            format: uuid
-                            title: Created By
-                            type: string
-                          data:
-                            additionalProperties: true
-                            title: Data
-                            type: object
-                          deleted:
-                            title: Deleted
-                            type: boolean
-                          id:
-                            format: uuid
-                            title: Id
-                            type: string
-                          restricted:
-                            title: Restricted
-                            type: boolean
-                          schema_name:
-                            title: Schema Name
-                            type: string
-                          schema_version:
-                            title: Schema Version
-                            type: string
-                        required:
-                        - created_at
-                        - created_by
-                        - id
-                        - schema_name
-                        - schema_version
-                        - deleted
-                        - restricted
-                        - data
-                        title: EntityRow
+                      created_at:
+                        format: date-time
+                        title: Created At
+                        type: string
+                      created_by:
+                        format: uuid
+                        title: Created By
+                        type: string
+                      data:
+                        additionalProperties: true
+                        title: Data
                         type: object
-                      patch:
-                        items:
-                          additionalProperties: true
-                          type: object
-                        title: Patch
-                        type: array
+                      deleted:
+                        title: Deleted
+                        type: boolean
+                      id:
+                        format: uuid
+                        title: Id
+                        type: string
+                      restricted:
+                        title: Restricted
+                        type: boolean
+                      schema_name:
+                        title: Schema Name
+                        type: string
+                      schema_version:
+                        title: Schema Version
+                        type: string
                     required:
-                    - entity
-                    - patch
-                    title: EntityUpdate
+                    - created_at
+                    - created_by
+                    - id
+                    - schema_name
+                    - schema_version
+                    - deleted
+                    - restricted
+                    - data
+                    title: EntityRow
                     type: object
+                  patch:
+                    items:
+                      additionalProperties: true
+                      type: object
+                    title: Patch
+                    type: array
                 required:
-                - data
-                title: APIResponse
+                - entity
+                - patch
+                title: EntityUpdate
                 type: object
-          description: EntityUpdate
+          description: ''
         400:
           content:
             application/json:
@@ -2643,76 +3003,69 @@ paths:
           content:
             application/json:
               schema:
-                description: FileRow
                 properties:
-                  data:
-                    properties:
-                      blob_id:
-                        format: uuid
-                        title: Blob Id
-                        type: string
-                      checksum:
-                        title: Checksum
-                        type: string
-                      comment:
-                        title: Comment
-                        type: string
-                      created_at:
-                        format: date-time
-                        title: Created At
-                        type: string
-                      created_by:
-                        format: uuid
-                        title: Created By
-                        type: string
-                      entity_id:
-                        format: uuid
-                        title: Entity Id
-                        type: string
-                      id:
-                        format: uuid
-                        title: Id
-                        type: string
-                      metadata:
-                        additionalProperties: true
-                        title: Metadata
-                        type: object
-                      mimetype:
-                        anyOf:
-                        - type: string
-                        - type: 'null'
-                        title: Mimetype
-                      path:
-                        title: Path
-                        type: string
-                      puid:
-                        anyOf:
-                        - type: string
-                        - type: 'null'
-                        title: Puid
-                      size:
-                        title: Size
-                        type: integer
-                    required:
-                    - created_at
-                    - created_by
-                    - id
-                    - entity_id
-                    - blob_id
-                    - path
-                    - puid
-                    - mimetype
-                    - size
-                    - checksum
-                    - comment
-                    - metadata
-                    title: FileRow
+                  blob_id:
+                    format: uuid
+                    title: Blob Id
+                    type: string
+                  checksum:
+                    title: Checksum
+                    type: string
+                  comment:
+                    title: Comment
+                    type: string
+                  created_at:
+                    format: date-time
+                    title: Created At
+                    type: string
+                  created_by:
+                    format: uuid
+                    title: Created By
+                    type: string
+                  entity_id:
+                    format: uuid
+                    title: Entity Id
+                    type: string
+                  id:
+                    format: uuid
+                    title: Id
+                    type: string
+                  metadata:
+                    additionalProperties: true
+                    title: Metadata
                     type: object
+                  mimetype:
+                    anyOf:
+                    - type: string
+                    - type: 'null'
+                    title: Mimetype
+                  path:
+                    title: Path
+                    type: string
+                  puid:
+                    anyOf:
+                    - type: string
+                    - type: 'null'
+                    title: Puid
+                  size:
+                    title: Size
+                    type: integer
                 required:
-                - data
-                title: APIResponse
+                - created_at
+                - created_by
+                - id
+                - entity_id
+                - blob_id
+                - path
+                - puid
+                - mimetype
+                - size
+                - checksum
+                - comment
+                - metadata
+                title: FileRow
                 type: object
-          description: FileRow
+          description: ''
         401:
           content:
             application/json:
@@ -2832,52 +3185,45 @@ paths:
           content:
             application/json:
               schema:
-                description: EntityVersionRow
                 properties:
-                  data:
-                    properties:
-                      created_at:
-                        format: date-time
-                        title: Created At
-                        type: string
-                      created_by:
-                        format: uuid
-                        title: Created By
-                        type: string
-                      entity_id:
-                        format: uuid
-                        title: Entity Id
-                        type: string
-                      patch:
-                        items:
-                          additionalProperties: true
-                          type: object
-                        title: Patch
-                        type: array
-                      schema_name:
-                        title: Schema Name
-                        type: string
-                      schema_version:
-                        title: Schema Version
-                        type: string
-                      version:
-                        title: Version
-                        type: integer
-                    required:
-                    - created_at
-                    - created_by
-                    - entity_id
-                    - version
-                    - schema_name
-                    - schema_version
-                    - patch
-                    title: EntityVersionRow
-                    type: object
+                  created_at:
+                    format: date-time
+                    title: Created At
+                    type: string
+                  created_by:
+                    format: uuid
+                    title: Created By
+                    type: string
+                  entity_id:
+                    format: uuid
+                    title: Entity Id
+                    type: string
+                  patch:
+                    items:
+                      additionalProperties: true
+                      type: object
+                    title: Patch
+                    type: array
+                  schema_name:
+                    title: Schema Name
+                    type: string
+                  schema_version:
+                    title: Schema Version
+                    type: string
+                  version:
+                    title: Version
+                    type: integer
                 required:
-                - data
-                title: APIResponse
+                - created_at
+                - created_by
+                - entity_id
+                - version
+                - schema_name
+                - schema_version
+                - patch
+                title: EntityVersionRow
                 type: object
-          description: EntityVersionRow
+          description: ''
         400:
           content:
             application/json:
@@ -2942,43 +3288,36 @@ paths:
           content:
             application/json:
               schema:
-                description: EntityVersionCompare
                 properties:
-                  data:
-                    properties:
-                      diff:
-                        items:
-                          additionalProperties: true
-                          type: object
-                        title: Diff
-                        type: array
-                      entity_a:
-                        additionalProperties: true
-                        title: Entity A
-                        type: object
-                      entity_b:
-                        additionalProperties: true
-                        title: Entity B
-                        type: object
-                      version_a:
-                        title: Version A
-                        type: string
-                      version_b:
-                        title: Version B
-                        type: string
-                    required:
-                    - entity_a
-                    - version_a
-                    - entity_b
-                    - version_b
-                    - diff
-                    title: EntityVersionCompare
+                  diff:
+                    items:
+                      additionalProperties: true
+                      type: object
+                    title: Diff
+                    type: array
+                  entity_a:
+                    additionalProperties: true
+                    title: Entity A
                     type: object
+                  entity_b:
+                    additionalProperties: true
+                    title: Entity B
+                    type: object
+                  version_a:
+                    title: Version A
+                    type: string
+                  version_b:
+                    title: Version B
+                    type: string
                 required:
-                - data
-                title: APIResponse
+                - entity_a
+                - version_a
+                - entity_b
+                - version_b
+                - diff
+                title: EntityVersionCompare
                 type: object
-          description: EntityVersionCompare
+          description: ''
         400:
           content:
             application/json:
@@ -3050,43 +3389,36 @@ paths:
           content:
             application/json:
               schema:
-                description: EntityVersionCompare
                 properties:
-                  data:
-                    properties:
-                      diff:
-                        items:
-                          additionalProperties: true
-                          type: object
-                        title: Diff
-                        type: array
-                      entity_a:
-                        additionalProperties: true
-                        title: Entity A
-                        type: object
-                      entity_b:
-                        additionalProperties: true
-                        title: Entity B
-                        type: object
-                      version_a:
-                        title: Version A
-                        type: string
-                      version_b:
-                        title: Version B
-                        type: string
-                    required:
-                    - entity_a
-                    - version_a
-                    - entity_b
-                    - version_b
-                    - diff
-                    title: EntityVersionCompare
+                  diff:
+                    items:
+                      additionalProperties: true
+                      type: object
+                    title: Diff
+                    type: array
+                  entity_a:
+                    additionalProperties: true
+                    title: Entity A
                     type: object
+                  entity_b:
+                    additionalProperties: true
+                    title: Entity B
+                    type: object
+                  version_a:
+                    title: Version A
+                    type: string
+                  version_b:
+                    title: Version B
+                    type: string
                 required:
-                - data
-                title: APIResponse
+                - entity_a
+                - version_a
+                - entity_b
+                - version_b
+                - diff
+                title: EntityVersionCompare
                 type: object
-          description: EntityVersionCompare
+          description: ''
         400:
           content:
             application/json:
@@ -3247,76 +3579,69 @@ paths:
           content:
             application/json:
               schema:
-                description: FileRow
                 properties:
-                  data:
-                    properties:
-                      blob_id:
-                        format: uuid
-                        title: Blob Id
-                        type: string
-                      checksum:
-                        title: Checksum
-                        type: string
-                      comment:
-                        title: Comment
-                        type: string
-                      created_at:
-                        format: date-time
-                        title: Created At
-                        type: string
-                      created_by:
-                        format: uuid
-                        title: Created By
-                        type: string
-                      entity_id:
-                        format: uuid
-                        title: Entity Id
-                        type: string
-                      id:
-                        format: uuid
-                        title: Id
-                        type: string
-                      metadata:
-                        additionalProperties: true
-                        title: Metadata
-                        type: object
-                      mimetype:
-                        anyOf:
-                        - type: string
-                        - type: 'null'
-                        title: Mimetype
-                      path:
-                        title: Path
-                        type: string
-                      puid:
-                        anyOf:
-                        - type: string
-                        - type: 'null'
-                        title: Puid
-                      size:
-                        title: Size
-                        type: integer
-                    required:
-                    - created_at
-                    - created_by
-                    - id
-                    - entity_id
-                    - blob_id
-                    - path
-                    - puid
-                    - mimetype
-                    - size
-                    - checksum
-                    - comment
-                    - metadata
-                    title: FileRow
+                  blob_id:
+                    format: uuid
+                    title: Blob Id
+                    type: string
+                  checksum:
+                    title: Checksum
+                    type: string
+                  comment:
+                    title: Comment
+                    type: string
+                  created_at:
+                    format: date-time
+                    title: Created At
+                    type: string
+                  created_by:
+                    format: uuid
+                    title: Created By
+                    type: string
+                  entity_id:
+                    format: uuid
+                    title: Entity Id
+                    type: string
+                  id:
+                    format: uuid
+                    title: Id
+                    type: string
+                  metadata:
+                    additionalProperties: true
+                    title: Metadata
                     type: object
+                  mimetype:
+                    anyOf:
+                    - type: string
+                    - type: 'null'
+                    title: Mimetype
+                  path:
+                    title: Path
+                    type: string
+                  puid:
+                    anyOf:
+                    - type: string
+                    - type: 'null'
+                    title: Puid
+                  size:
+                    title: Size
+                    type: integer
                 required:
-                - data
-                title: APIResponse
+                - created_at
+                - created_by
+                - id
+                - entity_id
+                - blob_id
+                - path
+                - puid
+                - mimetype
+                - size
+                - checksum
+                - comment
+                - metadata
+                title: FileRow
                 type: object
-          description: FileRow
+          description: ''
         400:
           content:
             application/json:
@@ -3436,76 +3761,69 @@ paths:
           content:
             application/json:
               schema:
-                description: FileRow
                 properties:
-                  data:
-                    properties:
-                      blob_id:
-                        format: uuid
-                        title: Blob Id
-                        type: string
-                      checksum:
-                        title: Checksum
-                        type: string
-                      comment:
-                        title: Comment
-                        type: string
-                      created_at:
-                        format: date-time
-                        title: Created At
-                        type: string
-                      created_by:
-                        format: uuid
-                        title: Created By
-                        type: string
-                      entity_id:
-                        format: uuid
-                        title: Entity Id
-                        type: string
-                      id:
-                        format: uuid
-                        title: Id
-                        type: string
-                      metadata:
-                        additionalProperties: true
-                        title: Metadata
-                        type: object
-                      mimetype:
-                        anyOf:
-                        - type: string
-                        - type: 'null'
-                        title: Mimetype
-                      path:
-                        title: Path
-                        type: string
-                      puid:
-                        anyOf:
-                        - type: string
-                        - type: 'null'
-                        title: Puid
-                      size:
-                        title: Size
-                        type: integer
-                    required:
-                    - created_at
-                    - created_by
-                    - id
-                    - entity_id
-                    - blob_id
-                    - path
-                    - puid
-                    - mimetype
-                    - size
-                    - checksum
-                    - comment
-                    - metadata
-                    title: FileRow
+                  blob_id:
+                    format: uuid
+                    title: Blob Id
+                    type: string
+                  checksum:
+                    title: Checksum
+                    type: string
+                  comment:
+                    title: Comment
+                    type: string
+                  created_at:
+                    format: date-time
+                    title: Created At
+                    type: string
+                  created_by:
+                    format: uuid
+                    title: Created By
+                    type: string
+                  entity_id:
+                    format: uuid
+                    title: Entity Id
+                    type: string
+                  id:
+                    format: uuid
+                    title: Id
+                    type: string
+                  metadata:
+                    additionalProperties: true
+                    title: Metadata
                     type: object
+                  mimetype:
+                    anyOf:
+                    - type: string
+                    - type: 'null'
+                    title: Mimetype
+                  path:
+                    title: Path
+                    type: string
+                  puid:
+                    anyOf:
+                    - type: string
+                    - type: 'null'
+                    title: Puid
+                  size:
+                    title: Size
+                    type: integer
                 required:
-                - data
-                title: APIResponse
+                - created_at
+                - created_by
+                - id
+                - entity_id
+                - blob_id
+                - path
+                - puid
+                - mimetype
+                - size
+                - checksum
+                - comment
+                - metadata
+                title: FileRow
                 type: object
-          description: FileRow
+          description: ''
         400:
           content:
             application/json:
@@ -3583,76 +3901,69 @@ paths:
           content:
             application/json:
               schema:
-                description: FileRow
                 properties:
-                  data:
-                    properties:
-                      blob_id:
-                        format: uuid
-                        title: Blob Id
-                        type: string
-                      checksum:
-                        title: Checksum
-                        type: string
-                      comment:
-                        title: Comment
-                        type: string
-                      created_at:
-                        format: date-time
-                        title: Created At
-                        type: string
-                      created_by:
-                        format: uuid
-                        title: Created By
-                        type: string
-                      entity_id:
-                        format: uuid
-                        title: Entity Id
-                        type: string
-                      id:
-                        format: uuid
-                        title: Id
-                        type: string
-                      metadata:
-                        additionalProperties: true
-                        title: Metadata
-                        type: object
-                      mimetype:
-                        anyOf:
-                        - type: string
-                        - type: 'null'
-                        title: Mimetype
-                      path:
-                        title: Path
-                        type: string
-                      puid:
-                        anyOf:
-                        - type: string
-                        - type: 'null'
-                        title: Puid
-                      size:
-                        title: Size
-                        type: integer
-                    required:
-                    - created_at
-                    - created_by
-                    - id
-                    - entity_id
-                    - blob_id
-                    - path
-                    - puid
-                    - mimetype
-                    - size
-                    - checksum
-                    - comment
-                    - metadata
-                    title: FileRow
+                  blob_id:
+                    format: uuid
+                    title: Blob Id
+                    type: string
+                  checksum:
+                    title: Checksum
+                    type: string
+                  comment:
+                    title: Comment
+                    type: string
+                  created_at:
+                    format: date-time
+                    title: Created At
+                    type: string
+                  created_by:
+                    format: uuid
+                    title: Created By
+                    type: string
+                  entity_id:
+                    format: uuid
+                    title: Entity Id
+                    type: string
+                  id:
+                    format: uuid
+                    title: Id
+                    type: string
+                  metadata:
+                    additionalProperties: true
+                    title: Metadata
                     type: object
+                  mimetype:
+                    anyOf:
+                    - type: string
+                    - type: 'null'
+                    title: Mimetype
+                  path:
+                    title: Path
+                    type: string
+                  puid:
+                    anyOf:
+                    - type: string
+                    - type: 'null'
+                    title: Puid
+                  size:
+                    title: Size
+                    type: integer
                 required:
-                - data
-                title: APIResponse
+                - created_at
+                - created_by
+                - id
+                - entity_id
+                - blob_id
+                - path
+                - puid
+                - mimetype
+                - size
+                - checksum
+                - comment
+                - metadata
+                title: FileRow
                 type: object
-          description: FileRow
+          description: ''
         400:
           content:
             application/json:
@@ -3873,14 +4184,7 @@ paths:
           content:
             application/json:
               schema:
-                properties:
-                  data:
-                    title: Data
-                    type: string
-                required:
-                - data
-                title: APIResponse
-                type: object
+                type: string
           description: ''
         400:
           content:
@@ -3971,110 +4275,48 @@ paths:
         content:
           application/json:
             schema:
-              $comment: This meta-schema also defines keywords that have appeared
-                in previous drafts in order to prevent incompatible extensions as
-                they remain in common use.
-              $dynamicAnchor: meta
-              $id: https://json-schema.org/draft/2020-12/schema
-              $schema: https://json-schema.org/draft/2020-12/schema
-              $vocabulary:
-                https://json-schema.org/draft/2020-12/vocab/applicator: true
-                https://json-schema.org/draft/2020-12/vocab/content: true
-                https://json-schema.org/draft/2020-12/vocab/core: true
-                https://json-schema.org/draft/2020-12/vocab/format-annotation: true
-                https://json-schema.org/draft/2020-12/vocab/meta-data: true
-                https://json-schema.org/draft/2020-12/vocab/unevaluated: true
-                https://json-schema.org/draft/2020-12/vocab/validation: true
-              allOf:
-              - $ref: meta/core
-              - $ref: meta/applicator
-              - $ref: meta/unevaluated
-              - $ref: meta/validation
-              - $ref: meta/meta-data
-              - $ref: meta/format-annotation
-              - $ref: meta/content
-              properties:
-                $id:
-                  pattern: ^\w+(\.\w+)*$
-                  type: string
-                $recursiveAnchor:
-                  $comment: '"$recursiveAnchor" has been replaced by "$dynamicAnchor".'
-                  $ref: meta/core#/$defs/anchorString
-                  deprecated: true
-                $recursiveRef:
-                  $comment: '"$recursiveRef" has been replaced by "$dynamicRef".'
-                  $ref: meta/core#/$defs/uriReferenceString
-                  deprecated: true
-                definitions:
-                  $comment: '"definitions" has been replaced by "$defs".'
-                  additionalProperties:
-                    $dynamicRef: '#meta'
-                  default: {}
-                  deprecated: true
-                  type: object
-                dependencies:
-                  $comment: '"dependencies" has been split and replaced by "dependentSchemas"
-                    and "dependentRequired" in order to serve their differing semantics.'
-                  additionalProperties:
-                    anyOf:
-                    - $dynamicRef: '#meta'
-                    - $ref: meta/validation#/$defs/stringArray
-                  default: {}
-                  deprecated: true
-                  type: object
-              required:
-              - $id
-              title: Core and Validation specifications meta-schema
-              type:
-              - object
-              - boolean
-        description: ''
+              description: https://json-schema.org/draft/2020-12/schema
+              type: object
+        description: https://json-schema.org/draft/2020-12/schema
         required: true
       responses:
         201:
           content:
             application/json:
               schema:
-                description: SchemaRow
                 properties:
+                  created_at:
+                    format: date-time
+                    title: Created At
+                    type: string
+                  created_by:
+                    format: uuid
+                    title: Created By
+                    type: string
                   data:
-                    properties:
-                      created_at:
-                        format: date-time
-                        title: Created At
-                        type: string
-                      created_by:
-                        format: uuid
-                        title: Created By
-                        type: string
-                      data:
-                        additionalProperties: true
-                        title: Data
-                        type: object
-                      id:
-                        format: uuid
-                        title: Id
-                        type: string
-                      name:
-                        title: Name
-                        type: string
-                      version:
-                        title: Version
-                        type: string
-                    required:
-                    - created_at
-                    - created_by
-                    - id
-                    - name
-                    - version
-                    - data
-                    title: SchemaRow
+                    additionalProperties: true
+                    title: Data
                     type: object
+                  id:
+                    format: uuid
+                    title: Id
+                    type: string
+                  name:
+                    title: Name
+                    type: string
+                  version:
+                    title: Version
+                    type: string
                 required:
+                - created_at
+                - created_by
+                - id
+                - name
+                - version
                 - data
-                title: APIResponse
+                title: SchemaRow
                 type: object
-          description: SchemaRow
+          description: ''
         401:
           content:
             application/json:
@@ -4154,46 +4396,39 @@ paths:
           content:
             application/json:
               schema:
-                description: SchemaRow
                 properties:
+                  created_at:
+                    format: date-time
+                    title: Created At
+                    type: string
+                  created_by:
+                    format: uuid
+                    title: Created By
+                    type: string
                   data:
-                    properties:
-                      created_at:
-                        format: date-time
-                        title: Created At
-                        type: string
-                      created_by:
-                        format: uuid
-                        title: Created By
-                        type: string
-                      data:
-                        additionalProperties: true
-                        title: Data
-                        type: object
-                      id:
-                        format: uuid
-                        title: Id
-                        type: string
-                      name:
-                        title: Name
-                        type: string
-                      version:
-                        title: Version
-                        type: string
-                    required:
-                    - created_at
-                    - created_by
-                    - id
-                    - name
-                    - version
-                    - data
-                    title: SchemaRow
+                    additionalProperties: true
+                    title: Data
                     type: object
+                  id:
+                    format: uuid
+                    title: Id
+                    type: string
+                  name:
+                    title: Name
+                    type: string
+                  version:
+                    title: Version
+                    type: string
                 required:
+                - created_at
+                - created_by
+                - id
+                - name
+                - version
                 - data
-                title: APIResponse
+                title: SchemaRow
                 type: object
-          description: SchemaRow
+          description: ''
         400:
           content:
             application/json:
@@ -4291,110 +4526,48 @@ paths:
         content:
           application/json:
             schema:
-              $comment: This meta-schema also defines keywords that have appeared
-                in previous drafts in order to prevent incompatible extensions as
-                they remain in common use.
-              $dynamicAnchor: meta
-              $id: https://json-schema.org/draft/2020-12/schema
-              $schema: https://json-schema.org/draft/2020-12/schema
-              $vocabulary:
-                https://json-schema.org/draft/2020-12/vocab/applicator: true
-                https://json-schema.org/draft/2020-12/vocab/content: true
-                https://json-schema.org/draft/2020-12/vocab/core: true
-                https://json-schema.org/draft/2020-12/vocab/format-annotation: true
-                https://json-schema.org/draft/2020-12/vocab/meta-data: true
-                https://json-schema.org/draft/2020-12/vocab/unevaluated: true
-                https://json-schema.org/draft/2020-12/vocab/validation: true
-              allOf:
-              - $ref: meta/core
-              - $ref: meta/applicator
-              - $ref: meta/unevaluated
-              - $ref: meta/validation
-              - $ref: meta/meta-data
-              - $ref: meta/format-annotation
-              - $ref: meta/content
-              properties:
-                $id:
-                  pattern: ^\w+(\.\w+)*$
-                  type: string
-                $recursiveAnchor:
-                  $comment: '"$recursiveAnchor" has been replaced by "$dynamicAnchor".'
-                  $ref: meta/core#/$defs/anchorString
-                  deprecated: true
-                $recursiveRef:
-                  $comment: '"$recursiveRef" has been replaced by "$dynamicRef".'
-                  $ref: meta/core#/$defs/uriReferenceString
-                  deprecated: true
-                definitions:
-                  $comment: '"definitions" has been replaced by "$defs".'
-                  additionalProperties:
-                    $dynamicRef: '#meta'
-                  default: {}
-                  deprecated: true
-                  type: object
-                dependencies:
-                  $comment: '"dependencies" has been split and replaced by "dependentSchemas"
-                    and "dependentRequired" in order to serve their differing semantics.'
-                  additionalProperties:
-                    anyOf:
-                    - $dynamicRef: '#meta'
-                    - $ref: meta/validation#/$defs/stringArray
-                  default: {}
-                  deprecated: true
-                  type: object
-              required:
-              - $id
-              title: Core and Validation specifications meta-schema
-              type:
-              - object
-              - boolean
-        description: ''
+              description: https://json-schema.org/draft/2020-12/schema
+              type: object
+        description: https://json-schema.org/draft/2020-12/schema
         required: true
       responses:
         200:
           content:
             application/json:
               schema:
-                description: SchemaRow
                 properties:
+                  created_at:
+                    format: date-time
+                    title: Created At
+                    type: string
+                  created_by:
+                    format: uuid
+                    title: Created By
+                    type: string
                   data:
-                    properties:
-                      created_at:
-                        format: date-time
-                        title: Created At
-                        type: string
-                      created_by:
-                        format: uuid
-                        title: Created By
-                        type: string
-                      data:
-                        additionalProperties: true
-                        title: Data
-                        type: object
-                      id:
-                        format: uuid
-                        title: Id
-                        type: string
-                      name:
-                        title: Name
-                        type: string
-                      version:
-                        title: Version
-                        type: string
-                    required:
-                    - created_at
-                    - created_by
-                    - id
-                    - name
-                    - version
-                    - data
-                    title: SchemaRow
+                    additionalProperties: true
+                    title: Data
                     type: object
+                  id:
+                    format: uuid
+                    title: Id
+                    type: string
+                  name:
+                    title: Name
+                    type: string
+                  version:
+                    title: Version
+                    type: string
                 required:
+                - created_at
+                - created_by
+                - id
+                - name
+                - version
                 - data
-                title: APIResponse
+                title: SchemaRow
                 type: object
-          description: SchemaRow
+          description: ''
         400:
           content:
             application/json:
@@ -4494,6 +4667,7 @@ paths:
           content:
             application/json:
               schema:
+                additionalProperties: true
                 type: object
           description: ''
         400:
@@ -4553,47 +4727,40 @@ paths:
           content:
             application/json:
               schema:
-                properties:
-                  data:
-                    items:
-                      properties:
-                        created_at:
-                          format: date-time
-                          title: Created At
-                          type: string
-                        created_by:
-                          format: uuid
-                          title: Created By
-                          type: string
-                        data:
-                          additionalProperties: true
-                          title: Data
-                          type: object
-                        id:
-                          format: uuid
-                          title: Id
-                          type: string
-                        name:
-                          title: Name
-                          type: string
-                        version:
-                          title: Version
-                          type: string
-                      required:
-                      - created_at
-                      - created_by
-                      - id
-                      - name
-                      - version
-                      - data
-                      title: SchemaRow
+                items:
+                  properties:
+                    created_at:
+                      format: date-time
+                      title: Created At
+                      type: string
+                    created_by:
+                      format: uuid
+                      title: Created By
+                      type: string
+                    data:
+                      additionalProperties: true
+                      title: Data
                       type: object
-                    title: Data
-                    type: array
-                required:
-                - data
-                title: APIResponse
-                type: object
+                    id:
+                      format: uuid
+                      title: Id
+                      type: string
+                    name:
+                      title: Name
+                      type: string
+                    version:
+                      title: Version
+                      type: string
+                  required:
+                  - created_at
+                  - created_by
+                  - id
+                  - name
+                  - version
+                  - data
+                  title: SchemaRow
+                  type: object
+                type: array
           description: ''
         400:
           content:
@@ -4701,46 +4868,39 @@ paths:
           content:
             application/json:
               schema:
-                description: SchemaRow
                 properties:
+                  created_at:
+                    format: date-time
+                    title: Created At
+                    type: string
+                  created_by:
+                    format: uuid
+                    title: Created By
+                    type: string
                   data:
-                    properties:
-                      created_at:
-                        format: date-time
-                        title: Created At
-                        type: string
-                      created_by:
-                        format: uuid
-                        title: Created By
-                        type: string
-                      data:
-                        additionalProperties: true
-                        title: Data
-                        type: object
-                      id:
-                        format: uuid
-                        title: Id
-                        type: string
-                      name:
-                        title: Name
-                        type: string
-                      version:
-                        title: Version
-                        type: string
-                    required:
-                    - created_at
-                    - created_by
-                    - id
-                    - name
-                    - version
-                    - data
-                    title: SchemaRow
+                    additionalProperties: true
+                    title: Data
                     type: object
+                  id:
+                    format: uuid
+                    title: Id
+                    type: string
+                  name:
+                    title: Name
+                    type: string
+                  version:
+                    title: Version
+                    type: string
                 required:
+                - created_at
+                - created_by
+                - id
+                - name
+                - version
                 - data
-                title: APIResponse
+                title: SchemaRow
                 type: object
-          description: SchemaRow
+          description: ''
         400:
           content:
             application/json:
@@ -4847,6 +5007,7 @@ paths:
           content:
             application/json:
               schema:
+                additionalProperties: true
                 type: object
           description: ''
         400:
@@ -5027,6 +5188,7 @@ paths:
           content:
             application/json:
               schema:
+                additionalProperties: true
                 type: object
           description: ''
         401:
@@ -5188,7 +5350,17 @@ paths:
                     type: string
                   role:
                     anyOf:
-                    - enum:
+                    - description: 'User roles:
+
+
+                        * VIEWER = 0
+
+                        * EDITOR = 10
+
+                        * MANAGER = 20
+
+                        * ADMIN = 30'
+                      enum:
                       - 0
                       - 10
                       - 20
@@ -5258,6 +5430,7 @@ paths:
           content:
             application/json:
               schema:
+                additionalProperties: true
                 type: object
           description: ''
         401:
@@ -5323,6 +5496,7 @@ paths:
           content:
             application/json:
               schema:
+                additionalProperties: true
                 type: object
           description: ''
         404:
@@ -5537,6 +5711,7 @@ paths:
           content:
             application/json:
               schema:
+                additionalProperties: true
                 type: object
           description: ''
         401:
@@ -5602,6 +5777,7 @@ paths:
           content:
             application/json:
               schema:
+                additionalProperties: true
                 type: object
           description: ''
         404:
