@@ -115,11 +115,11 @@ if os.getenv("TEST"):
         _load_py_settings("settings_test.py")
 
 
-def get_setting(key):
+def get_setting(key, default=None):
     """
     Get a setting by key
     """
-    return settings.get(key, None)
+    return settings.get(key, default)
 
 
 def get_settings_facets():
