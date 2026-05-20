@@ -30,6 +30,12 @@ class TestUserPermissions(unittest.TestCase):
     def test_permissions_from_v2_admin_role_maps_hierarchically(self):
         self.assertEqual(user.permissions_from_me({"role": 30}), ["admin", "employee", "user"])
 
+    def test_permissions_from_v2_admin_flag_maps_hierarchically(self):
+        self.assertEqual(
+            user.permissions_from_me({"role": 0, "admin": True}),
+            ["admin", "employee", "user"],
+        )
+
     def test_has_permission_uses_normalized_v2_permissions(self):
         me = {"role": 30}
 

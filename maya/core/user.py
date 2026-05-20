@@ -52,7 +52,7 @@ def permissions_from_me(me: dict) -> list:
         return permissions_as_list(user_permissions)
 
     if "role" in me:
-        return _permissions_from_v2_role(me.get("role"))
+        return _permissions_from_v2_role(me.get("role"), admin=me.get("admin") is True)
 
     return []
 
@@ -66,7 +66,10 @@ def has_permission(me: dict, permission: str) -> bool:
     return permission in user_permissions_list
 
 
-def _permissions_from_v2_role(role: int | None) -> list[str]:
+def _permissions_from_v2_role(role: int | None, *, admin: bool = False) -> list[str]:
+    if admin:
+        return ["admin", "employee", "user"]
+
     if role is None:
         return ["user"]
 
