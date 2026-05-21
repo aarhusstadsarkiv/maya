@@ -96,7 +96,7 @@ def get_insert_user_data(me: dict) -> dict:
     Get user data for inserting into users table
     """
     # Check if name exist on me
-    if me.get("name"):
+    if not me.get("display_name") and me.get("name"):
         me["display_name"] = me["name"]
 
     return {
