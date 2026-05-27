@@ -92,12 +92,11 @@ def set_latitude_longitude(data: dict):
 
 def set_creators_link_list(data: dict, schema):
     """
-    Set creator_link field on dict.
+    Set creator_creator_link field on dict.
     """
-    is_creator = data.get("is_creator")
-    is_creative_creator = data.get("is_creative_creator")
 
-    if is_creator and is_creative_creator:
+    is_creative_creator = data.get("is_creative_creator")
+    if is_creative_creator:
         label_key = "creator" if schema == "person" else "organization"
         label = translate(f"See all records this {label_key} has created")
 
@@ -116,7 +115,6 @@ def set_collectors_link_list(data: dict, schema):
     Set collectors_link field on dict.
     """
     is_creator = data.get("is_creator")
-
     if is_creator:
         label_key = "creator" if schema == "person" else "organization"
         label = translate(f"See all records this {label_key} has collected")
