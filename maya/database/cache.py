@@ -69,9 +69,11 @@ class DatabaseCache:
         Will return the value if the key exists and is not expired.
         Will return None if the key does not exist or if the key is expired.
         If expire_in is 0, the value will never expire.
+        Expired values are left in place for set() or delete_expired() to
+        replace or remove, keeping cache reads read-only under concurrency.
         """
         cursor = await self.connection.execute(
-            "SELECT id, value, unix_timestamp FROM cache WHERE key = ?",
+            "SELECT value, unix_timestamp FROM cache WHERE key = ?",
             (key,),
         )
         result = await cursor.fetchone()
@@ -83,7 +85,6 @@ class DatabaseCache:
             current_time = int(time.time())
             if current_time - result["unix_timestamp"] < expire_in:
                 return json.loads(result["value"])
-            await self.connection.execute("DELETE FROM cache WHERE key = ?", (key,))
         return None
 
     async def delete(self, id: int) -> None:

@@ -1,11 +1,16 @@
 import asyncio
+import os
+import time
+import unittest
+
+os.environ.setdefault("BASE_DIR", "sites/aarhus")
+
 from maya.core.dynamic_settings import init_settings
 from maya.core.logging import get_log
-import unittest
 from maya.core.migration import Migration
 from maya.migrations.tests import migrations_tests
+from maya.database.cache import DatabaseCache
 from maya.database import crud, utils
-import os
 
 init_settings()
 log = get_log()
@@ -119,6 +124,39 @@ class TestDB(unittest.TestCase):
             crud_instance = crud.CRUD(connection)
             count = await crud_instance.count("users", {})
             self.assertEqual(count, 0)
+
+    def test_cache_get_expired_value_is_read_only(self):
+        asyncio.run(self._test_cache_get_expired_value_is_read_only_async())
+
+    async def _test_cache_get_expired_value_is_read_only_async(self):
+        db_path = "/tmp/test_cache.db"
+
+        if os.path.exists(db_path):
+            os.remove(db_path)
+
+        database_transaction = utils.DatabaseConnection(db_path)
+        async with database_transaction.write_transaction_scope_async() as connection:
+            await connection.execute("""
+                CREATE TABLE cache (
+                    id INTEGER PRIMARY KEY,
+                    key TEXT NOT NULL UNIQUE,
+                    value TEXT,
+                    unix_timestamp INTEGER NOT NULL DEFAULT 0
+                ) STRICT
+                """)
+            await connection.execute(
+                "INSERT INTO cache (key, value, unix_timestamp) VALUES (?, ?, ?)",
+                ("expired", '{"value": "old"}', int(time.time()) - 100),
+            )
+
+        async with database_transaction.transaction_scope_async() as connection:
+            cache = DatabaseCache(connection)
+            self.assertIsNone(await cache.get("expired", expire_in=10))
+
+        async with database_transaction.transaction_scope_async() as connection:
+            cursor = await connection.execute("SELECT COUNT(*) AS count FROM cache WHERE key = ?", ("expired",))
+            result = await cursor.fetchone()
+            self.assertEqual(result["count"], 1)
 
 
 if __name__ == "__main__":
