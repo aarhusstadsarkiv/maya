@@ -3203,6 +3203,14 @@
         "id": "112133"
       },
       {
+        "display_label": "Valsedrømme",
+        "id": "160768"
+      },
+      {
+        "display_label": "En Eneste Nat",
+        "id": "161006"
+      },
+      {
         "display_label": "Henrik og Pernille",
         "id": "112325"
       },
@@ -5463,6 +5471,14 @@
       {
         "display_label": "Helsingør Revyen",
         "id": "118587"
+      },
+      {
+        "display_label": "Aarhus Teaters 50-års jubilæumsfest",
+        "id": "156985"
+      },
+      {
+        "display_label": "50 År",
+        "id": "112880"
       },
       {
         "display_label": "Ungdom og Galskab",
@@ -10367,6 +10383,10 @@
         "id": "118561"
       },
       {
+        "display_label": "Aneas",
+        "id": "161155"
+      },
+      {
         "display_label": "Salvador",
         "id": "118562"
       },
@@ -10974,6 +10994,10 @@
         "id": "113153"
       },
       {
+        "display_label": "I føling",
+        "id": "160752"
+      },
+      {
         "display_label": "Dance me to the end on/off love",
         "id": "118365"
       },
@@ -11051,8 +11075,16 @@
         "id": "118726"
       },
       {
-        "display_label": "For enden af kærligheden",
-        "id": "120377"
+        "display_label": "Et spørgsmål om tro",
+        "id": "161204"
+      },
+      {
+        "display_label": "Næste stoppested",
+        "id": "161202"
+      },
+      {
+        "display_label": "Efter lukketid",
+        "id": "161203"
       },
       {
         "display_label": "Jeg kan huske alting",
@@ -11061,6 +11093,14 @@
       {
         "display_label": "Salon Madam Nielsen",
         "id": "120376"
+      },
+      {
+        "display_label": "Lydkrop",
+        "id": "161218"
+      },
+      {
+        "display_label": "A Way",
+        "id": "161217"
       },
       {
         "display_label": "Bennys Badekar",
@@ -11188,6 +11228,10 @@
         "id": "120098"
       },
       {
+        "display_label": "Overload",
+        "id": "161144"
+      },
+      {
         "display_label": "Kaldet",
         "id": "120099"
       },
@@ -11243,6 +11287,10 @@
       {
         "id": "149860",
         "display_label": "Lyden af de skuldre vi står på"
+      },
+      {
+        "display_label": "Blessed are those who...",
+        "id": "161171"
       },
       {
         "id": "149881",
@@ -11572,8 +11620,169 @@
         "id": "155308"
       },
       {
+        "display_label": "Et Juleeventyr",
+        "id": "155534"
+      },
+      {
+        "display_label": "Leonora Christina - sandhedens dronning",
+        "id": "155859"
+      },
+      {
+        "display_label": "Charlie og Chokoladefabrikken",
+        "id": "155859"
+      },
+      {
+        "display_label": "The Supreme Gentleman",
+        "id": "155820"
+      },
+      {
+        "display_label": "A Clockwork Orange",
+        "id": "155918"
+      },
+      {
+        "display_label": "Kong Lear",
+        "id": "155642"
+      },
+      {
+        "display_label": "Vita Danica",
+        "id": "155591"
+      },
+      {
+        "display_label": "YCLWB",
+        "id": "155819"
+      },
+      {
+        "display_label": "100 Sange",
+        "id": "155978"
+      },
+      {
+        "display_label": "Kærlighed efter lukketid",
+        "id": "155919"
+      },
+      {
+        "display_label": "Kærlighedens forrykte former",
+        "id": "155544"
+      },
+      {
+        "display_label": "Intet er nok",
+        "id": "161111"
+      },
+      {
+        "display_label": "Mirakolinas fodbad",
+        "id": "161112"
+      },
+      {
+        "display_label": "Girls & Boys",
+        "id": "155924"
+      },
+      {
+        "display_label": "Rottweiler",
+        "id": "161158"
+      },
+      {
+        "display_label": "Hvad er det?",
+        "id": "161113"
+      },
+      {
+        "display_label": "Emma ude af takt",
+        "id": "161547"
+      },
+      {
+        "display_label": "Punk - a rebel never dies",
+        "id": "161548"
+      },
+      {
+        "display_label": "ILT21",
+        "id": "161146"
+      },
+      {
         "display_label": "En Fortælling Om Blindhed",
         "id": "155309"
+      }
+    ]
+  },
+  {
+    "display_label": "Sæson 2021-22",
+    "children": [
+      {
+        "display_label": "Jeg er jo lige her",
+        "id": "156144"
+      },
+      {
+        "display_label": "Romeo & Julie",
+        "id": "156211"
+      },
+      {
+        "display_label": "Cabaret",
+        "id": "156234"
+      },
+      {
+        "display_label": "Ordet",
+        "id": "111498"
+      },
+      {
+        "display_label": "Kagefabrikken",
+        "id": "156141"
+      },
+      {
+        "display_label": "Sandmanden",
+        "id": "156141"
+      },
+      {
+        "display_label": "Omstigning til Paradis",
+        "id": "156235"
+      },
+      {
+        "display_label": "Når vi døde vågner",
+        "id": "156188"
+      },
+      {
+        "display_label": "Til de lyse morgener",
+        "id": "156209"
+      },
+      {
+        "display_label": "The Supreme Gentleman",
+        "id": "156221"
+      },
+      {
+        "display_label": "Man vokser op",
+        "id": "156248"
+      },
+      {
+        "display_label": "Girls % Boys",
+        "id": "159900"
+      },
+      {
+        "display_label": "Himmelvendt",
+        "id": "156239"
+      },
+      {
+        "display_label": "Big Bang - Collective Matter",
+        "id": "161549"
+      },
+      {
+        "display_label": "Hjertebank",
+        "id": "161550"
+      },
+      {
+        "display_label": "The Danish Girl",
+        "id": "161551"
+      },
+      {
+        "display_label": "Mermaid Show",
+        "id": "156877"
+      },
+      {
+        "display_label": "Aftryk",
+        "id": "161536"
+      },
+      {
+        "display_label": "Cirkel",
+        "id": "161538"
+      },
+      {
+        "display_label": "Bedrag",
+        "id": "161539"
       }
     ]
   },
@@ -11609,7 +11818,7 @@
         "id": "156781"
       },
       {
-        "display_label": "Bang!",
+        "display_label": "Bang",
         "id": "156868"
       },
       {
@@ -11639,6 +11848,34 @@
       {
         "display_label": "Panic!",
         "id": "156876"
+      },
+      {
+        "display_label": "Melancholia",
+        "id": "156775"
+      },
+      {
+        "display_label": "Til de lyse morgener",
+        "id": "157908"
+      },
+      {
+        "display_label": "10.000 skridt",
+        "id": "161552"
+      },
+      {
+        "display_label": "Sommerhuset",
+        "id": "161553"
+      },
+      {
+        "display_label": "Ocean",
+        "id": "161554"
+      },
+      {
+        "display_label": "Lillebitte Kæmpestor",
+        "id": "161555"
+      },
+      {
+        "display_label": "ILT23",
+        "id": "161556"
       }
     ]
   },
@@ -11696,6 +11933,42 @@
       {
         "display_label": "Væksthuset",
         "id": "160210"
+      },
+      {
+        "display_label": "En lykkelig slutning",
+        "id": "157948"
+      },
+      {
+        "display_label": "10.000 skridt",
+        "id": "161557"
+      },
+      {
+        "display_label": "Hvor stjernerne blinker",
+        "id": "161540"
+      },
+      {
+        "display_label": "Ting jeg gjorde - Live",
+        "id": "161541"
+      },
+      {
+        "display_label": "Tone",
+        "id": "161542"
+      },
+      {
+        "display_label": "Tøj",
+        "id": "161542"
+      },
+      {
+        "display_label": "Is Anybody Home",
+        "id": "159907"
+      },
+      {
+        "display_label": "Ikke noget pis",
+        "id": "161544"
+      },
+      {
+        "display_label": "Jytte fra marketing er gået for i dag",
+        "id": "159908"
       }
     ]
   },
@@ -11753,6 +12026,208 @@
       {
         "display_label": "#Jeanne",
         "id": "160245"
+      },
+      {
+        "display_label": "10.000 skridt",
+        "id": "161114"
+      },
+      {
+        "display_label": "ILT25",
+        "id": "161115"
+      },
+      {
+        "display_label": "Eks",
+        "id": "161116"
+      },
+      {
+        "display_label": "Tænkepauser Live",
+        "id": "161117"
+      },
+      {
+        "display_label": "De urørlige",
+        "id": "161118"
+      },
+      {
+        "display_label": "Dødsdansen",
+        "id": "161119"
+      },
+      {
+        "display_label": "Natten",
+        "id": "161120"
+      },
+      {
+        "display_label": "Forvandling",
+        "id": "161121"
+      },
+      {
+        "display_label": "Pres",
+        "id": "161137"
+      }
+    ]
+  },
+  {
+    "display_label": "Sæson 2025-26",
+    "children": [
+      {
+        "display_label": "Teaterkoncert Thomas Helmig",
+        "id": "161122"
+      },
+      {
+        "display_label": "Amour",
+        "id": "161123"
+      },
+      {
+        "display_label": "Elverhøj",
+        "id": "161124"
+      },
+      {
+        "display_label": "En lykkelig slutning",
+        "id": "161125"
+      },
+      {
+        "display_label": "Dostojevskij",
+        "id": "161126"
+      },
+      {
+        "display_label": "Fædra",
+        "id": "161127"
+      },
+      {
+        "display_label": "Julen findes ikke",
+        "id": "161128"
+      },
+      {
+        "display_label": "Skolekomedien",
+        "id": "161129"
+      },
+      {
+        "display_label": "Tristan og Isolde",
+        "id": "161130"
+      },
+      {
+        "display_label": "Odysséen",
+        "id": "161131"
+      },
+      {
+        "display_label": "Dear Evan Hansen",
+        "id": "161132"
+      },
+      {
+        "display_label": "Barbara",
+        "id": "161133"
+      },
+      {
+        "display_label": "Real Love",
+        "id": "161134"
+      },
+      {
+        "display_label": "Mod Alle Odds",
+        "id": "161135"
+      },
+      {
+        "display_label": "Dancing on my own",
+        "id": "161136"
+      },
+      {
+        "display_label": "Pres",
+        "id": "161137"
+      },
+      {
+        "display_label": "Endnu en dag i Guds skaberværk",
+        "id": "161138"
+      },
+      {
+        "display_label": "Meter i sekundet",
+        "id": "161139"
+      },
+      {
+        "display_label": "Historiefestival - Aarhus Teater 125 år",
+        "id": "161141"
+      },
+      {
+        "display_label": "Spejlneuroner",
+        "id": "161141"
+      },
+      {
+        "display_label": "Se!",
+        "id": "161142"
+      },
+      {
+        "display_label": "Der kommer nogen",
+        "id": "161143"
+      }
+    ]
+  },
+  {
+    "display_label": "Sæson 2026-27",
+    "children": [
+      {
+        "display_label": "Jeppe på Bjerget",
+        "id": "161519"
+      },
+      {
+        "display_label": "Stolthed og fordom",
+        "id": "161520"
+      },
+      {
+        "display_label": "Vegetaren",
+        "id": "161521"
+      },
+      {
+        "display_label": "Absalons Hemmelighed",
+        "id": "161522"
+      },
+      {
+        "display_label": "Mann",
+        "id": "161523"
+      },
+      {
+        "display_label": "Lille Eyolf",
+        "id": "161524"
+      },
+      {
+        "display_label": "Christlike",
+        "id": "161525"
+      },
+      {
+        "display_label": "Hamlet",
+        "id": "161526"
+      },
+      {
+        "display_label": "Hvad blev der af Baby Jane?",
+        "id": "161527"
+      },
+      {
+        "display_label": "Solo",
+        "id": "161528"
+      },
+      {
+        "display_label": "Rodfæstet",
+        "id": "161529"
+      },
+      {
+        "display_label": "Very Rich Angels",
+        "id": "161530"
+      },
+      {
+        "display_label": "Leslie",
+        "id": "161531"
+      },
+      {
+        "display_label": "Lyt til månen",
+        "id": "161532"
+      },
+      {
+        "display_label": "Tone",
+        "id": "161533"
+      },
+      {
+        "display_label": "Faust",
+        "id": "161534"
+      },
+      {
+        "display_label": "ILT Festival",
+        "id": "161535"
       }
     ]
   }
