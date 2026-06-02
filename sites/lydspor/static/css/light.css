@@ -3,7 +3,7 @@
    * System colors
    */
 
-  --background-body: #fff;
+  --background-body: #fff9ed;
   --background: #efefef;
   --background-alt: #ececec;
   --text-main: #333;
@@ -11,7 +11,7 @@
   --text-muted: #70777f;
   /* --links: #f00; */
   /* --links: #0091ff; */
-  --links: black;
+  --links: #41292C;
   --focus: #9b9b9b;
   --border: #dbdbdb;
   --code: #000;
@@ -42,8 +42,8 @@
   /**
    * default.css
    */
-  --navigation-background: #efefef;  ;
-  --navigation-background-rgb: 221, 221, 221;
+  --navigation-background: #41292C;
+  --navigation-background-rgb: 65, 41, 44;
   --navigation-background-hover: #ffffff22;
 
   --flash-color: white;
@@ -51,7 +51,7 @@
   --flash-notice-color: #1b1f23;
   --flash-error-color: crimson;
 
-  --main-menu: #333;
+  --main-menu: white;
   --main-menu-hover: #ffffff22;
   --main-menu-top: 61px;
 
@@ -73,9 +73,9 @@
   /**
    * search.css
    */
-  --search-result-background: white;
-  --search-result-border: #e6e6e6;
-  --search-result-background-hover: #fafafa;
+  --search-result-background: #fff9ed;
+  --search-result-border: #8FB899;
+  --search-result-background-hover: #fef7ed;
   --search-link-text: black;
 
   --background-disabled: #efefef;
@@ -84,8 +84,8 @@
   /**
    * footer.css
    */
-  --footer-text: #333;
-  --footer-heading: #333;
+  --footer-text: white;
+  --footer-heading: white;
 
   /**
    * slideshow.css
@@ -98,4 +98,5 @@
    * overlay.css
    */
   --overlay-background: white;
+
 }

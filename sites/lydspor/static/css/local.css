@@ -1,8 +1,38 @@
+html {
+    font-size: 17px;
+}
+
+body {
+    font-family: "Inter", sans-serif;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.menu-text,
+footer .heading 
+{
+    font-family: "Bodoni Moda", serif;
+    letter-spacing: 0.035em;
+}
+
 .logo img {
     max-width: 100%;
     height: auto;
-    max-height: 61px;
-    padding-top: 10px;
+    max-height: 100px;
+    padding-top: 5px;
+}
+
+.navigation {
+    align-items: center;
+    box-shadow: 1px 1px 5px var(--record-representation-box-shadow);
+}
+
+.navigation-right-group {
+    padding-right: 20px;
 }
 
 /** only display #menu-hamburger menu devices where max-width is 768px */

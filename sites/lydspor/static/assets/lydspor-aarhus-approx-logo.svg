@@ -1,11 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="260 203 880 362" width="880" height="362" overflow="visible" role="img" aria-labelledby="title desc">
   <title id="title">Lydspor Aarhus logo</title>
-  <desc id="desc">Approximate vector recreation of the logo with a green circle and black serif text reading LYDSPOR AARHUS. Transparent background with extra padding so the final S is not clipped.</desc>
+  <desc id="desc">LYDSPOR AARHUS</desc>
   <defs>
     <style>
       .logo-text {
-        fill: #000000;
-        font-family: Didot, "Bodoni 72", "Bodoni MT", "Libre Bodoni", "Times New Roman", serif;
+        fill: #fff;
+        font-family: "Bodoni Moda", sans-serif;
         font-weight: 400;
         letter-spacing: 0.035em;
       }
