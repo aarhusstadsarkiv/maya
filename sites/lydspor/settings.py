@@ -9,12 +9,12 @@ settings: dict[str, typing.Any] = {
     "api_base_url": "https://api.openaws.dk/v1",
     "canonical_url": "https://www.aarhusarkivet.dk",
     "main_menu_top": [
-        {"name": "search_get", "title": "Udforsk Arkivet", "type": "text"},
-        {"name": "about", "title": "Om Arkivet", "type": "text"},
+        {"name": "search_get", "title": "Søg i Arkivet", "type": "text"},
+        {"name": "about", "title": "Om Lydspor Aarhus", "type": "text"},
     ],
     "show_version": True,
     "pages": [
         {"name": "home", "title": "Forside", "template": "pages/home.html", "url": "/"},
-        {"name": "about", "title": "Om", "template": "pages/about.html", "url": "/about"},
+        {"name": "about", "title": "Om Lydspor Aarhus", "template": "pages/about.html", "url": "/about"},
     ],
 }
