@@ -9,11 +9,13 @@ Ja — her er transskriberingen af PDF’en, side for side.
 **Projekter**
 
 **Farvekode**
-B0FE76
-41292C
-81E970
-8FB899
-FF47DA
+#B0FE76 green yellow
+#41292C deep moocha
+#81E970 light green 
+#8FB899 muted teal
+#FF47DA cotton bloom (pink)
+
+#fb607f (brink pink)
 
 **Skrifttyper**
 
@@ -117,4 +119,10 @@ Den ene version bliver forside og den anden version kan være siderne, hvor man 
 Vil gerne se begge versioner på enkeltsiderne :)
 
 **ENKELTMATERIALE**
+
+## Fonts
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
 
