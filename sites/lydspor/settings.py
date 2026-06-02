@@ -9,17 +9,12 @@ settings: dict[str, typing.Any] = {
     "api_base_url": "https://api.openaws.dk/v1",
     "canonical_url": "https://www.aarhusarkivet.dk",
     "main_menu_top": [
-        {"name": "search_get", "title": "Søg", "type": "icon", "icon": "search"},
-    ],
-    "main_menu_system": [
-        {"name": "home", "title": "Forside"},
+        {"name": "search_get", "title": "Udforsk Arkivet", "type": "text"},
+        {"name": "about", "title": "Om Arkivet", "type": "text"},
     ],
     "show_version": True,
+    "pages": [
+        {"name": "home", "title": "Forside", "template": "pages/home.html", "url": "/"},
+        {"name": "about", "title": "Om", "template": "pages/about.html", "url": "/about"},
+    ],
 }
-
-
-pages: list = [
-    {"name": "home", "title": "Forside", "template": "pages/home.html", "url": "/"},
-]
-
-settings["pages"] = pages
