@@ -2,4 +2,26 @@
     max-width: 100%;
     height: auto;
     max-height: 61px;
+    padding-top: 10px;
+}
+
+/** only display #menu-hamburger menu devices where max-width is 768px */
+#menu-hamburger {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    #menu-hamburger {
+        display: block;
+    }
+}
+
+@media (min-width: 769px) {
+    .main-menu-overlay {
+        /** 
+         * This is the absolute simplest way to hide the overlay menu on desktop
+         * without changing the html structure or adding javascript.
+        */
+        display: none !important;
+    }
 }
