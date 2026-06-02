@@ -1,5 +1,6 @@
 from maya.core.logging import get_log
 from maya.core.hooks_spec import HooksSpec
+from maya.records import record_utils
 
 log = get_log()
 
@@ -59,3 +60,15 @@ class Hooks(HooksSpec):
         # organisations=107434
         query_params = [(key, value) for key, value in query_params if key != "organisations"]
         return query_params
+
+    async def after_get_record(self, record: dict, meta_data: dict) -> tuple:
+        """
+        Alter the record and meta_data dictionaries after the api call
+        """
+
+        # in case teater arkivet is curator use special rule :/
+        if record_utils.is_curator(record, 4):
+            if record.get("summary"):
+                meta_data["title"] = f"[{record['summary']}]"
+
+        return record, meta_data
