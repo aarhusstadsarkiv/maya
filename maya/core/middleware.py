@@ -146,18 +146,16 @@ class NoCacheMiddleware(BaseHTTPMiddleware):
 class CSPMiddleware(BaseHTTPMiddleware):
     """
     Content Security Policy middleware.
-    Adds a Content-Security-Policy header to each response
+    Adds a Content-Security-Policy header to each response.
     """
 
     async def dispatch(self, request: Request, call_next):
-
         # Set nonce on request state for use in templates
         nonce = os.urandom(16).hex()
         request.state.csp_nonce = nonce
 
         response = await call_next(request)
 
-        # Define Content Security Policy header
         asset_src = [
             "'self'",
             "data:",
@@ -168,12 +166,12 @@ class CSPMiddleware(BaseHTTPMiddleware):
 
         csp_policy = (
             "default-src 'self'; "
-            f"script-src 'self' 'nonce-{nonce}';"
+            f"script-src 'self' 'nonce-{nonce}'; "
             f"script-src-elem 'self' 'nonce-{nonce}'; "
-            "style-src 'self' 'unsafe-inline'; "
+            "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
             f"img-src {' '.join(asset_src)}; "
             f"media-src {' '.join(asset_src)}; "
-            "font-src 'self'; "
+            "font-src 'self' https://fonts.gstatic.com; "
             "connect-src 'self' https://analytics.aarhusstadsarkiv.dk;"
         )
 
