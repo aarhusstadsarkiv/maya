@@ -72,5 +72,6 @@ settings: Settings = {
     "allow_user_management": False,
     "allow_online_ordering": False,
     "allow_save_bookmarks": False,
+    "allow_theme_toggle": False,
     "ignore_record_keys": [],
 }

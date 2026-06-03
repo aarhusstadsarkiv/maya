@@ -89,6 +89,7 @@ settings: Settings = {
     "allow_save_bookmarks": True,
     "allow_save_search": False,
     "allow_online_ordering": True,
+    "allow_theme_toggle": True,
     "sqlite3": {
         "default": "local/data/database.db",
         "orders": "local/data/orders.db",

@@ -38,6 +38,7 @@
             {% endif %}
             {% endfor %}
 
+            {% if get_setting('allow_theme_toggle') %}
             <button id="theme-toggle"
                     class="theme-toggle"
                     type="button"
@@ -52,6 +53,7 @@
                     {{ get_icon('dark_mode')|safe }}
                 </span>
             </button>
+            {% endif %}
 
             {% for menu_item in main_menu_top %}
             {% if menu_item.type == 'icon' %}

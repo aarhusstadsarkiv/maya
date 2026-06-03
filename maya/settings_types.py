@@ -85,6 +85,7 @@ class Settings(TypedDict, total=True):
     allow_online_ordering: bool
     allow_save_bookmarks: bool
     allow_save_search: NotRequired[bool]
+    allow_theme_toggle: NotRequired[bool]
 
     ignore_record_keys: list[str]
 
