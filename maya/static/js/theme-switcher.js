@@ -2,19 +2,15 @@ const validThemes = ['light', 'dark'];
 
 const themeLink = document.getElementById('theme-stylesheet');
 const themeToggle = document.getElementById('theme-toggle');
-const lightIcon = themeToggle?.querySelector('.theme-toggle-icon-light');
-const darkIcon = themeToggle?.querySelector('.theme-toggle-icon-dark');
+const lightIcon = themeToggle.querySelector('.theme-toggle-icon-light');
+const darkIcon = themeToggle.querySelector('.theme-toggle-icon-dark');
 
 function getCurrentTheme() {
-    if (!themeLink) {
-        return 'light';
-    }
-
     return themeLink.getAttribute('href') === themeLink.dataset.darkHref ? 'dark' : 'light';
 }
 
 function setTheme(theme) {
-    if (!themeLink || !validThemes.includes(theme)) {
+    if (!validThemes.includes(theme)) {
         return;
     }
 
@@ -22,13 +18,11 @@ function setTheme(theme) {
     themeLink.setAttribute('href', href);
     document.documentElement.dataset.theme = theme;
 
-    if (themeToggle) {
-        themeToggle.setAttribute('aria-pressed', theme === 'dark' ? 'true' : 'false');
-        themeToggle.setAttribute(
-            'aria-label',
-            theme === 'dark' ? themeToggle.dataset.lightLabel : themeToggle.dataset.darkLabel,
-        );
-    }
+    themeToggle.setAttribute('aria-pressed', theme === 'dark' ? 'true' : 'false');
+    themeToggle.setAttribute(
+        'aria-label',
+        theme === 'dark' ? themeToggle.dataset.lightLabel : themeToggle.dataset.darkLabel,
+    );
 
     if (lightIcon && darkIcon) {
         lightIcon.hidden = theme === 'light';
@@ -58,7 +52,7 @@ async function persistTheme(theme) {
 
 setTheme(getCurrentTheme());
 
-themeToggle?.addEventListener('click', async function () {
+themeToggle.addEventListener('click', async function () {
     const previousTheme = getCurrentTheme();
     const nextTheme = getCurrentTheme() === 'dark' ? 'light' : 'dark';
 

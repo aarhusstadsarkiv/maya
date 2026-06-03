@@ -37,7 +37,9 @@
     Flash.clearMessages(); // Clear flash messages on page load
     
     import "/static/js/detect-missing-img.js";
+    {% if get_setting('allow_theme_toggle') %}
     import "/static/js/theme-switcher.js";
+    {% endif %}
     import "/static/js/main-navigation.js";
     import "/static/js/local.js";
 </script>
