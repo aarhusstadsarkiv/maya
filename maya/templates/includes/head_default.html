@@ -15,7 +15,7 @@
 
 {% set light_theme_href = url_for('static', path='/css/light.css') ~ '?v=' ~ get_setting('version') %}
 {% set dark_theme_href = url_for('static', path='/css/dark.css') ~ '?v=' ~ get_setting('version') %}
-{% set theme_href = dark_theme_href if dark_theme else light_theme_href %}
+{% set theme_href = dark_theme_href if get_setting('allow_theme_toggle') and dark_theme else light_theme_href %}
 
 <link id="theme-stylesheet"
       rel="stylesheet"
@@ -37,9 +37,7 @@
     Flash.clearMessages(); // Clear flash messages on page load
     
     import "/static/js/detect-missing-img.js";
-    {% if get_setting('allow_theme_toggle') %}
     import "/static/js/theme-switcher.js";
-    {% endif %}
     import "/static/js/main-navigation.js";
     import "/static/js/local.js";
 </script>
