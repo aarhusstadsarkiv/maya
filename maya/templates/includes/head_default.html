@@ -13,11 +13,15 @@
   {% endfor %}
 {% endif %}
 
-{% if dark_theme %}
-<link rel="stylesheet" href="{{ url_for('static', path='/css/dark.css') }}?v={{ get_setting('version') }}">
-{% else %}
-<link rel="stylesheet" href="{{ url_for('static', path='/css/light.css') }}?v={{ get_setting('version') }}">
-{% endif %}
+{% set light_theme_href = url_for('static', path='/css/light.css') ~ '?v=' ~ get_setting('version') %}
+{% set dark_theme_href = url_for('static', path='/css/dark.css') ~ '?v=' ~ get_setting('version') %}
+{% set theme_href = dark_theme_href if dark_theme else light_theme_href %}
+
+<link id="theme-stylesheet"
+      rel="stylesheet"
+      href="{{ theme_href }}"
+      data-light-href="{{ light_theme_href }}"
+      data-dark-href="{{ dark_theme_href }}">
 <link rel="stylesheet" href="{{ url_for('static', path='/css/dolphin.css') }}?v={{ get_setting('version') }}">
 <link rel="stylesheet" href="{{ url_for('static', path='/css/default.css') }}?v={{ get_setting('version') }}">
 <link rel="stylesheet" href="{{ url_for('static', path='/css/navigation.css') }}?v={{ get_setting('version') }}">
@@ -33,6 +37,7 @@
     Flash.clearMessages(); // Clear flash messages on page load
     
     import "/static/js/detect-missing-img.js";
+    import "/static/js/theme-switcher.js";
     import "/static/js/main-navigation.js";
     import "/static/js/local.js";
 </script>

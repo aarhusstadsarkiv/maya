@@ -131,11 +131,9 @@ async def auth_set_cooke(request: Request):
         # 10 years
         MAX_AGE = 10 * 365 * 24 * 60 * 60
         if cookie_value:
-            flash.set_message(request, message=translate("Dark theme enabled."), type="success")
             response.set_cookie(cookie_name, cookie_value, max_age=MAX_AGE, httponly=True)
         else:
             response.delete_cookie(cookie_name)
-            flash.set_message(request, message=translate("Dark theme disabled."), type="success")
         return response
     else:
         return JSONResponse({})

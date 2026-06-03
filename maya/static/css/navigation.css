@@ -22,6 +22,39 @@
     padding: 5px;
 }
 
+.theme-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    margin-right: 6px;
+    margin-bottom: 5px;
+    padding: 5px;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+}
+
+.theme-toggle:hover {
+    background: transparent;
+}
+
+.theme-toggle:focus {
+    background: transparent;
+    box-shadow: none;
+}
+
+.theme-toggle-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.theme-toggle:focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+}
+
 /**
  * The main menu is hidden by default
  * When the hamburger menu is clicked, the main menu is shown
@@ -88,11 +121,17 @@
 /**
  * main menu icons
  */
-.menu-icon svg {
+.menu-icon svg,
+.theme-toggle svg {
     color: var(--main-menu);
     fill: var(--main-menu);
     height: 40px;
     width: 40px;
+}
+
+.theme-toggle svg {
+    height: 24px;
+    width: 24px;
 }
 
 
@@ -101,10 +140,6 @@
     padding: 0 5px;
 }
 
-
-.menu-icon:hover {
-    color: var(--main-menu-hover);
-}
 
 /**
  * main-menu menu-text

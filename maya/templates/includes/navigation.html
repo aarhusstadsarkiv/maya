@@ -38,6 +38,21 @@
             {% endif %}
             {% endfor %}
 
+            <button id="theme-toggle"
+                    class="theme-toggle"
+                    type="button"
+                    aria-label="{{ translate('Toggle theme') }}"
+                    aria-pressed="false"
+                    data-light-label="{{ translate('Switch to light theme') }}"
+                    data-dark-label="{{ translate('Switch to dark theme') }}">
+                <span class="theme-toggle-icon theme-toggle-icon-light" hidden>
+                    {{ get_icon('light_mode')|safe }}
+                </span>
+                <span class="theme-toggle-icon theme-toggle-icon-dark">
+                    {{ get_icon('dark_mode')|safe }}
+                </span>
+            </button>
+
             {% for menu_item in main_menu_top %}
             {% if menu_item.type == 'icon' %}
             <a href="{{ menu_item.url }}" aria-label="{{ menu_item.title }}">

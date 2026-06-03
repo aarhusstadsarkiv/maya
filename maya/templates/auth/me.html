@@ -83,72 +83,8 @@
         </div>
         {% endif %}
 
-        <div class="record-content">
-            <div class="label">Mørkt tema</div>
-            <div class="content">
-                <p>
-                    <label class="switch">
-
-                        <input type="checkbox" id="dark-theme" {% if dark_theme %}checked{% endif %}>
-                        <span class="slider round"></span>
-
-                    </label>
-                </p>
-            </div>
-        </div>
     </div>
 </div>
-<div class="loadingspinner hidden"></div>
-<script type="module" nonce="{{ request.state.csp_nonce }}">
-
-    import { asyncLogError } from "/static/js/error.js";
-    import { Requests } from "/static/js/requests.js";
-    import { Flash } from "/static/js/flash.js";
-    import { config } from "/static/js/config.js";
-
-    const spinner = document.querySelector('.loadingspinner');
-    const darkTheme = document.getElementById('dark-theme');
-
-    const get_data = () => {
-
-        const data = {
-            cookie_name: 'dark_theme',
-            cookie_value: darkTheme.checked
-        };
-
-        return JSON.stringify(data);
-    }
-
-    darkTheme.addEventListener('change', async function (e) {
-        let res;
-        e.preventDefault();
-        spinner.classList.toggle('hidden');
-
-        try {
-            const data = get_data();
-            console.log(data)
-            res = await Requests.asyncPostJson('/auth/cookie', data, 'POST');
-            if (res.error) {
-                Flash.setMessage(res.message, 'error');
-            }
-
-            // redirect /auth/me
-            window.location.href = '/auth/me';
-
-
-        } catch (e) {
-            Flash.setMessage(config.jsExceptionMessage, 'error');
-            asyncLogError(e);
-            console.error(e);
-        } finally {
-            // initialize();
-            spinner.classList.toggle('hidden');
-        }
-
-    });
-
-
-</script>
 
 {% if get_setting('debug') %}
 <pre>{{ to_json(me) }}</pre>
