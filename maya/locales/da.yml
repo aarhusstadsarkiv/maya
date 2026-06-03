@@ -21,8 +21,6 @@ Create: Create
 Create Schema: Opret skema
 Create entity: Create entity
 Create schema: Opret skema
-Dark theme disabled.: Mørkt tema deaktiveret
-Dark theme enabled.: Mørkt tema aktiveret
 Date From: Tidligste dato
 Date To: Seneste dato
 Delete order: Afslut bestilling
@@ -142,6 +140,8 @@ Show all results in the collection: Vis alle resultater i samlingen
 Showing page: Side
 Something went wrong. Please try again.: Der opstod en fejl prøv igen senere.
 Submit: Send
+Switch to dark theme: Skift til mørkt tema
+Switch to light theme: Skift til lyst tema
 System can not deliver an email about resetting password. Try again later.: Systemet
   kan ikke sende en email om at nulstille password. Prøv igen senere.
 System error. Something went wrong: System fejl. Fejlen er blevet logget.
@@ -159,6 +159,7 @@ The token is not valid. You will need to a new token to verify your email.: Nøg
   i URLen er ikke gyldigt. Eller den er udløbet. Du skal logge ind for at få tilsendt
   en ny nøgle til din email.
 There is no user with this email address.: Der er ingen bruger med denne email adresse.
+Toggle theme: Skift tema
 Unknown error. Please try again later.: Ukendt fejl. Prøv igen senere.
 Update: Update
 Update Password: Opdater password

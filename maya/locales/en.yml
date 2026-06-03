@@ -25,8 +25,6 @@ Create Schema: Create Schema
 Create a resource: Create a resource
 Create entity: Create entity
 Create schema: Create schema
-Dark theme disabled.: Dark theme disabled.
-Dark theme enabled.: Dark theme enabled.
 Date From: Date From
 Date To: Date To
 Delete order: Delete order
@@ -159,6 +157,8 @@ Showing page: Showing page
 Slet en resource: Slet en resource
 Something went wrong. Please try again.: Something went wrong. Please try again.
 Submit: Submit
+Switch to dark theme: Switch to dark theme
+Switch to light theme: Switch to light theme
 System can not deliver an email about resetting password. Try again later.: System
   can not deliver an email about resetting password. Try again later.
 System error. Something went wrong: System error. Something went wrong
@@ -177,6 +177,7 @@ The token is not valid. You need to request a new mail with a new token.: The to
 The token is not valid. You will need to a new token to verify your email.: The token
   is not valid. You will need to a new token to verify your email.
 There is no user with this email address.: There is no user with this email address.
+Toggle theme: Toggle theme
 Total results: Total results
 Unknown error. Please try again later.: Unknown error. Please try again later.
 Update: Update
