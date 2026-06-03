@@ -56,7 +56,7 @@ footer .heading
 
 @media (max-width: 992px) {
     .navigation-right-group .menu-text a {
-        font-size: 0.80rem;
+        font-size: 0.75rem;
     }
 }
 
