@@ -5,15 +5,41 @@
     <style>
       .logo-text {
         fill: #fff;
-        font-family: "Bodoni Moda", sans-serif;
+        font-family: "Bodoni 72", "Didot", "Bodoni MT", "Times New Roman", serif;
         font-weight: 400;
         letter-spacing: 0.035em;
+      }
+      .soundwave {
+        stroke: #fff;
+        stroke-width: 7;
+        stroke-linecap: round;
+        fill: none;
       }
     </style>
   </defs>
 
-  <circle cx="837" cy="384" r="177" fill="#98BC9D"/>
+  <circle cx="837" cy="384" r="177" fill="#8FB899"/>
 
-  <text class="logo-text" x="268" y="382" font-size="122">LYDSPOR</text>
-  <text class="logo-text" x="585" y="491" font-size="122">AARHUS</text>
+  <text class="logo-text" x="248" y="382" font-size="120">LYDSPOR</text>
+  <!-- Move the whole soundwave by changing the translate(x y) values below. -->
+<g id="soundwave-box" aria-label="soundwave" class="soundwave" transform="translate(852 340)">
+  <line x1="0"   y1="-10" x2="0"   y2="10"/>
+  <line x1="10"  y1="-18" x2="10"  y2="18"/>
+  <line x1="20"  y1="-30" x2="20"  y2="30"/>
+  <line x1="30"  y1="-20" x2="30"  y2="20"/>
+  <line x1="40"  y1="-12" x2="40"  y2="12"/>
+
+  <line x1="50"  y1="-24" x2="50"  y2="24"/>
+  <line x1="60"  y1="-42" x2="60"  y2="42"/>
+  <line x1="70"  y1="-58" x2="70"  y2="58"/>
+  <line x1="80"  y1="-42" x2="80"  y2="42"/>
+  <line x1="90"  y1="-24" x2="90"  y2="24"/>
+
+  <line x1="100" y1="-12" x2="100" y2="12"/>
+  <line x1="110" y1="-20" x2="110" y2="20"/>
+  <line x1="120" y1="-30" x2="120" y2="30"/>
+  <line x1="130" y1="-18" x2="130" y2="18"/>
+  <line x1="140" y1="-10" x2="140" y2="10"/>
+</g>
+  <text class="logo-text" x="565" y="491" font-size="120">AARHUS</text>
 </svg>

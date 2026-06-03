@@ -23,7 +23,7 @@ footer .heading
     max-width: 100%;
     height: auto;
     max-height: 100px;
-    padding-top: 5px;
+    padding-top: 2px;
 }
 
 .navigation {
@@ -34,6 +34,32 @@ footer .heading
 .navigation-right-group {
     padding-right: 20px;
 }
+
+.navigation-right-group .menu-text:nth-last-of-type(2) {
+    background-color: #B0FE76;
+    color: #000;
+}
+
+.navigation-right-group .menu-text:nth-last-of-type(2) a {
+    color: #000;
+}
+
+.navigation-right-group .menu-text:last-of-type {
+    background-color: #FF47DA;
+    color: #fff;
+}
+
+.navigation-right-group .menu-text:last-of-type a {
+    color: #fff;
+}
+
+
+@media (max-width: 992px) {
+    .navigation-right-group .menu-text a {
+        font-size: 0.80rem;
+    }
+}
+
 
 /** only display #menu-hamburger menu devices where max-width is 768px */
 #menu-hamburger {

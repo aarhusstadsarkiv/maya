@@ -11,11 +11,13 @@ settings: dict[str, typing.Any] = {
     "main_menu_top": [
         {"name": "search_get", "title": "Søg i Arkivet", "type": "text"},
         {"name": "about", "title": "Om Lydspor Aarhus", "type": "text"},
+        {"name": "projects", "title": "Projekter", "type": "text"},
     ],
     "show_version": True,
     "allow_theme_toggle": True,
     "pages": [
         {"name": "home", "title": "Forside", "template": "pages/home.html", "url": "/"},
         {"name": "about", "title": "Om Lydspor Aarhus", "template": "pages/about.html", "url": "/about"},
+        {"name": "projects", "title": "Projekter", "template": "pages/projects.html", "url": "/projects"},
     ],
 }
