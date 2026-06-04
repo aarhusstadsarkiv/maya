@@ -8,30 +8,6 @@ function getImageUrl(img) {
     return img.currentSrc || img.src || img.getAttribute('src') || "";
 }
 
-function shouldIgnoreImage(img) {
-    return img.getAttribute('loading') === 'lazy';
-}
-
-function hasImageUrl(img) {
-    return Boolean(getImageUrl(img));
-}
-
-async function logExistingImageError(img) {
-    if (shouldIgnoreImage(img) || !hasImageUrl(img) || !img.complete || img.naturalWidth !== 0) {
-        return;
-    }
-
-    if (typeof img.decode !== 'function') {
-        return;
-    }
-
-    try {
-        await img.decode();
-    } catch {
-        logImageError(getImageUrl(img));
-    }
-}
-
 function logImageError(missingImageUrl) {
     if (!missingImageUrl || loggedImageErrors.has(missingImageUrl)) {
         return;
@@ -49,21 +25,19 @@ function logImageError(missingImageUrl) {
     asyncLogError(error);
 }
 
-const images = document.querySelectorAll('img');
-images.forEach((img) => {
-    img.addEventListener('error', () => {
-
-        // If image attribute loading equals "lazy" loaded ignore it
-        if (shouldIgnoreImage(img)) {
-            return;
-        }
-
+function logIfImageIsMissing(img) {
+    if (img.complete && img.naturalWidth === 0) {
         logImageError(getImageUrl(img));
+    }
+}
 
-    });
+document.addEventListener("error", (event) => {
+    if (event.target instanceof HTMLImageElement) {
+        logImageError(getImageUrl(event.target));
+    }
+}, true);
 
-    logExistingImageError(img);
-});
+document.querySelectorAll("img").forEach(logIfImageIsMissing);
 
 document.addEventListener("securitypolicyviolation", (event) => {
     if (!imgSrcDirectives.includes(event.effectiveDirective)) {
