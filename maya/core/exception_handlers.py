@@ -40,7 +40,7 @@ async def not_found(request: Request, exc: HTTPException):
     }
 
     # No need to log full exception. It's a 404
-    log.warning(f"Not Found: {request.url}", extra={"error_code": 404, "error_url": str(request.url)})
+    log.warning("Not found", extra={"error_code": 404, "error_url": str(request.url)})
     context = await get_context(request, context_values=context_values)
     return templates.TemplateResponse(request, "errors/default.html", context, status_code=404)
 
@@ -56,14 +56,14 @@ async def http_status_error(request: Request, exc: HTTPStatusError):
         "title": title,
         "status_code": exc.response.status_code,
         "human_error": (
-            "Der skete en fejl, da systemet hentede data fra et API. Fejlen er blevet logget, og vi vil kigge på det hurtigst muligt."
+            "Der skete en fejl, da systemet hentede data fra et API. " "Fejlen er blevet logget, og vi vil kigge på det hurtigst muligt."
         ),
         "exc": exc,
         "exc_traceback": exc_traceback,
     }
 
     extra = {"error_code": exc.response.status_code, "error_url": str(request.url)}
-    log.exception(f"Error: {request.url}", extra=extra)
+    log.exception("HTTP status error", extra=extra)
     context = await get_context(request, context_values=context_values)
     return templates.TemplateResponse(request, "errors/default.html", context, status_code=exc.response.status_code)
 
@@ -74,7 +74,7 @@ async def http_timeout_error(request: Request, exc: TimeoutException):
     """
 
     exc_traceback = traceback.format_exc()
-    status_code = 504  # Gateway Timeout
+    status_code = 504  # TimeoutException has no response status; return Gateway Timeout.
 
     context_values = {
         "title": f"{status_code}. {translate('Error. Request Timeout')}",
@@ -89,10 +89,10 @@ async def http_timeout_error(request: Request, exc: TimeoutException):
     }
 
     extra = {"error_code": status_code, "error_url": str(request.url)}
-    log.exception(f"Timeout: {request.url}", extra=extra)
+    log.exception("HTTP timeout error", extra=extra)
 
     context = await get_context(request, context_values=context_values)
-    return templates.TemplateResponse("errors/default.html", context, status_code=status_code)
+    return templates.TemplateResponse(request, "errors/default.html", context, status_code=status_code)
 
 
 async def server_error(request: Request, exc: Exception):
@@ -110,7 +110,7 @@ async def server_error(request: Request, exc: Exception):
     }
 
     extra = {"error_code": 500, "error_url": str(request.url)}
-    log.exception(f"{request.url}", extra=extra)
+    log.exception("Server error", extra=extra)
     context = await get_context(request, context_values=context_values)
     return templates.TemplateResponse(request, "errors/default.html", context, status_code=500)
 
