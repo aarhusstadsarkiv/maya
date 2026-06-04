@@ -44,6 +44,7 @@ function logImageError(missingImageUrl) {
     error.error_url = window.location.href;
     error.error_code = 404;
     error.error_type = imageErrorMessage;
+    error.level = "WARNING";
 
     asyncLogError(error);
 }
