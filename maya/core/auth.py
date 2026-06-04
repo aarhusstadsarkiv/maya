@@ -90,7 +90,7 @@ async def _check_authentication(request: Request, permissions, message, must_be_
     # Check if authenticated
     is_logged_in = await api.is_logged_in(request)
     if not is_logged_in:
-        _log_401_error(request, f"401 Unauthorized: {request.url}")
+        _log_401_error(request, "Authentication required")
         if json_response:
             raise AuthExceptionJSON(message=message)
         raise AuthException(request, message=message, redirect_url=_get_redirect_url(request))
@@ -100,7 +100,7 @@ async def _check_authentication(request: Request, permissions, message, must_be_
     is_verified = await api.me_verified(request)
 
     if must_be_verified and not is_verified:
-        _log_403_error(request, f"403 Forbidden: {request.url}. User {me['email']}. User is not verified")
+        _log_403_error(request, f"User {me['email']} is not verified")
         message = translate("You need to verify your email address to view this page.")
         if json_response:
             # json version of message
@@ -114,7 +114,7 @@ async def _check_authentication(request: Request, permissions, message, must_be_
         permission_granted = any(permission in user_permissions_list for permission in permissions)
 
         if not permission_granted:
-            _log_403_error(request, f"403 Forbidden: {request.url}. User {me['email']}. Missing required permissions")
+            _log_403_error(request, f"User {me['email']} is missing required permissions")
             message = translate("You do not have the required permissions to view the page.")
             if json_response:
                 raise AuthExceptionJSON(message=message)
