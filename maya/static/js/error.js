@@ -2,7 +2,7 @@
  * function that serializes the error
  */
 function serializeError(error) {
-    // Note: error_type, error_code, error_url are options in the python logger
+    // Note: level, error_type, error_code, error_url are options in the python logger
     // May use them at some point 
     let data = {
         message: error.message,
@@ -12,7 +12,8 @@ function serializeError(error) {
     // Get error_url from the window object
     const error_url = window.location.href;
 
-    // error_type, error_code, error_url are optional
+    // level, error_type, error_code, error_url are optional
+    data.level = error.level || "ERROR";
     data.error_type = error.error_type || "Javscript Error";
     data.error_code = error.error_code || 500;
     data.error_url = error.error_url || error_url;
