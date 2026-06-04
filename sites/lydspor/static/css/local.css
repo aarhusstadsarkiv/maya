@@ -26,6 +26,15 @@ footer .heading
     padding-top: 2px;
 }
 
+@media (max-width: 576px) {
+    .logo img {
+        max-width: 100%;
+        height: auto;
+        max-height: 65px;
+        padding-top: 5px;
+    }
+}
+
 .navigation {
     align-items: center;
     box-shadow: 1px 1px 5px var(--record-representation-box-shadow);
