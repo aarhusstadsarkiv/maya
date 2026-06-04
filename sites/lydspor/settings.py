@@ -20,5 +20,5 @@ settings: dict[str, typing.Any] = {
         {"name": "about", "title": "Om Lydspor Aarhus", "template": "pages/about.html", "url": "/about"},
         {"name": "projects", "title": "Projekter", "template": "pages/projects.html", "url": "/projects"},
     ],
-    "main_menu_system": []
+    "main_menu_system": [],
 }

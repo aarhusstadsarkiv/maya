@@ -40,7 +40,7 @@ async def not_found(request: Request, exc: HTTPException):
     }
 
     # No need to log full exception. It's a 404
-    log.warning(f"404 Not Found: {request.url}", extra={"error_code": 404, "error_url": str(request.url)})
+    log.warning(f"Not Found: {request.url}", extra={"error_code": 404, "error_url": str(request.url)})
     context = await get_context(request, context_values=context_values)
     return templates.TemplateResponse(request, "errors/default.html", context, status_code=404)
 
@@ -63,7 +63,7 @@ async def http_status_error(request: Request, exc: HTTPStatusError):
     }
 
     extra = {"error_code": exc.response.status_code, "error_url": str(request.url)}
-    log.exception(f"{exc.response.status_code} Error: {request.url}", extra=extra)
+    log.exception(f"Error: {request.url}", extra=extra)
     context = await get_context(request, context_values=context_values)
     return templates.TemplateResponse(request, "errors/default.html", context, status_code=exc.response.status_code)
 
@@ -89,7 +89,7 @@ async def http_timeout_error(request: Request, exc: TimeoutException):
     }
 
     extra = {"error_code": status_code, "error_url": str(request.url)}
-    log.exception(f"{status_code} Timeout: {request.url}", extra=extra)
+    log.exception(f"Timeout: {request.url}", extra=extra)
 
     context = await get_context(request, context_values=context_values)
     return templates.TemplateResponse("errors/default.html", context, status_code=status_code)
@@ -110,7 +110,7 @@ async def server_error(request: Request, exc: Exception):
     }
 
     extra = {"error_code": 500, "error_url": str(request.url)}
-    log.exception(f"500 Error: {request.url}", extra=extra)
+    log.exception(f"{request.url}", extra=extra)
     context = await get_context(request, context_values=context_values)
     return templates.TemplateResponse(request, "errors/default.html", context, status_code=500)
 
