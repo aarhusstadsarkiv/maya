@@ -2,11 +2,22 @@
 Error endpoints.
 """
 
+import logging
+
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 from maya.core.logging import get_log
 
 log = get_log()
+DEFAULT_LOG_LEVEL = "ERROR"
+ALLOWED_LOG_LEVELS = logging.getLevelNamesMapping()
+
+
+def _get_log_level(level_name: str | None) -> int:
+    if not isinstance(level_name, str):
+        return ALLOWED_LOG_LEVELS[DEFAULT_LOG_LEVEL]
+
+    return ALLOWED_LOG_LEVELS.get(level_name.upper(), ALLOWED_LOG_LEVELS[DEFAULT_LOG_LEVEL])
 
 
 async def error_log_post(request: Request):
@@ -14,7 +25,7 @@ async def error_log_post(request: Request):
     Log posted JSON data.
 
     Note: The caller is responsible for providing a meaningful 'message'.
-    Optional fields: error_code, error_type, error_url, exception
+    Optional fields: level, error_code, error_type, error_url, exception
     """
 
     try:
@@ -27,7 +38,7 @@ async def error_log_post(request: Request):
             "exception": data.get("exception", ""),
         }
 
-        log.error(data.get("message"), extra=extra)
+        log.log(_get_log_level(data.get("level")), data.get("message"), extra=extra)
         return JSONResponse({"status": "received"}, status_code=200)
 
     except Exception as e:
