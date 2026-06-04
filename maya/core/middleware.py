@@ -255,8 +255,9 @@ class SameOriginMiddleware(BaseHTTPMiddleware):
                 if origin not in allowed:
                     raise OpenAwsException(403, "Forbidden. Bad Origin.")
             except OpenAwsException as exc:
-                log.exception(f"Forbidden request from origin: {origin}")
-                JSONResponse({"error": True, "message": exc.message}, status_code=exc.status_code)
+                extra = {"error_code": exc.status_code, "error_url": str(request.url)}
+                log.exception(f"Forbidden request from origin: {origin}", extra=extra)
+                return JSONResponse({"error": True, "message": exc.message}, status_code=exc.status_code)
 
         return await call_next(request)
 
