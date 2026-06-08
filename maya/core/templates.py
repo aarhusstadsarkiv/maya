@@ -20,7 +20,7 @@ Key Features:
 
 import typing
 import os
-from jinja2 import FileSystemLoader
+from jinja2 import Environment, FileSystemLoader, select_autoescape
 from starlette.templating import Jinja2Templates
 from starlette.requests import Request
 from maya.core.translate import translate
@@ -105,13 +105,15 @@ def _markdown(text: str, safe: bool = True):
     return markdown.markdown(text, extensions=["fenced_code", TocExtension(permalink=False)])
 
 
-loader = FileSystemLoader(template_dirs)
-templates = Jinja2Templates(
-    directory=template_dirs,
-    context_processors=[_get_app_context],
-    loader=loader,
+env = Environment(
+    loader=FileSystemLoader(template_dirs),
+    autoescape=select_autoescape(),
     trim_blocks=True,
     lstrip_blocks=True,
+)
+templates = Jinja2Templates(
+    context_processors=[_get_app_context],
+    env=env,
 )
 
 
