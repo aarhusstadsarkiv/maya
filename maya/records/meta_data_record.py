@@ -67,7 +67,7 @@ async def get_record_meta_data(
     meta_data["_permission_granted"] = is_employee
 
     meta_data["title"] = _get_record_title(record)
-    meta_data["meta_title"] = _get_meta_title(record)
+    meta_data["meta_title"] = _get_record_title(record)
     meta_data["summary"] = record.get("summary", "")
     meta_data["meta_description"] = _get_meta_description(record)
 
@@ -233,34 +233,21 @@ def _get_record_title(record: dict) -> str:
     Try to get a title for the record. This is used as the title of the document, not the meta title
     """
 
-    title = ""
     record_title = record.get("title", "")
     if not record_title:
         record_title = record.get("heading", "")
 
-    if record_title:
-        title = record_title
+    if not record_title:
+        record_title = record_utils.meaningful_substring(record.get("summary", ""), 140)
 
-    return title
-
-
-def _get_meta_title(record: dict) -> str:
-    """
-    Get the meta title for the record. This is used as the meta title of the document, the <title> tag
-    """
-    meta_title = _get_record_title(record)
-
-    if not meta_title:
-        meta_title = record_utils.meaningful_substring(record.get("summary", ""), 60)
-
-    return meta_title
+    return record_title
 
 
 def _get_meta_description(record: dict) -> str:
 
-    meta_description = record_utils.meaningful_substring(record.get("summary", ""), 120)
+    meta_description = record_utils.meaningful_substring(record.get("summary", ""), 200)
     if not meta_description:
-        meta_description = _get_meta_title(record)
+        meta_description = _get_record_title(record)
     return meta_description
 
 
