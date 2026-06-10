@@ -13,7 +13,7 @@ h4,
 h5,
 h6,
 .menu-text,
-footer .heading 
+footer .heading
 {
     font-family: "Bodoni Moda", serif;
     letter-spacing: 0.035em;
@@ -45,21 +45,21 @@ footer .heading
 }
 
 .navigation-right-group .menu-text:nth-last-of-type(2) {
-    background-color: #B0FE76;
+    background-color: #41292c;
     color: #000;
 }
 
 .navigation-right-group .menu-text:nth-last-of-type(2) a {
-    color: #000;
+    color: #fff9ed;
 }
 
 .navigation-right-group .menu-text:last-of-type {
-    background-color: #FF47DA;
-    color: #fff;
+    background-color: #ff47da;
+    color: #fff9ed;
 }
 
 .navigation-right-group .menu-text:last-of-type a {
-    color: #fff;
+    color: #fff9ed;
 }
 
 
@@ -83,7 +83,7 @@ footer .heading
 
 @media (min-width: 769px) {
     .main-menu-overlay {
-        /** 
+        /**
          * This is the absolute simplest way to hide the overlay menu on desktop
          * without changing the html structure or adding javascript.
         */
