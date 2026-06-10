@@ -193,3 +193,14 @@
 .action-links a.delete-order, .action-links a.delete-bookmark {
     background-color: var(--flash-error-color);
 }
+
+.record_content_agenda_items {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.record_content_agenda_items .label {
+    width:100%;
+    border-bottom: 1px solid var(--border);
+}
