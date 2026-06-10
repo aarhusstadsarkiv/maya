@@ -131,7 +131,7 @@ class TestJSON(unittest.TestCase):
     "title": "En køretur med sporvogn",
     "meta_title": "En køretur med sporvogn",
     "summary": "Filmens første 38 sekunder er fra Clemens Bro i 1902 \n\nDen 7. juli 1904 blev den første sporvognsrute indviet i Aarhus. Ruten gik fra Dalgas Avenue gennem Hans Broges Gade, Skt. Pauls Kirkeplads, M.P. Bruuns Gade forbi hovedbanegården, videre ad den velkendte omnibusrute til Østbanetorvet og derfra til Skovvejen og til sidst Trøjborgvej. Længe var dette den eneste rute, men da kommunen overtog driften blev den eksisterende rute i 1930 udvidet og en ny blev tilføjet. Sporvognskørslen i Aarhus fortsatte op til 1971.\n\nFilmene viser sporvognene køre gennem Aarhus i 1905.",
-    "meta_description": "Filmens første 38 sekunder er fra Clemens Bro i 1902 \n\nDen 7. juli 1904 blev den første sporvognsrute indviet i Aarhus....",
+    "meta_description": "Filmens første 38 sekunder er fra Clemens Bro i 1902 \n\nDen 7. juli 1904 blev den første sporvognsrute indviet i Aarhus. Ruten gik fra Dalgas Avenue gennem Hans Broges Gade, Skt. Pauls Kirkeplads,...",
     "icon": {
         "icon": "movie",
         "label": "Medieproduktioner"
