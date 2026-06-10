@@ -47,6 +47,7 @@ class Hooks(HooksSpec):
         """
         Alter the record and meta_data dictionaries after the api call
         """
+
         # sejrs sedler
         if record_utils.is_collection(record, 1):
             meta_data["title"] = ""
@@ -59,11 +60,6 @@ class Hooks(HooksSpec):
                 assert isinstance(record_id, str)
                 extra = {"error_code": 499, "error_url": record_utils.get_record_url(record_id)}
                 log.error("Sejrs sedler should have a summary", extra=extra)
-
-        # teater arkivet
-        if record_utils.is_curator(record, 4):
-            if record.get("summary"):
-                meta_data["title"] = f"[{record['summary']}]"
 
         # check if record is ordered by user
         me = await api.me_get(self.request)
