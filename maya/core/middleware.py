@@ -234,13 +234,23 @@ class SameOriginMiddleware(BaseHTTPMiddleware):
     Control same-origin policy for state-changing requests
     """
 
-    def __init__(self, app, allowed_origins: list = [], allow_same_origin: bool = True):
+    def __init__(
+        self,
+        app,
+        allowed_origins: list | None = None,
+        allow_same_origin: bool = True,
+        exempt_path_prefixes: list | None = None,
+    ):
         super().__init__(app)
-        self.allowed_origins = allowed_origins
+        self.allowed_origins = allowed_origins or []
         self.allow_same_origin = allow_same_origin
+        self.exempt_path_prefixes = exempt_path_prefixes or []
 
     async def dispatch(self, request: Request, call_next):
         if request.method in {"POST", "PUT", "PATCH", "DELETE"}:
+            if any(request.url.path.startswith(prefix) for prefix in self.exempt_path_prefixes):
+                return await call_next(request)
+
             origin = request.headers.get("origin")
 
             try:
@@ -280,7 +290,14 @@ middleware.append(Middleware(CORSMiddleware, allow_origins=settings["cors_allow_
 middleware.append(Middleware(CSPMiddleware))
 
 # Instruct what origins the client browser should permit for state-changing requests
-middleware.append(Middleware(SameOriginMiddleware, allow_same_origin=True))
+middleware.append(
+    Middleware(
+        SameOriginMiddleware,
+        allowed_origins=settings["same_origin_allow_origins"],
+        allow_same_origin=True,
+        exempt_path_prefixes=settings["same_origin_exempt_path_prefixes"],
+    )
+)
 
 # Session management with secure cookies
 secret_key = str(os.getenv("SECRET"))

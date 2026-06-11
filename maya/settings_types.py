@@ -79,6 +79,8 @@ class Settings(TypedDict, total=True):
 
     facets_enabled: list[str]
     cors_allow_origins: list[str]
+    same_origin_allow_origins: list[str]
+    same_origin_exempt_path_prefixes: list[str]
 
     allow_user_registration: bool
     allow_user_management: bool

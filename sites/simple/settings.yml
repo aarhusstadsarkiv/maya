@@ -107,6 +107,10 @@ facets_enabled:
 # CORS allow origins
 cors_allow_origins: []
 
+# Same-origin middleware exempt paths for server-to-server callbacks
+same_origin_exempt_path_prefixes:
+  - /webhook/
+
 # Allow user registration
 allow_user_registration: true
 

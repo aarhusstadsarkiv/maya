@@ -68,6 +68,8 @@ settings: Settings = {
     "search_keep_results": True,
     "facets_enabled": ["content_types", "subjects", "availability", "usability", "dates"],
     "cors_allow_origins": [],
+    "same_origin_allow_origins": ["https://api.openaws.dk"],
+    "same_origin_exempt_path_prefixes": ["/webhook/"],
     "allow_user_registration": False,
     "allow_user_management": False,
     "allow_online_ordering": False,

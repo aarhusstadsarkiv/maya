@@ -16,6 +16,31 @@ class FakeRequest:
 
 
 class MiddlewareTest(IsolatedAsyncioTestCase):
+    async def test_same_origin_middleware_allows_configured_origin(self):
+        middleware = SameOriginMiddleware(app=None, allowed_origins=["https://api.openaws.dk"])
+        call_next = AsyncMock()
+        call_next.return_value = "response"
+        request = FakeRequest()
+        request.headers = {"origin": "https://api.openaws.dk"}
+
+        response = await middleware.dispatch(request, call_next)
+
+        self.assertEqual(response, "response")
+        call_next.assert_called_once_with(request)
+
+    async def test_same_origin_middleware_allows_exempt_path_without_origin(self):
+        middleware = SameOriginMiddleware(app=None, exempt_path_prefixes=["/webhook/"])
+        call_next = AsyncMock()
+        call_next.return_value = "response"
+        request = FakeRequest()
+        request.headers = {}
+        request.url = URL("https://www.aarhusarkivet.dk/webhook/mail/token/verify")
+
+        response = await middleware.dispatch(request, call_next)
+
+        self.assertEqual(response, "response")
+        call_next.assert_called_once_with(request)
+
     async def test_same_origin_middleware_logs_error_code_and_url_for_forbidden_origin(self):
         middleware = SameOriginMiddleware(app=None, allowed_origins=[])
         call_next = AsyncMock()
