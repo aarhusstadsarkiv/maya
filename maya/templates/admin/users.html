@@ -37,7 +37,7 @@
                 <th>Navn</th>
                 <th>Verificeret</th>
                 <th>Rettighed</th>
-                <th>Opdateret</th>
+                <th>Oprettet</th>
                 <th>Handling</th>
             </tr>
         </thead>
@@ -55,12 +55,9 @@
                 {% endif %}
                 </td>
 
-                
-                
                 <td>{{ user.permission_translated }}</td>
-
-                <td>
-                    {{ format_date(user.updated) }}
+                <td>                    
+                    {{ format_date(user.timestamp) }}
                 </td>
 
                 <td>
