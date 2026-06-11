@@ -32,6 +32,7 @@ import json
 import re
 import markdown
 from markdown.extensions.toc import TocExtension
+from datetime import datetime
 
 log = get_log()
 
@@ -167,6 +168,10 @@ async def get_template_content(template_path: str, context_values: dict) -> str:
     return html_content
 
 
+def format_date(timestamp):
+    return datetime.fromtimestamp(timestamp).strftime("%Y-%m-%d")
+
+
 templates.env.globals.update(translate=translate)
 templates.env.globals.update(get_setting=get_setting)
 templates.env.globals.update(date_format=date_format)
@@ -178,3 +183,4 @@ templates.env.globals.update(has_permission=has_permission)
 templates.env.globals.update(markdown=_markdown)
 templates.env.globals.update(key_exist_in_dict=_key_exist_in_dict)
 templates.env.globals.update(sub_string=sub_string)
+templates.env.globals.update(format_date=format_date)

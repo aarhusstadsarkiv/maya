@@ -37,6 +37,7 @@
                 <th>Navn</th>
                 <th>Verificeret</th>
                 <th>Rettighed</th>
+                <th>Opdateret</th>
                 <th>Handling</th>
             </tr>
         </thead>
@@ -53,8 +54,15 @@
                     Nej
                 {% endif %}
                 </td>
+
+                
                 
                 <td>{{ user.permission_translated }}</td>
+
+                <td>
+                    {{ format_date(user.updated) }}
+                </td>
+
                 <td>
                     <a class="action-link" href="{{ url_for('admin_users_get_single', uuid=user.id) }}">Rediger</a>
                     <a class="action-link delete-user" data-uuid="{{ user.id }}" href="#">Slet</a>   
