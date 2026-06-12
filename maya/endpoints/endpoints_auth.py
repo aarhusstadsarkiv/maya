@@ -69,7 +69,7 @@ async def auth_login_post(request: Request):
             return JSONResponse({"error": False, "redirect": _get_default_next_url(request)})
 
     except OpenAwsException as e:
-        log.exception("OpenAwsException in auth_login_post")
+        log.info(f"OpenAwsException in auth_login_post: {e}")
         return JSONResponse({"message": str(e), "error": True})
 
     except Exception:
@@ -91,6 +91,7 @@ async def auth_logout_get(request: Request):
         flash.set_message(request, translate("You have been logged out."), type="success")
 
     except OpenAwsException as e:
+        log.info(f"OpenAwsException in auth_logout_get: {e}")
         flash.set_message(request, str(e), type="error")
     except Exception as e:
         log.exception("Error in auth_logout_post")
@@ -108,6 +109,7 @@ async def auth_logout_post(request: Request):
         flash.set_message(request, translate("You have been logged out."), type="success")
 
     except OpenAwsException as e:
+        log.info(f"OpenAwsException in auth_logout_post: {e}")
         flash.set_message(request, str(e), type="error")
     except Exception as e:
         log.exception("Error in auth_logout_post")
@@ -167,6 +169,7 @@ async def auth_register_post(request: Request):
 
         return JSONResponse({"error": False})
     except OpenAwsException as e:
+        log.info(f"OpenAwsException in auth_register_post: {e}")
         return JSONResponse({"message": str(e), "error": True})
     except Exception as e:
         log.exception("Error in auth_register_post")
@@ -187,6 +190,7 @@ async def auth_verify(request: Request):
 
         return RedirectResponse(url="/auth/login", status_code=302)
     except OpenAwsException as e:
+        log.info(f"OpenAwsException in auth_verify: {e}")
         flash.set_message(request, str(e), type="error")
     except Exception as e:
         log.exception("Error in auth_verify")
@@ -219,6 +223,7 @@ async def auth_me_get(request: Request):
 
         return templates.TemplateResponse(request, "auth/me.html", context)
     except OpenAwsException as e:
+        log.info(f"OpenAwsException in auth_me_get: {e}")
         flash.set_message(request, str(e), type="error")
     except Exception as e:
         log.exception("Error in auth_me_get")
@@ -238,6 +243,7 @@ async def auth_search_results(request: Request):
 
         return templates.TemplateResponse(request, "auth/search_results.html", context)
     except OpenAwsException as e:
+        log.info(f"OpenAwsException in auth_search_results: {e}")
         flash.set_message(request, str(e), type="error")
     except Exception as e:
         log.exception("Error in auth_search_results")
@@ -269,6 +275,7 @@ async def auth_forgot_password_post(request: Request):
         )
         return JSONResponse({"error": False})
     except OpenAwsException as e:
+        log.info(f"OpenAwsException in auth_forgot_password_post: {e}")
         return JSONResponse({"message": str(e), "error": True})
     except Exception as e:
         log.exception("Error in auth_forgot_password_post")
@@ -298,6 +305,7 @@ async def auth_reset_password_post(request: Request):
         )
         return JSONResponse({"error": False, "redirect": "/auth/login"})
     except OpenAwsException as e:
+        log.info(f"OpenAwsException in auth_reset_password_post: {e}")
         return JSONResponse({"message": str(e), "error": True})
     except Exception as e:
         return JSONResponse({"message": str(e), "error": True})
@@ -316,6 +324,7 @@ async def auth_send_verify_email(request: Request):
         )
 
     except OpenAwsException as e:
+        log.info(f"OpenAwsException in auth_send_verify_email: {e}")
         flash.set_message(request, str(e), type="error")
     except Exception as e:
         log.exception("Error in auth_send_verify_email")
