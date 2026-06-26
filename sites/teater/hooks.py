@@ -156,13 +156,15 @@ class Hooks(HooksSpec):
         Hooks.search_context = search_context
 
         search_result = search_context["search_result"]
-        relations_formatted = format_relations(type, relations)
+        request_url = str(self.request.url)
+        log.info(f"request.url: {request_url}")
+        relations_formatted = format_relations(type, relations, request_url)
 
         # sort
         if type == "people":
-            relations_formatted = sort_data(relations_formatted, "display_label")
+            relations_formatted = sort_data(relations_formatted, "display_label", request_url)
         if type == "events":
-            relations_formatted = sort_data(relations_formatted, "rel_label")
+            relations_formatted = sort_data(relations_formatted, "rel_label", request_url)
 
         resource["relations"] = relations_formatted
         resource["search_result"] = search_result
