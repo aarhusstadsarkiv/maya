@@ -157,7 +157,6 @@ class Hooks(HooksSpec):
 
         search_result = search_context["search_result"]
         request_url = str(self.request.url)
-        log.info(f"request.url: {request_url}")
         relations_formatted = format_relations(type, relations, request_url)
 
         # sort
