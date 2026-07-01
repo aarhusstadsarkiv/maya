@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "base_small.html" %}
 
 {% block body_class %}page-about{% endblock %}
 
@@ -6,10 +6,19 @@
 {% endblock head %}
 
 {% block content %}
-<h1>Projekter</h1>
 
-<p>
-    Projekter
-</p>
+{% set markdown_content %}
+
+# Projekter
+
+Lydspor Aarhus har modtaget økonomisk støtte fra Det Danske Rockakademi til registrering af lydmand og lydtekniker Kaspar Vorbecks store samling af lydoptagelser.
+
+Samlingen rummer bånd i mange forskellige formater med både studie- og liveoptagelser af utallige Aarhus-bands samt unikke koncertoptagelser - blandt andet fra koncerter i Vejlby Risskov Hallen i begyndelsen af 1970’erne.
+
+I første omgang består arbejdet i en grovsortering og registrering af materialet. Herefter vil der blive søgt yderligere midler til endelig registrering, digitalisering og opbevaring.
+
+{% endset %}
+
+{{ markdown(markdown_content)|safe }}
 
 {% endblock content %}

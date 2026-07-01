@@ -1,16 +1,4 @@
-{% extends "base_small.html" %}
-
-{% block body_class %}page-about{% endblock %}
-
-{% block head %}
-{% endblock head %}
-
-{% block content %}
-
-
-{% set markdown_content %}
-
-# Om Lydspor Aarhus
+**Om foreningen Lydspor Aarhus**
 
 Musik er mere end toner og sange. Musik er minder, oplevelser,
 fællesskaber og fortællinger om mennesker og steder. Derfor arbejder
@@ -47,10 +35,3 @@ historier. Sammen samler vi sporene fra fortiden, giver dem liv i
 nutiden og sørger for, at de kan inspirere kommende generationer. For
 Aarhus\' musikhistorie er ikke kun fortællingen om det, der var -- den
 er også en del af fortællingen om det, der kommer.
-
-{% endset %}
-
-{{ markdown(markdown_content)|safe }}
-
-
-{% endblock content %}
