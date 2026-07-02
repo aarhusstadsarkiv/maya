@@ -17,8 +17,9 @@ settings: dict[str, typing.Any] = {
     "allow_theme_toggle": True,
     "pages": [
         {"name": "home", "title": "Forside", "template": "pages/home.html", "url": "/"},
-        {"name": "about", "title": "Om Lydspor Aarhus", "template": "pages/about.html", "url": "/about"},
-        {"name": "projects", "title": "Projekter", "template": "pages/projects.html", "url": "/projects"},
+        {"name": "about", "title": "Om Lydspor Aarhus", "template": "pages/om-lydspor-aarhus.html", "url": "/about"},
+        {"name": "projects", "title": "Projekter", "template": "pages/projekter.html", "url": "/projects"},
+        {"name": "foreningen", "title": "Foreningen", "template": "pages/foreningen.html", "url": "/foreningen"},
     ],
     "main_menu_system": [],
 }
