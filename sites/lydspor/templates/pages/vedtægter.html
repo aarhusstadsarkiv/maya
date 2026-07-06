@@ -1,4 +1,18 @@
-**VEDTÆGTER**
+
+
+{% extends "base_small.html" %}
+
+{% block body_class %}page-about{% endblock %}
+
+{% block head %}
+{% endblock head %}
+
+{% block content %}
+
+
+{% set markdown_content %}
+
+# VEDTÆGTER
 
 **Foreningen Lydspor Aarhus**
 
@@ -90,23 +104,23 @@ vedrørende sagernes behandlingsmåde, stemmeafgivning og resultat heraf.
 Stk. 7. Dagsorden for den ordinære generalforsamling skal indeholde
 følgende:
 
-1\. Valg af dirigent og referent.
+1. Valg af dirigent og referent.
 
-2\. Bestyrelsens beretning om Foreningens virksomhed i det forløbne år.
+2. Bestyrelsens beretning om Foreningens virksomhed i det forløbne år.
 
-3\. Forelæggelse af årsrapport (regnskab) til godkendelse.
+3. Forelæggelse af årsrapport (regnskab) til godkendelse.
 
-4\. Fremlæggelse af budget.
+4. Fremlæggelse af budget.
 
-5\. Indkomne forslag fra bestyrelse eller Foreningens medlemmer.
+5. Indkomne forslag fra bestyrelse eller Foreningens medlemmer.
 
-6\. Fastsættelse af kontingent for det følgende medlemssår.
+6. Fastsættelse af kontingent for det følgende medlemssår.
 
-7\. Valg af bestyrelse.
+7. Valg af bestyrelse.
 
-8\. Valg af revisor.
+8. Valg af revisor.
 
-9\. Eventuelt.
+9. Eventuelt.
 
 Stk. 8. De på generalforsamlingen behandlede anliggender afgøres ved
 simpelt flertal, medmindre vedtægterne bestemmer andet.
@@ -227,16 +241,9 @@ foreningens.
 
 **Således vedtaget på den stiftende generalforsamling i Aarhus den 15.
 februar 2026**
+{% endset %}
 
-..........................................................................
-...........................................................................
+{{ markdown(markdown_content)|safe }}
 
-..........................................................................
-..........................................................................
 
-..........................................................................
-..........................................................................
-
-..........................................................................
-
-Dirigent
+{% endblock content %}

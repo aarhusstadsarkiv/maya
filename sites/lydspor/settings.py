@@ -15,19 +15,23 @@ settings: dict[str, typing.Any] = {
             "type": "dropdown",
             "css_class": "menu-about",
             "items": [
-                {"name": "about", "title": "Om Lydspor Aarhus"},
-                {"name": "foreningen", "title": "Foreningen"},
+                {"name": "vision", "title": "Vision"},
+                {"name": "bestyrelsen", "title": "Betyrelsen"},
+                {"name": "vedtægter", "title": "Vedtægter"},
             ],
         },
-        {"name": "projects", "title": "Projekter", "type": "text", "css_class": "menu-projects"},
+        {"name": "projekter", "title": "Projekter", "type": "text", "css_class": "menu-projects"},
+
     ],
     "show_version": True,
     "allow_theme_toggle": True,
     "pages": [
         {"name": "home", "title": "Forside", "template": "pages/home.html", "url": "/"},
-        {"name": "about", "title": "Om Lydspor Aarhus", "template": "pages/om-lydspor-aarhus.html", "url": "/about"},
-        {"name": "projects", "title": "Projekter", "template": "pages/projekter.html", "url": "/projects"},
-        {"name": "foreningen", "title": "Foreningen", "template": "pages/foreningen.html", "url": "/foreningen"},
+        {"name": "vision", "title": "Om Lydspor Aarhus", "template": "pages/vision.html", "url": "/vision"},
+        {"name": "projekter", "title": "Projekter", "template": "pages/projekter.html", "url": "/projekter"},
+        {"name": "bestyrelsen", "title": "Betyrelsen", "template": "pages/bestyrelsen.html", "url": "/bestyrelsen"},
+        {"name": "vedtægter", "title": "Vedtægter", "template": "pages/vedtægter.html", "url": "/vedtægter"},
+
     ],
     "main_menu_system": [],
 }
