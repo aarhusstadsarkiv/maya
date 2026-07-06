@@ -13,6 +13,7 @@ h4,
 h5,
 h6,
 .menu-text,
+.menu-dropdown,
 footer .heading
 {
     font-family: "Bodoni Moda", serif;
@@ -44,44 +45,51 @@ footer .heading
     padding-right: 20px;
 }
 
-.navigation-right-group .menu-text:nth-last-of-type(2) {
+.navigation-right-group .menu-about .menu-dropdown-toggle {
     background-color: #41292c;
-    color: #000;
-}
-
-.navigation-right-group .menu-text:nth-last-of-type(2) a {
     color: #fff9ed;
 }
 
-.navigation-right-group .menu-text:last-of-type {
+.navigation-right-group .menu-about .menu-dropdown-toggle:hover {
+    background-color: #ff47da;
+}
+
+.navigation-right-group .menu-about .menu-dropdown-toggle:focus {
+    box-shadow: none;
+}
+
+.navigation-right-group .menu-projects {
     background-color: #ff47da;
     color: #fff9ed;
 }
 
-.navigation-right-group .menu-text:last-of-type a {
+.navigation-right-group .menu-projects a {
     color: #fff9ed;
 }
 
 
-@media (max-width: 992px) {
-    .navigation-right-group .menu-text a {
-        font-size: 0.75rem;
-    }
-}
-
-
-/** only display #menu-hamburger menu devices where max-width is 768px */
+/** Display the hamburger navigation on tablet and mobile devices. */
 #menu-hamburger {
     display: none;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 992px) {
     #menu-hamburger {
+        display: block;
+    }
+
+    .navigation-right-group .menu-text,
+    .navigation-right-group .menu-dropdown {
+        display: none;
+    }
+
+    .menu-text-overlay,
+    .menu-dropdown-overlay {
         display: block;
     }
 }
 
-@media (min-width: 769px) {
+@media (min-width: 993px) {
     .main-menu-overlay {
         /**
          * This is the absolute simplest way to hide the overlay menu on desktop

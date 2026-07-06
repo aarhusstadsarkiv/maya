@@ -10,8 +10,16 @@ settings: dict[str, typing.Any] = {
     "canonical_url": "https://www.aarhusarkivet.dk",
     "main_menu_top": [
         {"name": "search_get", "title": "Søg i Arkivet", "type": "text"},
-        {"name": "about", "title": "Om Lydspor Aarhus", "type": "text"},
-        {"name": "projects", "title": "Projekter", "type": "text"},
+        {
+            "title": "Om Lydspor Aarhus",
+            "type": "dropdown",
+            "css_class": "menu-about",
+            "items": [
+                {"name": "about", "title": "Om Lydspor Aarhus"},
+                {"name": "foreningen", "title": "Foreningen"},
+            ],
+        },
+        {"name": "projects", "title": "Projekter", "type": "text", "css_class": "menu-projects"},
     ],
     "show_version": True,
     "allow_theme_toggle": True,
