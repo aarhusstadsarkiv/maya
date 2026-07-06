@@ -22,8 +22,10 @@ class PageSettings(TypedDict, total=False):
 class MenuItemSettings(TypedDict, total=False):
     name: str
     title: str
-    type: NotRequired[Literal["icon"]]
+    type: NotRequired[Literal["text", "icon", "dropdown"]]
     icon: NotRequired[str]
+    items: NotRequired[list[MenuItemSettings]]
+    css_class: NotRequired[str]
 
 
 class SectionPageRef(TypedDict, total=False):

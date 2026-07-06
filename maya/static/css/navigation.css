@@ -142,40 +142,116 @@
 
 
 /**
- * main-menu menu-text
+ * Main-menu text links and dropdowns
  */
-.menu-text a {
+.menu-text a,
+.menu-dropdown-toggle {
     display: flex;
+    align-items: center;
     color: var(--main-menu);
     font-size: 1.2rem;
     font-weight: 600;
+    font-family: inherit;
+    line-height: inherit;
     text-decoration: none;
     border-radius: 6px;
+    border: 0;
     padding: 8px;
     margin: 4px;
+    background: transparent;
+    cursor: pointer;
     transition: background-color 0.2s ease-in-out;
     text-transform: uppercase;
 }
 
-.menu-text a:hover {
+.menu-text a:hover,
+.menu-dropdown-toggle:hover {
     background-color: var(--main-menu-hover);
 }
 
-.menu-text {
+.menu-dropdown-toggle:active {
+    transform: none;
+}
+
+.menu-text,
+.menu-dropdown {
     display: flex;
+    align-items: center;
     flex-direction: row;
 }
 
- .menu-text-overlay {
+.menu-dropdown {
+    position: relative;
+}
+
+.menu-dropdown-toggle::after {
+    width: 0.45em;
+    height: 0.45em;
+    margin-left: 0.6em;
+    border-right: 2px solid currentColor;
+    border-bottom: 2px solid currentColor;
+    content: "";
+    transform: translateY(-0.15em) rotate(45deg);
+    transition: transform 0.2s ease-in-out;
+}
+
+.menu-dropdown-toggle[aria-expanded="true"]::after {
+    transform: translateY(0.1em) rotate(225deg);
+}
+
+.menu-dropdown-toggle:focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+}
+
+.menu-dropdown-list {
+    position: absolute;
+    top: calc(100% + 4px);
+    right: 4px;
+    z-index: 120;
+    min-width: max-content;
+    margin: 0;
+    padding: 6px;
+    list-style: none;
+    border-radius: 6px;
+    background-color: rgba(var(--navigation-background-rgb), 0.975);
+    box-shadow: 1px 2px 5px var(--record-representation-box-shadow);
+}
+
+.menu-dropdown-list[hidden] {
+    display: none;
+}
+
+.menu-dropdown-list a {
+    display: block;
+    margin: 0;
+    padding: 8px 12px;
+    color: var(--main-menu);
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-decoration: none;
+    text-transform: uppercase;
+    border-radius: 6px;
+    white-space: nowrap;
+}
+
+.menu-dropdown-list a:hover {
+    background-color: var(--main-menu-hover);
+}
+
+.menu-text-overlay,
+.menu-dropdown-overlay {
     display: none;
 }
 
 @media (max-width: 768px) {
-    .navigation-right-group .menu-text {
+    .navigation-right-group .menu-text,
+    .navigation-right-group .menu-dropdown {
         display: none;
     }
 
-    .menu-text-overlay {
+    .menu-text-overlay,
+    .menu-dropdown-overlay {
         display: block;
     }
 }

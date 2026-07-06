@@ -19,6 +19,12 @@
         <div class="menu-text-overlay">
             <a href="{{ menu_item.url }}">{{ menu_item.title }}</a>
         </div>
+        {% elif menu_item.type == 'dropdown' %}
+        <div class="menu-dropdown-overlay">
+            {% for dropdown_item in menu_item["items"] %}
+            <a href="{{ dropdown_item.url }}">{{ dropdown_item.title }}</a>
+            {% endfor %}
+        </div>
         {% endif %}
         {% endfor %}
     </div>
@@ -30,8 +36,28 @@
 
             {% for menu_item in main_menu_top %}
             {% if menu_item.type == 'text' %}
-            <div class="menu-text">
+            <div class="menu-text{% if menu_item.css_class %} {{ menu_item.css_class }}{% endif %}">
                 <a href="{{ menu_item.url }}">{{ menu_item.title }}</a>
+            </div>
+            {% elif menu_item.type == 'dropdown' %}
+            <div class="menu-dropdown{% if menu_item.css_class %} {{ menu_item.css_class }}{% endif %}">
+                <button class="menu-dropdown-toggle"
+                        id="menu-dropdown-toggle-{{ loop.index }}"
+                        type="button"
+                        aria-expanded="false"
+                        aria-controls="menu-dropdown-{{ loop.index }}">
+                    {{ menu_item.title }}
+                </button>
+                <ul class="menu-dropdown-list"
+                    id="menu-dropdown-{{ loop.index }}"
+                    aria-labelledby="menu-dropdown-toggle-{{ loop.index }}"
+                    hidden>
+                    {% for dropdown_item in menu_item["items"] %}
+                    <li>
+                        <a href="{{ dropdown_item.url }}">{{ dropdown_item.title }}</a>
+                    </li>
+                    {% endfor %}
+                </ul>
             </div>
             {% endif %}
             {% endfor %}

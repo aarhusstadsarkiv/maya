@@ -80,17 +80,24 @@ async def get_context(request: Request, context_values: dict = {}, identifier: s
 
 def _generate_menu_urls(request: Request, menu_items: list, search_query_str):
     """
-    Generate URLs for the main menu items.
+    Generate URLs for the main menu items and nested dropdown items.
     In order to ease the process of using the items on the frontend.
     """
 
     for menu_item in menu_items:
-        url = str(request.url_for(menu_item["name"], **menu_item.get("params", {})))
-        if menu_item["name"] == "search_get":
+        if menu_item.get("items"):
+            _generate_menu_urls(request, menu_item["items"], search_query_str)
+
+        name = menu_item.get("name")
+        if not name:
+            continue
+
+        url = str(request.url_for(name, **menu_item.get("params", {})))
+        if name == "search_get":
 
             # Add search_query_str to search url
             menu_item["url"] = f"{url}?{search_query_str}"
-        elif menu_item["name"] == "auth_login_get":
+        elif name == "auth_login_get":
 
             # Add next parameter to login url
             path_with_query = request.url.path
