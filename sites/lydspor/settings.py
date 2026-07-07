@@ -18,10 +18,10 @@ settings: dict[str, typing.Any] = {
                 {"name": "vision", "title": "Vision"},
                 {"name": "bestyrelsen", "title": "Betyrelsen"},
                 {"name": "vedtægter", "title": "Vedtægter"},
+                {"name": "news_index", "title": "Nyheder"},
             ],
         },
         {"name": "projekter", "title": "Projekter", "type": "text", "css_class": "menu-projects"},
-
     ],
     "show_version": True,
     "allow_theme_toggle": True,
@@ -31,7 +31,6 @@ settings: dict[str, typing.Any] = {
         {"name": "projekter", "title": "Projekter", "template": "pages/projekter.html", "url": "/projekter"},
         {"name": "bestyrelsen", "title": "Betyrelsen", "template": "pages/bestyrelsen.html", "url": "/bestyrelsen"},
         {"name": "vedtægter", "title": "Vedtægter", "template": "pages/vedtægter.html", "url": "/vedtægter"},
-
     ],
     "main_menu_system": [],
 }

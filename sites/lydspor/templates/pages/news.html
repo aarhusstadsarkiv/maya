@@ -1,0 +1,89 @@
+{% extends "base_small.html" %}
+
+{% block body_class %}page-news{% endblock %}
+
+{% block head %}
+<style>
+    .page-news time {
+        background: unset;
+        color: inherit;
+        padding: 0;
+        border-radius: 0;
+    }
+
+    .page-news .news-list {
+        list-style: none;
+        margin: 2rem 0 0;
+        padding: 0;
+    }
+
+    .page-news .news-list li {
+        border-top: 1px solid var(--border);
+        padding: 1rem 0;
+    }
+
+    .page-news .news-list li:last-child {
+        border-bottom: 1px solid var(--border);
+    }
+
+    .page-news .news-list a {
+        font-size: 1.15rem;
+        font-weight: 600;
+    }
+
+    .page-news .news-list time,
+    .page-news .news-meta {
+        color: var(--text-muted);
+    }
+
+    .page-news .news-list time {
+        display: block;
+        margin-top: 0.35rem;
+    }
+
+    .page-news .news-article h1 {
+        margin-bottom: 0.5rem;
+    }
+
+    .page-news .news-meta {
+        margin: 0 0 2rem;
+    }
+
+</style>
+{% endblock head %}
+
+{% block content %}
+
+{% if article %}
+
+<article class="news-article">
+    <p><a href="/nyheder">&lt;- Nyheder</a></p>
+    <h1>{{ article.title }}</h1>
+
+    {% if article.date or article.author %}
+    <p class="news-meta">
+        {% if article.date %}<time datetime="{{ article.date }}">{{ article.date }}</time>{% endif %}
+        {% if article.date and article.author %} - {% endif %}
+        {% if article.author %}{{ article.author }}{% endif %}
+    </p>
+    {% endif %}
+
+    {{ markdown(article.body)|safe }}
+</article>
+
+{% else %}
+
+<h1>Nyheder</h1>
+
+<ul class="news-list">
+{% for article in articles %}
+    <li>
+        <a href="{{ article.path }}">{{ article.title }}</a>
+        {% if article.date %}<time datetime="{{ article.date }}">{{ article.date }}</time>{% endif %}
+    </li>
+{% endfor %}
+</ul>
+
+{% endif %}
+
+{% endblock content %}
