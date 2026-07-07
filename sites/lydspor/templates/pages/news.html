@@ -2,7 +2,40 @@
 
 {% block body_class %}page-news{% endblock %}
 
-{% block head %}
+{% block content %}
+
+{% if article %}
+
+<article class="news-article">
+    <p><a href="/nyheder">&lt;- Nyheder</a></p>
+    <h1>{{ article.title }}</h1>
+
+    {% if article.date or article.author %}
+    <p class="news-meta">
+        {% if article.date %}<time datetime="{{ article.date }}">{{ article.date }}</time>{% endif %}
+        {% if article.date and article.author %} - {% endif %}
+        {% if article.author %}{{ article.author }}{% endif %}
+    </p>
+    {% endif %}
+
+    {{ markdown(article.body)|safe }}
+</article>
+
+{% else %}
+
+<h1>Nyheder</h1>
+
+<ul class="news-list">
+{% for article in articles %}
+    <li>
+        <a href="{{ article.path }}">{{ article.title }}</a>
+        {% if article.date %}<time datetime="{{ article.date }}">{{ article.date }}</time>{% endif %}
+    </li>
+{% endfor %}
+</ul>
+
+{% endif %}
+
 <style>
     .page-news time {
         background: unset;
@@ -50,40 +83,5 @@
     }
 
 </style>
-{% endblock head %}
-
-{% block content %}
-
-{% if article %}
-
-<article class="news-article">
-    <p><a href="/nyheder">&lt;- Nyheder</a></p>
-    <h1>{{ article.title }}</h1>
-
-    {% if article.date or article.author %}
-    <p class="news-meta">
-        {% if article.date %}<time datetime="{{ article.date }}">{{ article.date }}</time>{% endif %}
-        {% if article.date and article.author %} - {% endif %}
-        {% if article.author %}{{ article.author }}{% endif %}
-    </p>
-    {% endif %}
-
-    {{ markdown(article.body)|safe }}
-</article>
-
-{% else %}
-
-<h1>Nyheder</h1>
-
-<ul class="news-list">
-{% for article in articles %}
-    <li>
-        <a href="{{ article.path }}">{{ article.title }}</a>
-        {% if article.date %}<time datetime="{{ article.date }}">{{ article.date }}</time>{% endif %}
-    </li>
-{% endfor %}
-</ul>
-
-{% endif %}
 
 {% endblock content %}
