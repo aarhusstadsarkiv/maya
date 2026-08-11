@@ -30,6 +30,11 @@ Third-party Middleware:
 The middleware list is assembled dynamically based on application settings.
 """
 
+import asyncio
+import json
+import os
+from time import time
+
 from starlette.middleware.sessions import SessionMiddleware
 from starlette.middleware import Middleware
 from starlette.middleware.base import BaseHTTPMiddleware
@@ -39,10 +44,6 @@ from starlette.requests import Request
 from maya.core.dynamic_settings import settings
 from maya.core.logging import get_log, get_access_log
 from maya.core import api, api_client
-import os
-import json
-import re
-from time import time
 from maya.core.hooks import get_hooks
 from maya.core.api_error import OpenAwsException
 from starlette.responses import JSONResponse, PlainTextResponse
@@ -50,35 +51,82 @@ from starlette.responses import JSONResponse, PlainTextResponse
 log = get_log()
 access_log = get_access_log()
 
-BOT_UA_RE = re.compile(
-    r"(ahrefsbot|semrushbot|awariobot|bytespider|googlebot|bingbot|"
-    r"facebookexternalhit|meta-externalagent|sitecheck-sitecrawl|siteimprove)",
-    re.IGNORECASE,
-)
+# BOT_UA_RE = re.compile(
+#     r"(ahrefsbot|semrushbot|awariobot|bytespider|googlebot|bingbot|"
+#     r"facebookexternalhit|meta-externalagent|sitecheck-sitecrawl|siteimprove)",
+#     re.IGNORECASE,
+# )
 
 
-class BlockSpiderSearchMiddleware(BaseHTTPMiddleware):
+# class BlockSpiderSearchMiddleware(BaseHTTPMiddleware):
+#     """
+#     Block known spider user-agents from faceted search URLs.
+#     """
+
+#     async def dispatch(self, request: Request, call_next):
+#         path = request.url.path
+#         query = request.url.query
+#         user_agent = request.headers.get("user-agent", "-")
+
+#         if request.client:
+#             client_ip = request.client.host
+#             client_port = str(request.client.port)
+#         else:
+#             client_ip = "unknown"
+#             client_port = "unknown"
+
+#         if path == "/search" and query and BOT_UA_RE.search(user_agent):
+#             access_log.warning(f'{client_ip}:{client_port} - "BLOCKED {request.method} {path}?{query}" 403 ua="{user_agent}"')
+#             return PlainTextResponse("Forbidden", status_code=403)
+
+#         return await call_next(request)
+
+
+class ConcurrencyLimitMiddleware(BaseHTTPMiddleware):
     """
-    Block known spider user-agents from faceted search URLs.
+    Limit concurrent requests to configured paths within this process.
+
+    The counter is shared by all configured paths. Requests are rejected rather
+    than queued when all slots are occupied, keeping excess traffic from
+    consuming application and upstream resources.
     """
+
+    def __init__(self, app, max_concurrency: int, paths: list[str], retry_after: int = 5):
+        super().__init__(app)
+
+        if max_concurrency < 1:
+            raise ValueError("max_concurrency must be at least 1")
+        if not paths:
+            raise ValueError("paths must contain at least one path")
+
+        self.max_concurrency = max_concurrency
+        self.paths = set(paths)
+        self.retry_after = retry_after
+        self._active_requests = 0
+        self._counter_lock = asyncio.Lock()
 
     async def dispatch(self, request: Request, call_next):
-        path = request.url.path
-        query = request.url.query
-        user_agent = request.headers.get("user-agent", "-")
+        if request.url.path not in self.paths:
+            return await call_next(request)
 
-        if request.client:
-            client_ip = request.client.host
-            client_port = str(request.client.port)
-        else:
-            client_ip = "unknown"
-            client_port = "unknown"
+        async with self._counter_lock:
+            if self._active_requests >= self.max_concurrency:
+                return PlainTextResponse(
+                    "Too Many Requests",
+                    status_code=429,
+                    headers={
+                        "Retry-After": str(self.retry_after),
+                        "Cache-Control": "no-store",
+                    },
+                )
 
-        if path == "/search" and query and BOT_UA_RE.search(user_agent):
-            access_log.warning(f'{client_ip}:{client_port} - "BLOCKED {request.method} {path}?{query}" 403 ua="{user_agent}"')
-            return PlainTextResponse("Forbidden", status_code=403)
+            self._active_requests += 1
 
-        return await call_next(request)
+        try:
+            return await call_next(request)
+        finally:
+            async with self._counter_lock:
+                self._active_requests -= 1
 
 
 class RequestBeginMiddleware(BaseHTTPMiddleware):
@@ -274,8 +322,17 @@ class SameOriginMiddleware(BaseHTTPMiddleware):
 
 middleware = []
 
-middleware.append(Middleware(BlockSpiderSearchMiddleware))
+# middleware.append(Middleware(BlockSpiderSearchMiddleware))
 middleware.append(Middleware(AccessLogMiddleware))
+concurrency_limit = settings["concurrency_limit"]
+middleware.append(
+    Middleware(
+        ConcurrencyLimitMiddleware,
+        max_concurrency=concurrency_limit["max"],
+        paths=concurrency_limit["paths"],
+        retry_after=concurrency_limit["retry_after"],
+    )
+)
 middleware.append(Middleware(RequestBeginMiddleware))
 
 if settings["log_api_calls"]:
