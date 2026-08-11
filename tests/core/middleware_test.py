@@ -18,7 +18,13 @@ class FakeRequest:
 
 class MiddlewareTest(IsolatedAsyncioTestCase):
     async def test_search_concurrency_limit_rejects_excess_request(self):
-        middleware = ConcurrencyLimitMiddleware(app=None, max_concurrency=1, paths=["/search", "/search/json"], retry_after=7)
+        middleware = ConcurrencyLimitMiddleware(
+            app=None,
+            limits=[
+                {"max": 1, "retry_after": 7, "paths": ["/search", "/search/json"]},
+                {"max": 2, "retry_after": 5, "paths": ["*"]},
+            ],
+        )
         first_request_started = asyncio.Event()
         finish_first_request = asyncio.Event()
 
@@ -45,27 +51,52 @@ class MiddlewareTest(IsolatedAsyncioTestCase):
         self.assertEqual(response.headers["cache-control"], "no-store")
         rejected_call_next.assert_not_called()
 
+        record_request = FakeRequest()
+        record_request.url = URL("https://www.aarhusarkivet.dk/records/1")
+        record_call_next = AsyncMock(return_value="record response")
+        record_response = await middleware.dispatch(record_request, record_call_next)
+
+        self.assertEqual(record_response, "record response")
+        record_call_next.assert_called_once_with(record_request)
+
         finish_first_request.set()
         self.assertEqual(await first_task, "first response")
 
     async def test_search_concurrency_limit_covers_json_endpoint(self):
-        middleware = ConcurrencyLimitMiddleware(app=None, max_concurrency=1, paths=["/search", "/search/json"])
-        middleware._active_requests = 1
-        request = FakeRequest()
-        request.method = "GET"
-        request.url = URL("https://www.aarhusarkivet.dk/search/json?q=aarhus")
-        call_next = AsyncMock()
+        middleware = ConcurrencyLimitMiddleware(
+            app=None,
+            limits=[{"max": 1, "retry_after": 5, "paths": ["/search", "/search/json"]}],
+        )
+        first_request_started = asyncio.Event()
+        finish_first_request = asyncio.Event()
 
-        response = await middleware.dispatch(request, call_next)
+        async def slow_search(_request):
+            first_request_started.set()
+            await finish_first_request.wait()
+            return "first response"
+
+        search_request = FakeRequest()
+        search_request.url = URL("https://www.aarhusarkivet.dk/search")
+        first_task = asyncio.create_task(middleware.dispatch(search_request, slow_search))
+        await first_request_started.wait()
+
+        json_request = FakeRequest()
+        json_request.url = URL("https://www.aarhusarkivet.dk/search/json?q=aarhus")
+        call_next = AsyncMock()
+        response = await middleware.dispatch(json_request, call_next)
 
         self.assertEqual(response.status_code, 429)
         call_next.assert_not_called()
 
+        finish_first_request.set()
+        await first_task
+
     async def test_search_concurrency_limit_does_not_limit_other_paths(self):
-        middleware = ConcurrencyLimitMiddleware(app=None, max_concurrency=1, paths=["/search", "/search/json"])
-        middleware._active_requests = 1
+        middleware = ConcurrencyLimitMiddleware(
+            app=None,
+            limits=[{"max": 1, "retry_after": 5, "paths": ["/search", "/search/json"]}],
+        )
         request = FakeRequest()
-        request.method = "GET"
         request.url = URL("https://www.aarhusarkivet.dk/records/1")
         call_next = AsyncMock(return_value="record response")
 
@@ -75,7 +106,10 @@ class MiddlewareTest(IsolatedAsyncioTestCase):
         call_next.assert_called_once_with(request)
 
     async def test_search_concurrency_limit_releases_slot_after_error(self):
-        middleware = ConcurrencyLimitMiddleware(app=None, max_concurrency=1, paths=["/search", "/search/json"])
+        middleware = ConcurrencyLimitMiddleware(
+            app=None,
+            limits=[{"max": 1, "retry_after": 5, "paths": ["/search", "/search/json"]}],
+        )
         request = FakeRequest()
         request.method = "GET"
         request.url = URL("https://www.aarhusarkivet.dk/search")
@@ -89,6 +123,105 @@ class MiddlewareTest(IsolatedAsyncioTestCase):
 
         self.assertEqual(response, "search response")
         successful_call_next.assert_called_once_with(request)
+
+    async def test_global_wildcard_limits_all_paths(self):
+        middleware = ConcurrencyLimitMiddleware(
+            app=None,
+            limits=[{"max": 1, "retry_after": 9, "paths": ["*"]}],
+        )
+        first_request_started = asyncio.Event()
+        finish_first_request = asyncio.Event()
+
+        async def slow_request(_request):
+            first_request_started.set()
+            await finish_first_request.wait()
+            return "first response"
+
+        record_request = FakeRequest()
+        record_request.url = URL("https://www.aarhusarkivet.dk/records/1")
+        first_task = asyncio.create_task(middleware.dispatch(record_request, slow_request))
+        await first_request_started.wait()
+
+        home_request = FakeRequest()
+        home_request.url = URL("https://www.aarhusarkivet.dk/")
+        call_next = AsyncMock()
+        response = await middleware.dispatch(home_request, call_next)
+
+        self.assertEqual(response.status_code, 429)
+        self.assertEqual(response.headers["retry-after"], "9")
+        call_next.assert_not_called()
+
+        finish_first_request.set()
+        await first_task
+
+    async def test_trailing_wildcard_limits_matching_prefix(self):
+        middleware = ConcurrencyLimitMiddleware(
+            app=None,
+            limits=[{"max": 1, "retry_after": 5, "paths": ["/records/*"]}],
+        )
+        first_request_started = asyncio.Event()
+        finish_first_request = asyncio.Event()
+
+        async def slow_record(_request):
+            first_request_started.set()
+            await finish_first_request.wait()
+            return "first response"
+
+        first_request = FakeRequest()
+        first_request.url = URL("https://www.aarhusarkivet.dk/records/1")
+        first_task = asyncio.create_task(middleware.dispatch(first_request, slow_record))
+        await first_request_started.wait()
+
+        second_request = FakeRequest()
+        second_request.url = URL("https://www.aarhusarkivet.dk/records/2")
+        call_next = AsyncMock()
+        response = await middleware.dispatch(second_request, call_next)
+
+        self.assertEqual(response.status_code, 429)
+        call_next.assert_not_called()
+
+        finish_first_request.set()
+        await first_task
+
+    async def test_excluded_path_uses_its_own_limit(self):
+        middleware = ConcurrencyLimitMiddleware(
+            app=None,
+            limits=[
+                {"max": 2, "retry_after": 5, "paths": ["/static/*"]},
+                {"max": 1, "retry_after": 5, "paths": ["*"], "exclude_paths": ["/static/*"]},
+            ],
+        )
+        global_request_started = asyncio.Event()
+        finish_global_request = asyncio.Event()
+
+        async def slow_global_request(_request):
+            global_request_started.set()
+            await finish_global_request.wait()
+            return "global response"
+
+        record_request = FakeRequest()
+        record_request.url = URL("https://www.aarhusarkivet.dk/records/1")
+        global_task = asyncio.create_task(middleware.dispatch(record_request, slow_global_request))
+        await global_request_started.wait()
+
+        static_request = FakeRequest()
+        static_request.url = URL("https://www.aarhusarkivet.dk/static/css/default.css")
+        static_call_next = AsyncMock(return_value="static response")
+        response = await middleware.dispatch(static_request, static_call_next)
+
+        self.assertEqual(response, "static response")
+        static_call_next.assert_called_once_with(static_request)
+
+        blocked_record_request = FakeRequest()
+        blocked_record_request.url = URL("https://www.aarhusarkivet.dk/records/2")
+        blocked_call_next = AsyncMock()
+        blocked_response = await middleware.dispatch(blocked_record_request, blocked_call_next)
+
+        self.assertEqual(blocked_response.status_code, 429)
+        blocked_call_next.assert_not_called()
+
+        finish_global_request.set()
+        await global_task
 
     async def test_same_origin_middleware_allows_configured_origin(self):
         middleware = SameOriginMiddleware(app=None, allowed_origins=["https://api.openaws.dk"])

@@ -66,11 +66,24 @@ settings: Settings = {
     "main_menu_sections": [],
     "search_base_url": "/search",
     "search_keep_results": True,
-    "concurrency_limit": {
-        "max": 4,
-        "retry_after": 5,
-        "paths": ["/search", "/search/json"],
-    },
+    "concurrency_limits": [
+        {
+            "max": 4,
+            "retry_after": 5,
+            "paths": ["/search", "/search/json"],
+        },
+        {
+            "max": 100,
+            "retry_after": 5,
+            "paths": ["/static/*"],
+        },
+        {
+            "max": 20,
+            "retry_after": 5,
+            "paths": ["*"],
+            "exclude_paths": ["/static/*"],
+        },
+    ],
     "facets_enabled": ["content_types", "subjects", "availability", "usability", "dates"],
     "cors_allow_origins": [],
     "same_origin_allow_origins": ["https://api.openaws.dk"],

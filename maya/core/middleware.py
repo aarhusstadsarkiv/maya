@@ -46,87 +46,89 @@ from maya.core.logging import get_log, get_access_log
 from maya.core import api, api_client
 from maya.core.hooks import get_hooks
 from maya.core.api_error import OpenAwsException
+from maya.settings_types import ConcurrencyLimitSettings
 from starlette.responses import JSONResponse, PlainTextResponse
 
 log = get_log()
 access_log = get_access_log()
 
-# BOT_UA_RE = re.compile(
-#     r"(ahrefsbot|semrushbot|awariobot|bytespider|googlebot|bingbot|"
-#     r"facebookexternalhit|meta-externalagent|sitecheck-sitecrawl|siteimprove)",
-#     re.IGNORECASE,
-# )
 
+class _ConcurrencyLimitRule:
+    def __init__(self, config: ConcurrencyLimitSettings):
+        if config["max"] < 1:
+            raise ValueError("max must be at least 1")
+        if not config["paths"]:
+            raise ValueError("paths must contain at least one path")
 
-# class BlockSpiderSearchMiddleware(BaseHTTPMiddleware):
-#     """
-#     Block known spider user-agents from faceted search URLs.
-#     """
+        self.paths = config["paths"]
+        self.exclude_paths = config.get("exclude_paths", [])
 
-#     async def dispatch(self, request: Request, call_next):
-#         path = request.url.path
-#         query = request.url.query
-#         user_agent = request.headers.get("user-agent", "-")
+        for path in self.paths + self.exclude_paths:
+            if "*" in path and path != "*" and (path.count("*") > 1 or not path.endswith("*")):
+                raise ValueError("wildcards are only supported as '*' or at the end of a path")
 
-#         if request.client:
-#             client_ip = request.client.host
-#             client_port = str(request.client.port)
-#         else:
-#             client_ip = "unknown"
-#             client_port = "unknown"
+        self.max_concurrency = config["max"]
+        self.retry_after = config["retry_after"]
+        self.active_requests = 0
 
-#         if path == "/search" and query and BOT_UA_RE.search(user_agent):
-#             access_log.warning(f'{client_ip}:{client_port} - "BLOCKED {request.method} {path}?{query}" 403 ua="{user_agent}"')
-#             return PlainTextResponse("Forbidden", status_code=403)
+    @staticmethod
+    def _matches_any(path: str, patterns: list[str]) -> bool:
+        for pattern in patterns:
+            if pattern == "*" or pattern == path:
+                return True
+            if pattern.endswith("*") and path.startswith(pattern[:-1]):
+                return True
+        return False
 
-#         return await call_next(request)
+    def matches(self, path: str) -> bool:
+        return self._matches_any(path, self.paths) and not self._matches_any(path, self.exclude_paths)
 
 
 class ConcurrencyLimitMiddleware(BaseHTTPMiddleware):
     """
-    Limit concurrent requests to configured paths within this process.
+    Apply independent, overlapping concurrency limits within this process.
 
-    The counter is shared by all configured paths. Requests are rejected rather
-    than queued when all slots are occupied, keeping excess traffic from
-    consuming application and upstream resources.
+    Exact paths, trailing wildcards such as ``/records/*``, and the global ``*``
+    wildcard are supported for included and excluded paths. A request counts
+    against every matching rule and is rejected when any matching rule is
+    exhausted.
     """
 
-    def __init__(self, app, max_concurrency: int, paths: list[str], retry_after: int = 5):
+    def __init__(self, app, limits: list[ConcurrencyLimitSettings]):
         super().__init__(app)
 
-        if max_concurrency < 1:
-            raise ValueError("max_concurrency must be at least 1")
-        if not paths:
-            raise ValueError("paths must contain at least one path")
+        if not limits:
+            raise ValueError("limits must contain at least one concurrency limit")
 
-        self.max_concurrency = max_concurrency
-        self.paths = set(paths)
-        self.retry_after = retry_after
-        self._active_requests = 0
+        self._limits = [_ConcurrencyLimitRule(config) for config in limits]
         self._counter_lock = asyncio.Lock()
 
     async def dispatch(self, request: Request, call_next):
-        if request.url.path not in self.paths:
+        matching_limits = [limit for limit in self._limits if limit.matches(request.url.path)]
+        if not matching_limits:
             return await call_next(request)
 
         async with self._counter_lock:
-            if self._active_requests >= self.max_concurrency:
+            exhausted_limits = [limit for limit in matching_limits if limit.active_requests >= limit.max_concurrency]
+            if exhausted_limits:
                 return PlainTextResponse(
                     "Too Many Requests",
                     status_code=429,
                     headers={
-                        "Retry-After": str(self.retry_after),
+                        "Retry-After": str(max(limit.retry_after for limit in exhausted_limits)),
                         "Cache-Control": "no-store",
                     },
                 )
 
-            self._active_requests += 1
+            for limit in matching_limits:
+                limit.active_requests += 1
 
         try:
             return await call_next(request)
         finally:
             async with self._counter_lock:
-                self._active_requests -= 1
+                for limit in matching_limits:
+                    limit.active_requests -= 1
 
 
 class RequestBeginMiddleware(BaseHTTPMiddleware):
@@ -322,15 +324,11 @@ class SameOriginMiddleware(BaseHTTPMiddleware):
 
 middleware = []
 
-# middleware.append(Middleware(BlockSpiderSearchMiddleware))
 middleware.append(Middleware(AccessLogMiddleware))
-concurrency_limit = settings["concurrency_limit"]
 middleware.append(
     Middleware(
         ConcurrencyLimitMiddleware,
-        max_concurrency=concurrency_limit["max"],
-        paths=concurrency_limit["paths"],
-        retry_after=concurrency_limit["retry_after"],
+        limits=settings["concurrency_limits"],
     )
 )
 middleware.append(Middleware(RequestBeginMiddleware))

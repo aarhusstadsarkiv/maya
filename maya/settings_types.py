@@ -49,6 +49,7 @@ class ConcurrencyLimitSettings(TypedDict):
     max: int
     retry_after: int
     paths: list[str]
+    exclude_paths: NotRequired[list[str]]
 
 
 class Settings(TypedDict, total=True):
@@ -84,7 +85,7 @@ class Settings(TypedDict, total=True):
 
     search_base_url: str
     search_keep_results: bool
-    concurrency_limit: ConcurrencyLimitSettings
+    concurrency_limits: list[ConcurrencyLimitSettings]
 
     facets_enabled: list[str]
     cors_allow_origins: list[str]
