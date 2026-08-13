@@ -18,6 +18,7 @@ from maya.core.templates import templates
 from maya.core.context import get_context
 from maya.core.translate import translate
 from maya.core.logging import get_log
+from maya.core.logging_context import get_request_client_ip
 from maya.core import flash
 from maya.core.auth import AuthException, AuthExceptionJSON
 from httpx import HTTPStatusError, TimeoutException
@@ -40,7 +41,14 @@ async def not_found(request: Request, exc: HTTPException):
     }
 
     # No need to log full exception. It's a 404
-    log.warning("Not found", extra={"error_code": 404, "error_url": str(request.url)})
+    log.warning(
+        "Not found",
+        extra={
+            "client_ip": get_request_client_ip(request),
+            "error_code": 404,
+            "error_url": str(request.url),
+        },
+    )
     context = await get_context(request, context_values=context_values)
     return templates.TemplateResponse(request, "errors/default.html", context, status_code=404)
 
@@ -62,7 +70,11 @@ async def http_status_error(request: Request, exc: HTTPStatusError):
         "exc_traceback": exc_traceback,
     }
 
-    extra = {"error_code": exc.response.status_code, "error_url": str(request.url)}
+    extra = {
+        "client_ip": get_request_client_ip(request),
+        "error_code": exc.response.status_code,
+        "error_url": str(request.url),
+    }
     log.exception("HTTP status error", extra=extra)
     context = await get_context(request, context_values=context_values)
     return templates.TemplateResponse(request, "errors/default.html", context, status_code=exc.response.status_code)
@@ -88,7 +100,11 @@ async def http_timeout_error(request: Request, exc: TimeoutException):
         "exc_traceback": exc_traceback,
     }
 
-    extra = {"error_code": status_code, "error_url": str(request.url)}
+    extra = {
+        "client_ip": get_request_client_ip(request),
+        "error_code": status_code,
+        "error_url": str(request.url),
+    }
     log.exception("HTTP timeout error", extra=extra)
 
     context = await get_context(request, context_values=context_values)
@@ -109,7 +125,11 @@ async def server_error(request: Request, exc: Exception):
         "exc_traceback": exc_traceback,
     }
 
-    extra = {"error_code": 500, "error_url": str(request.url)}
+    extra = {
+        "client_ip": get_request_client_ip(request),
+        "error_code": 500,
+        "error_url": str(request.url),
+    }
     log.exception("Server error", extra=extra)
     context = await get_context(request, context_values=context_values)
     return templates.TemplateResponse(request, "errors/default.html", context, status_code=500)

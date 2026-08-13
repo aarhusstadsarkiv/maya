@@ -62,7 +62,7 @@ class JsonFormatter(logging.Formatter):
             "message": record.getMessage(),
         }
 
-        client_ip = get_client_ip()
+        client_ip = getattr(record, "client_ip", None) or get_client_ip()
         if client_ip is not None:
             log_record["client_ip"] = client_ip
 

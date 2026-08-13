@@ -20,3 +20,11 @@ class JsonFormatterTest(TestCase):
         output = JsonFormatter().format(logging.LogRecord("main", logging.INFO, "", 0, "Test", (), None))
 
         self.assertNotIn("client_ip", json.loads(output))
+
+    def test_explicit_client_ip_works_outside_request_context(self):
+        record = logging.LogRecord("main", logging.ERROR, "", 0, "Test", (), None)
+        record.client_ip = "203.0.113.5"
+
+        output = JsonFormatter().format(record)
+
+        self.assertEqual(json.loads(output)["client_ip"], "203.0.113.5")

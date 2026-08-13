@@ -1,6 +1,7 @@
 """Request-local context made available to log formatters."""
 
 from contextvars import ContextVar, Token
+from typing import Any
 
 _client_ip: ContextVar[str | None] = ContextVar("client_ip", default=None)
 
@@ -15,3 +16,8 @@ def set_client_ip(client_ip: str) -> Token:
 
 def reset_client_ip(token: Token) -> None:
     _client_ip.reset(token)
+
+
+def get_request_client_ip(request: Any) -> str:
+    client = getattr(request, "client", None)
+    return client.host if client else "unknown"
