@@ -84,6 +84,24 @@ settings: Settings = {
             ],
         },
     ],
+    "concurrency_limits": [
+        {
+            "max": 8,
+            "retry_after": 5,
+            "paths": ["/search"],
+        },
+        {
+            "max": 100,
+            "retry_after": 5,
+            "paths": ["/static/*"],
+        },
+        {
+            "max": 20,
+            "retry_after": 5,
+            "paths": ["*"],
+            "exclude_paths": ["/static/*"],
+        },
+    ],
     "allow_user_registration": True,
     "allow_user_management": True,
     "allow_save_bookmarks": True,
