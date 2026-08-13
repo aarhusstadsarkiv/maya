@@ -273,6 +273,7 @@ class MiddlewareTest(IsolatedAsyncioTestCase):
         middleware = SameOriginMiddleware(app=None, allowed_origins=[])
         call_next = AsyncMock()
         request = FakeRequest()
+        request.client = SimpleNamespace(host="203.0.113.4", port=0)
 
         with patch("maya.core.middleware.log") as log:
             response = await middleware.dispatch(request, call_next)
@@ -282,5 +283,9 @@ class MiddlewareTest(IsolatedAsyncioTestCase):
         call_next.assert_not_called()
         log.exception.assert_called_once_with(
             "Forbidden request from origin: https://blocked.example",
-            extra={"error_code": 403, "error_url": "http://testserver/records/1"},
+            extra={
+                "client_ip": "203.0.113.4",
+                "error_code": 403,
+                "error_url": "http://testserver/records/1",
+            },
         )

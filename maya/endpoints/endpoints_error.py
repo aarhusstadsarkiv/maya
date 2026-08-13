@@ -7,6 +7,7 @@ import logging
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 from maya.core.logging import get_log
+from maya.core.logging_context import get_request_client_ip
 
 log = get_log()
 DEFAULT_LOG_LEVEL = "ERROR"
@@ -32,6 +33,7 @@ async def error_log_post(request: Request):
         data = await request.json()
 
         extra = {
+            "client_ip": get_request_client_ip(request),
             "error_code": data.get("error_code", 500),
             "error_type": data.get("error_type", "Unknown Error"),
             "error_url": data.get("error_url", str(request.url.path)),
@@ -43,7 +45,13 @@ async def error_log_post(request: Request):
 
     except Exception as e:
 
-        extra = {"error_code": 500, "error_type": "UnknownError", "error_url": str(request.url.path), "exception": str(e)}
+        extra = {
+            "client_ip": get_request_client_ip(request),
+            "error_code": 500,
+            "error_type": "UnknownError",
+            "error_url": str(request.url.path),
+            "exception": str(e),
+        }
 
         log.error("Failed to parse error log", extra=extra)
         return JSONResponse({"status": "received"}, status_code=200)

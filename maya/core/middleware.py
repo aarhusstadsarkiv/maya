@@ -43,7 +43,7 @@ from starlette.middleware.gzip import GZipMiddleware
 from starlette.requests import Request
 from maya.core.dynamic_settings import settings
 from maya.core.logging import get_log, get_access_log
-from maya.core.logging_context import reset_client_ip, set_client_ip
+from maya.core.logging_context import get_request_client_ip, reset_client_ip, set_client_ip
 from maya.core import api, api_client
 from maya.core.hooks import get_hooks
 from maya.core.api_error import OpenAwsException
@@ -322,7 +322,11 @@ class SameOriginMiddleware(BaseHTTPMiddleware):
                 if origin not in allowed:
                     raise OpenAwsException(403, "Forbidden. Bad Origin.")
             except OpenAwsException as exc:
-                extra = {"error_code": exc.status_code, "error_url": str(request.url)}
+                extra = {
+                    "client_ip": get_request_client_ip(request),
+                    "error_code": exc.status_code,
+                    "error_url": str(request.url),
+                }
                 log.exception(f"Forbidden request from origin: {origin}", extra=extra)
                 return JSONResponse({"error": True, "message": exc.message}, status_code=exc.status_code)
 
