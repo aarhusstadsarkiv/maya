@@ -1,5 +1,6 @@
 import asyncio
 import os
+from types import SimpleNamespace
 from unittest import IsolatedAsyncioTestCase
 from unittest.mock import AsyncMock, patch
 
@@ -7,7 +8,8 @@ from starlette.datastructures import URL
 
 os.environ.setdefault("BASE_DIR", "sites/aarhus")
 
-from maya.core.middleware import ConcurrencyLimitMiddleware, SameOriginMiddleware
+from maya.core.logging_context import get_client_ip
+from maya.core.middleware import AccessLogMiddleware, ConcurrencyLimitMiddleware, SameOriginMiddleware
 
 
 class FakeRequest:
@@ -17,6 +19,25 @@ class FakeRequest:
 
 
 class MiddlewareTest(IsolatedAsyncioTestCase):
+    async def test_access_log_exposes_client_ip_to_request_logs_and_resets_it(self):
+        middleware = AccessLogMiddleware(app=None)
+        request = FakeRequest()
+        request.method = "GET"
+        request.headers = {"user-agent": "test-agent"}
+        request.url = URL("https://www.aarhusarkivet.dk/records/1")
+        request.client = SimpleNamespace(host="203.0.113.4", port=0)
+
+        async def call_next(_request):
+            self.assertEqual(get_client_ip(), "203.0.113.4")
+            return SimpleNamespace(status_code=200)
+
+        with patch("maya.core.middleware.access_log") as access_log:
+            response = await middleware.dispatch(request, call_next)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIsNone(get_client_ip())
+        self.assertIn('203.0.113.4:0 - "GET /records/1" 200', access_log.info.call_args.args[0])
+
     async def test_search_concurrency_limit_rejects_excess_request(self):
         middleware = ConcurrencyLimitMiddleware(
             app=None,

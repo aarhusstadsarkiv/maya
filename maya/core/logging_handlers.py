@@ -33,6 +33,7 @@ from concurrent_log_handler import ConcurrentRotatingFileHandler
 import warnings
 from maya.core.paths import get_data_dir_path
 import json
+from maya.core.logging_context import get_client_ip
 
 MAX_LOG_SIZE = 100 * 1024 * 1024
 BACKUP_COUNT = 5
@@ -60,6 +61,10 @@ class JsonFormatter(logging.Formatter):
             "level": record.levelname,
             "message": record.getMessage(),
         }
+
+        client_ip = get_client_ip()
+        if client_ip is not None:
+            log_record["client_ip"] = client_ip
 
         # If exception information is present, add it to the log record
         if record.exc_info:

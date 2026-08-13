@@ -43,6 +43,7 @@ from starlette.middleware.gzip import GZipMiddleware
 from starlette.requests import Request
 from maya.core.dynamic_settings import settings
 from maya.core.logging import get_log, get_access_log
+from maya.core.logging_context import reset_client_ip, set_client_ip
 from maya.core import api, api_client
 from maya.core.hooks import get_hooks
 from maya.core.api_error import OpenAwsException
@@ -264,19 +265,25 @@ class AccessLogMiddleware(BaseHTTPMiddleware):
             client_ip = "unknown"
             client_port = "unknown"
 
-        start_time = time()
+        client_ip_token = set_client_ip(client_ip)
+        try:
+            start_time = time()
 
-        # Process the request and get the response
-        response = await call_next(request)
+            # Process the request and get the response
+            response = await call_next(request)
 
-        # Log response details after it's processed
-        status_code = response.status_code
-        duration = time() - start_time
+            # Log response details after it's processed
+            status_code = response.status_code
+            duration = time() - start_time
 
-        # Log the access information to access.log, including client IP and port
-        access_log.info(f'{client_ip}:{client_port} - "{method} {path}{query_string}" {status_code} {duration:.4f}s ua="{user_agent}')
+            # Log the access information to access.log, including client IP and port
+            access_log.info(
+                f'{client_ip}:{client_port} - "{method} {path}{query_string}" ' f'{status_code} {duration:.4f}s ua="{user_agent}'
+            )
 
-        return response
+            return response
+        finally:
+            reset_client_ip(client_ip_token)
 
 
 class SameOriginMiddleware(BaseHTTPMiddleware):
