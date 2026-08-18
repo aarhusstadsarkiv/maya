@@ -3,7 +3,7 @@ import unittest
 from unittest.mock import AsyncMock, patch
 
 from maya.core import api
-from maya.core.api_auth import V1AuthAdapter, V2AuthAdapter, get_auth_adapter
+from maya.core.api_auth import V1AuthAdapter, get_auth_adapter
 from maya.core.api_request import get_auth_headers
 from maya.core.api_user import V1UserAdapter, V2UserAdapter, get_user_adapter
 from maya.core.dynamic_settings import settings
@@ -29,25 +29,17 @@ class TestApiProfile(unittest.TestCase):
         self.assertNotIn("Cookie", headers)
         self.assertIsInstance(get_auth_adapter(), V1AuthAdapter)
 
-    def test_v2_profile_uses_session_cookie_header(self):
+    def test_v2_profile_still_uses_v1_authentication(self):
         settings["api_profile"] = "v2"
-        request = SimpleNamespace(session={"session": "s1", "client": "c1", "domain": "d1"})
+        request = SimpleNamespace(session={"access_token": "token"})
 
         headers = get_auth_headers(request, {"Accept": "application/json"})
 
-        self.assertEqual(headers["Cookie"], "session=s1; client=c1; domain=d1")
-        self.assertNotIn("Authorization", headers)
-        self.assertIsInstance(get_auth_adapter(), V2AuthAdapter)
+        self.assertEqual(headers["Authorization"], "Bearer token")
+        self.assertNotIn("Cookie", headers)
+        self.assertIsInstance(get_auth_adapter(), V1AuthAdapter)
+        self.assertEqual(get_auth_adapter().base_url, settings["api_base_url"])
         self.assertIsInstance(get_user_adapter(), V2UserAdapter)
-
-    def test_v2_profile_uses_minimal_session_cookie_header(self):
-        settings["api_profile"] = "v2"
-        request = SimpleNamespace(session={"session": "s1"})
-
-        headers = get_auth_headers(request, {"Accept": "application/json"})
-
-        self.assertEqual(headers["Cookie"], "session=s1")
-        self.assertNotIn("Authorization", headers)
 
     def test_v1_profile_uses_v1_user_adapter(self):
         settings["api_profile"] = "v1"
@@ -55,15 +47,7 @@ class TestApiProfile(unittest.TestCase):
 
     def test_auth_logout_clears_v1_session_with_v1_profile(self):
         settings["api_profile"] = "v1"
-        request = SimpleNamespace(session={"access_token": "token", "token_type": "bearer", "session": "s1"})
-
-        api.auth_logout(request)
-
-        self.assertEqual(request.session, {})
-
-    def test_auth_logout_clears_v2_session_with_v2_profile(self):
-        settings["api_profile"] = "v2"
-        request = SimpleNamespace(session={"session": "s1", "client": "c1", "domain": "d1", "access_token": "token"})
+        request = SimpleNamespace(session={"access_token": "token", "token_type": "bearer"})
 
         api.auth_logout(request)
 
@@ -131,10 +115,10 @@ class TestApiProfile(unittest.TestCase):
         self.assertFalse(verified)
 
     @patch("maya.core.api.users_me_get", new_callable=AsyncMock)
-    def test_me_verified_treats_successful_v2_me_lookup_as_verified(self, mock_users_me_get):
+    def test_me_verified_uses_is_verified_flag_with_v2_api_profile(self, mock_users_me_get):
         settings["api_profile"] = "v2"
         request = SimpleNamespace()
-        mock_users_me_get.return_value = {"email": "user@example.com"}
+        mock_users_me_get.return_value = {"email": "user@example.com", "is_verified": True}
 
         import asyncio
 

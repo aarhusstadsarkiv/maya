@@ -18,7 +18,6 @@ REQUEST_TIME_USED: dict = {}
 class ApiProfile:
     name: str
     base_url: str
-    auth_backend: str
 
 
 async def _request_start_time(request):
@@ -81,9 +80,8 @@ def get_api_profile() -> ApiProfile:
     """
     Resolve the configured API profile.
 
-    The default keeps the existing v1/JWT behavior. Setting api_profile to "v2"
-    switches auth endpoints to v2/session-cookie behavior while the rest of the
-    public facade can be migrated endpoint by endpoint.
+    The profile selects the API used by version-specific non-auth adapters.
+    Authentication always uses the v1/JWT adapter.
     """
     profile_name = str(settings.get("api_profile", "v1"))
 
@@ -91,11 +89,9 @@ def get_api_profile() -> ApiProfile:
         return ApiProfile(
             name="v2",
             base_url=str(settings["api_base_url_v2"]),
-            auth_backend="session_cookie",
         )
 
     return ApiProfile(
         name="v1",
         base_url=str(settings["api_base_url"]),
-        auth_backend="jwt",
     )
