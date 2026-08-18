@@ -9,7 +9,17 @@
     .home-search-container {
         background-position: top center;
         background-repeat: no-repeat;
-        background-size: cover;
+    }
+
+    @media (max-width: 992px) {
+        .home-search-container {
+            background-size: cover;
+            background-position: center center;       
+        }
+    }
+
+    body {
+        background-color: var(--navigation-background);
     }
 </style>
 {% endblock head %}
@@ -39,8 +49,14 @@
 
     const homeSearchContainer = document.querySelector('.home-search-container');
     const frontpageImages = [
+        /*
         '/static/frontpage/image_1.jpg',
         '/static/frontpage/image_2.jpg',
+        */
+        '/static/frontpage/image_3.jpg',
+        '/static/frontpage/image_4.jpg',
+        '/static/frontpage/image_5.jpg',
+        '/static/frontpage/image_6.jpg',
     ];
     const randomIndex = Math.floor(Math.random() * frontpageImages.length);
     homeSearchContainer.style.backgroundImage = `url("${frontpageImages[randomIndex]}")`;
