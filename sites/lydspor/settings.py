@@ -31,6 +31,7 @@ settings: dict[str, typing.Any] = {
         {"name": "projekter", "title": "Projekter", "template": "pages/projekter.html", "url": "/projekter"},
         {"name": "bestyrelsen", "title": "Betyrelsen", "template": "pages/bestyrelsen.html", "url": "/bestyrelsen"},
         {"name": "vedtægter", "title": "Vedtægter", "template": "pages/vedtægter.html", "url": "/vedtægter"},
+        {"name": "privacy", "title": "Privatlivspolitik", "template": "pages/privacy.html", "url": "/privacy"},
     ],
     "main_menu_system": [],
 }

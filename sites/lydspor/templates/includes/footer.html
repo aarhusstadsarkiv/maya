@@ -1,0 +1,41 @@
+<div class="footer-content" id="item-1">
+
+</div>
+
+<div class="footer-content" id="item-2">
+    <ul class="contact-info">
+        <li class="heading">Organisation</li>
+        <li>Lydspor Aarhus er godt i gang. Vi arbejder i øjeblikket med at udvikle hjemmesiden og planlægge de første arrangementer og initiativer.</li>
+        
+        <li>
+            &nbsp;
+        </li>
+
+        <li>Mail: <a href="mailto:stadsarkiv@aarhus.dk">stadsarkiv@aarhus.dk</a></li>
+        <li>Web: www.lydspor-aarhus.dk</li>
+
+        {% if get_setting('show_version') %}
+        {% set version = get_setting('version') %}
+            <li>
+                &nbsp;
+            </li>
+            <li class="version">{{ version }}</li>
+        {% endif %}
+    </ul>
+</div>
+
+<div class="footer-content" id="item-3">
+    <ul class="reading-room">
+        <li class="heading">Praktisk info</li>
+        <li><a href="https://www.facebook.com/profile.php?id=61586551773246">Facebook</a></li>
+        <li><a href="https://www.instagram.com/lydspor_aarhus/">Instagram</a></li>
+        <li>
+            &nbsp;
+        </li>
+        <li><a href="/privacy">Privatlivspolitik</a></li>
+    </ul>
+</div>
+
+<div class="footer-content" id="item-4">
+
+</div>
