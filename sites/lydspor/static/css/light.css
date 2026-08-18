@@ -4,7 +4,7 @@
    */
 
   --background-body: #fff9ed;
-  --background: #41292c;
+  --background: #efefef;
   --background-alt: #ff47da;
   --text-main: #41292c;
   --text-bright: #8fbb99;
@@ -20,8 +20,8 @@
   --button-hover: #ff47da;
   --scrollbar-thumb: color-mod(var(--button-hover) lightness(+6%));
   --scrollbar-thumb-hover: var(--button-hover);
-  --form-placeholder: #fff9ed;
-  --form-text: #fff9ed;
+  --form-placeholder: #949494;
+  --form-text: #41292c;
   --variable: #32c736;
   --highlight: #ff0;
   --body-width: 100%;
