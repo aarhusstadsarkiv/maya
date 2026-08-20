@@ -137,7 +137,7 @@
                     {% else %}
                     {% set location_change_disabled = "disabled" %}
                     {% set title = "
-Du kan ikke ændre lokation, da materialet er i Læsesalen og en bruger har rettighed til
+Du kan ikke ændre lokation, da materialet er på læsesalen og en bruger har rettighed til
 at benytte det. Du må først afslutte den aktive bestilling, før du kan ændre lokation."
                     %}
                     {% endif %}
@@ -360,7 +360,7 @@ at benytte det. Du må først afslutte den aktive bestilling, før du kan ændre
 
         for (const [index, element] of locationElements.entries()) {
             if (element.value == RecordLocation.READING_ROOM && initialLocationValues[index] != RecordLocation.READING_ROOM) {
-                const confirmMessage = `Er du sikker på at du vil ændre lokation til læsesal? Mail(s) vil blive sendt til bruger(e) om at materiale er tilgængeligt i læsesalen.`;
+                const confirmMessage = `Er du sikker på at du vil ændre lokation til læsesal? Mail(s) vil blive sendt til bruger(e) om at materiale er tilgængeligt på læsesalen.`;
                 return confirm(confirmMessage);
             }
         }

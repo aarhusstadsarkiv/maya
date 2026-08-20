@@ -117,7 +117,7 @@ async def allow_location_change(crud, record_id: str, raise_exception: bool = Fa
     )
     if orders:
         if raise_exception:
-            raise Exception(f"Lokation kan ikke ændres. Der er allerede en bestilling med record_id {record_id} i læsesalen")
+            raise Exception(f"Lokation kan ikke ændres. Der er allerede en bestilling med record_id {record_id} på læsesalen")
         return False
     return True
 
