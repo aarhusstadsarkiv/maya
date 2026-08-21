@@ -59,18 +59,22 @@
     {% for facet in facets_content %}
     <li>
         {% if 'children' in facet and facet["count"] %}
-        <details data-id="{{top_level_key }}-{{ facet['id'] }}">
-            <summary class="facets-clickable">
+        <div class="facet-branch" data-id="{{top_level_key }}-{{ facet['id'] }}">
+            <div class="facet-branch-heading">
+                <button type="button"
+                        class="facet-expander facets-clickable"
+                        aria-expanded="false"
+                        aria-label="{{ translate('Toggle subfacets') }}: {{ facet['label'] }}"></button>
                 {{ parse_facet_link(top_level_key, facet) }}
-            </summary>
-            {{ parse_facets(top_level_key, facet['children'] ) }}
-        </details>
+            </div>
+            <div class="facet-children" hidden>
+                {{ parse_facets(top_level_key, facet['children'] ) }}
+            </div>
+        </div>
         {% else %}
-        <details data-id="{{ facet['id'] }}">
-            <summary class="inactive">
-                {{ parse_facet_link(top_level_key, facet) }}
-            </summary>
-        </details>
+        <div class="facet-leaf" data-id="{{ facet['id'] }}">
+            {{ parse_facet_link(top_level_key, facet) }}
+        </div>
         {% endif %}
     </li>
     {% endfor %}
@@ -91,12 +95,9 @@
             <ul>
                 {% for link in facet['children'] %}
                 <li>
-                    <details data-id="{{ link['id']}}">
-                        <summary class="inactive">
-                            <a href="/{{ resource_type }}/{{link['id']}}">{{ link['label'] }}</a>
-                        </summary>
-                    </details>
-                    
+                    <div class="facet-leaf" data-id="{{ link['id']}}">
+                        <a href="/{{ resource_type }}/{{link['id']}}">{{ link['label'] }}</a>
+                    </div>
                 </li>
                 {% endfor %}
             </ul>

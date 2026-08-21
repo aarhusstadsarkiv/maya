@@ -10,15 +10,22 @@ const containerLeft = document.querySelector('.container-left');
 const containerMainFacets = document.querySelector('.container-main-facets');
 
 /**
- * Utility function to save the state of details elements from a given container
+ * Utility function to save the state of expandable facets from a given container
  */
 function saveState(containerSelector, storageKey) {
     const openFacets = [];
-    const detailsElements = document.querySelectorAll(`${containerSelector} .facets details`);
+    const facetElements = document.querySelectorAll(
+        `${containerSelector} .facets details, ${containerSelector} .facets .facet-branch`
+    );
 
-    detailsElements.forEach(detailElement => {
-        if (detailElement.open) {
-            openFacets.push(detailElement.getAttribute('data-id'));
+    facetElements.forEach(facetElement => {
+        const isOpen = facetElement.matches('details')
+            ? facetElement.open
+            : facetElement.querySelector('.facet-expander').getAttribute('aria-expanded') === 'true';
+        const facetId = facetElement.getAttribute('data-id');
+
+        if (isOpen && facetId) {
+            openFacets.push(facetId);
         }
     });
 
@@ -53,10 +60,17 @@ function expandTreeFromState(containerSelector, storageKey) {
 
         const openFacets = JSON.parse(jsCookie.get(storageKey));
         if (openFacets && openFacets.length) {
-            const detailElements = document.querySelectorAll(`${containerSelector} .facets details`);
-            detailElements.forEach(detailElement => {
-                if (openFacets.includes(detailElement.getAttribute('data-id'))) {
-                    detailElement.open = true;
+            const facetElements = document.querySelectorAll(
+                `${containerSelector} .facets details, ${containerSelector} .facets .facet-branch`
+            );
+            facetElements.forEach(facetElement => {
+                if (openFacets.includes(facetElement.getAttribute('data-id'))) {
+                    if (facetElement.matches('details')) {
+                        facetElement.open = true;
+                    } else {
+                        facetElement.querySelector('.facet-expander').setAttribute('aria-expanded', 'true');
+                        facetElement.querySelector('.facet-children').hidden = false;
+                    }
                 }
             });
         }
@@ -80,6 +94,24 @@ function expandTree() {
         }
     }
 }
+
+document.querySelectorAll('.facet-expander').forEach(expander => {
+    expander.addEventListener('click', function () {
+        const isExpanded = expander.getAttribute('aria-expanded') === 'true';
+        expander.setAttribute('aria-expanded', String(!isExpanded));
+        expander.parentElement.nextElementSibling.hidden = isExpanded;
+    });
+});
+
+document.querySelectorAll('.facet-branch-heading').forEach(heading => {
+    heading.addEventListener('click', function (e) {
+        if (e.target.closest('a, .facet-expander')) {
+            return;
+        }
+
+        heading.querySelector('.facet-expander').click();
+    });
+});
 
 document.querySelectorAll('.facets-clickable').forEach(facet => {
     facet.addEventListener('click', function (e) {
