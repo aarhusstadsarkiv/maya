@@ -21,6 +21,9 @@ from maya.core.object_storage import set_presigned_urls_search
 
 log = get_log()
 
+ALLOWED_SEARCH_SORTS = {"_score", "date_from", "date_to", "created_at"}
+ALLOWED_SEARCH_VIEWS = {"list", "gallery", "grid"}
+
 
 def _get_api_acceptable_query_params() -> list:
     api_accept_query_params = []
@@ -103,8 +106,20 @@ def get_size_sort_view(request: Request):
     sort_default = settings.get("search_default_sort", "date_from")
     view_default = settings.get("search_default_view", "list")
 
+    if sort_default not in ALLOWED_SEARCH_SORTS:
+        sort_default = "date_from"
+
+    if view_default not in ALLOWED_SEARCH_VIEWS:
+        view_default = "list"
+
     sort = request.query_params.get("sort", request.cookies.get("sort", sort_default))
     view = request.query_params.get("view", request.cookies.get("view", view_default))
+
+    if sort not in ALLOWED_SEARCH_SORTS:
+        sort = sort_default
+
+    if view not in ALLOWED_SEARCH_VIEWS:
+        view = view_default
 
     return size, sort, view
 
