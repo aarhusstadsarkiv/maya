@@ -5,23 +5,18 @@
 <div class="footer-content" id="item-2">
     <ul class="contact-info">
         <li class="heading">Organisation</li>
-        <li>Vil du være med i foreningen? Meld dig ind her ved at skrive til denne mail: <a href="mailto:stadsarkiv@aarhus.dk">stadsarkiv@aarhus.dk</a>
-Så modtager du information om indmeldelse, kontingent osv. </li>
-        
+        <li>Vil du være med i foreningen? Meld dig ind her ved at skrive til denne mail: <a href="mailto:stadsarkiv@aarhus.dk">stadsarkiv@aarhus.dk</a> </li>
+        <li>
+            &nbsp;
+        </li>
+        <li>Så modtager du information om indmeldelse, kontingent osv. </li>
         <li>
             &nbsp;
         </li>
 
-        <li>Mail: <a href="mailto:stadsarkiv@aarhus.dk">stadsarkiv@aarhus.dk</a></li>
         <li>Web: <a href="https://www.lydsporaarhus.dk">www.lydsporaarhus.dk</a></li>
+        <li>Mail: <a href="mailto:stadsarkiv@aarhus.dk">stadsarkiv@aarhus.dk</a></li>
 
-        {% if get_setting('show_version') %}
-        {% set version = get_setting('version') %}
-            <li>
-                &nbsp;
-            </li>
-            <li class="version">{{ version }}</li>
-        {% endif %}
     </ul>
 </div>
 
@@ -30,10 +25,18 @@ Så modtager du information om indmeldelse, kontingent osv. </li>
         <li class="heading">Praktisk info</li>
         <li><a href="https://www.facebook.com/profile.php?id=61586551773246">Facebook</a></li>
         <li><a href="https://www.instagram.com/lydspor_aarhus/">Instagram</a></li>
+        
+        <li><a href="/privacy">Privatlivspolitik</a></li>
         <li>
             &nbsp;
         </li>
-        <li><a href="/privacy">Privatlivspolitik</a></li>
+        {% if get_setting('show_version') %}
+        {% set version = get_setting('version') %}
+            <li>
+                &nbsp;
+            </li>
+            <li class="version">Version: {{ version }}</li>
+        {% endif %}
     </ul>
 </div>
 
