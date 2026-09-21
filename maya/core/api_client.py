@@ -7,7 +7,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from time import time
 
-import httpx
+import httpx2
 
 from maya.core.dynamic_settings import settings
 
@@ -22,14 +22,14 @@ class ApiProfile:
 
 async def _request_start_time(request):
     """
-    Custom event for httpx. Add a start time to the request.
+    Custom event for httpx2. Add a start time to the request.
     """
     request.start_time = time()
 
 
-async def _request_custom_header(request: httpx.Request):
+async def _request_custom_header(request: httpx2.Request):
     """
-    Custom event for httpx. Add a custom header to the request.
+    Custom event for httpx2. Add a custom header to the request.
     """
     request.headers["x-key"] = settings["api_key"]
     request.headers["x-client"] = settings["client_name"]
@@ -38,9 +38,9 @@ async def _request_custom_header(request: httpx.Request):
     return request
 
 
-async def _response_httpx_timer(response):
+async def _response_httpx2_timer(response):
     """
-    Custom event for httpx. Log the time spend on the request.
+    Custom event for httpx2. Log the time spend on the request.
     """
     request = response.request
 
@@ -49,12 +49,12 @@ async def _response_httpx_timer(response):
     set_time_used(request_name, elapsed_time)
 
 
-def get_async_client() -> httpx.AsyncClient:
+def get_async_client() -> httpx2.AsyncClient:
     """
-    Get an async httpx client with custom events.
+    Get an async httpx2 client with custom events.
     """
-    return httpx.AsyncClient(
-        event_hooks={"request": [_request_custom_header, _request_start_time], "response": [_response_httpx_timer]},
+    return httpx2.AsyncClient(
+        event_hooks={"request": [_request_custom_header, _request_start_time], "response": [_response_httpx2_timer]},
         timeout=7,
     )
 

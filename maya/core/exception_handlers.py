@@ -21,7 +21,7 @@ from maya.core.logging import get_log
 from maya.core.logging_context import get_request_client_ip
 from maya.core import flash
 from maya.core.auth import AuthException, AuthExceptionJSON
-from httpx import HTTPStatusError, TimeoutException
+from httpx2 import HTTPStatusError, TimeoutException
 import traceback
 
 HTML_404_PAGE = "404"
@@ -82,7 +82,7 @@ async def http_status_error(request: Request, exc: HTTPStatusError):
 
 async def http_timeout_error(request: Request, exc: TimeoutException):
     """
-    Any HTTPX timeout error (connect/read/write/pool) when calling external APIs.
+    Any HTTPX2 timeout error (connect/read/write/pool) when calling external APIs.
     """
 
     exc_traceback = traceback.format_exc()
