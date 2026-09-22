@@ -396,8 +396,14 @@ async def orders_record_get(request: Request):
 
     record, meta_data, record_and_types = await get_record_data(request, record)
 
-    all_keys = list(record_and_types.keys())
-    all_keys = ["collectors", "resources", "subjects", "date_normalized", "desc_notes", "admin_data"]
+    summary = record_and_types.get("summary", {}).get("value")
+    if summary and len(summary) > 100:
+        record_and_types = {
+            **record_and_types,
+            "summary": {**record_and_types["summary"], "value": utils_orders.get_order_summary(summary)},
+        }
+
+    all_keys = ["collectors", "resources", "subjects", "date_normalized", "summary", "desc_notes", "admin_data"]
     html = utils_core.get_parsed_data_as_table(record_and_types, all_keys, debug=True)
     context_variables = {
         "html": html,
@@ -470,6 +476,9 @@ async def _get_print_data(request: Request, order_id: int = 0) -> dict:
     record_keys = ["id", "collectors", "date_normalized"]
     material_base_info = utils_core.get_record_and_types_as_strings(record_and_types, record_keys)
     material_base_info["title"] = meta_data["meta_title"]
+    summary = utils_orders.get_order_summary(record_and_types.get("summary", {}).get("value"))
+    if summary:
+        material_base_info["summary"] = summary
 
     # get resources
     resources = meta_data.get("resources", {})

@@ -10,6 +10,13 @@ from maya.records.meta_data_record import is_orderable_by_form
 log = get_log()
 
 
+def get_order_summary(summary: str | None) -> str:
+    """Limit abstracts in order views to 100 characters, including the ellipsis."""
+    if not summary:
+        return ""
+    return summary[:97] + "..." if len(summary) > 100 else summary
+
+
 @dataclasses.dataclass
 class RecordLocation:
     """
