@@ -124,6 +124,7 @@ def get_insert_record_data(meta_data: dict, record_and_types: dict, location: in
     data = {
         "record_id": meta_data["id"],
         "label": meta_data["meta_title"],
+        "magasin": get_mag_location_string(meta_data),
         "meta_data": json.dumps(meta_data),
         "record_and_types": json.dumps(record_and_types),
         "location": location,
@@ -266,7 +267,7 @@ def get_lb_number(record_and_types: dict) -> str:
 
 def get_mag_location_string(meta_data_dict: dict) -> str:
     # MAG, VCU, BTV
-    placement_str = meta_data_dict.get("resources", {}).get("location", "").strip().lower()
+    placement_str = (meta_data_dict.get("resources", {}).get("location") or "").strip().lower()
     if "bautavej" in placement_str:
         return "BTV"
 

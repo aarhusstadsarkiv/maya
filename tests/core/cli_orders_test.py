@@ -20,13 +20,16 @@ class TestOrdersCli(unittest.TestCase):
 
     async def _test_run_cron_tasks_calls_both_order_crons(self):
         from maya.orders import service as orders_service
+        from maya.orders import refresh
 
         with (
+            patch.object(refresh, "cron_refresh_records", new=AsyncMock(return_value={"updated": 2, "failed": 0})) as refresh_mock,
             patch.object(orders_service, "cron_orders_expire", new=AsyncMock(return_value=1)) as expire_mock,
             patch.object(orders_service, "cron_renewal_emails", new=AsyncMock(return_value=1)) as renew_mock,
         ):
             await cli._run_cron_tasks()
 
+        refresh_mock.assert_awaited_once()
         expire_mock.assert_awaited_once()
         renew_mock.assert_awaited_once()
 

@@ -65,7 +65,20 @@ INSERT INTO users (user_id, user_email, user_display_name) VALUES ('SYSTEM', 'sy
 
 """
 
+_add_records_magasin_query = """
+ALTER TABLE records ADD COLUMN magasin TEXT NOT NULL DEFAULT 'MAG';
+
+UPDATE records SET magasin = CASE
+    WHEN json_valid(meta_data) THEN CASE
+        WHEN lower(COALESCE(json_extract(meta_data, '$.resources.location'), '')) LIKE '%bautavej%'
+        THEN 'BTV' ELSE 'MAG' END
+    ELSE 'MAG' END;
+
+CREATE INDEX idx_records_magasin ON records(magasin);
+"""
+
 # List of migrations with keys
 migrations_orders = {
     "create_orders": _create_orders_query,
+    "add_records_magasin": _add_records_magasin_query,
 }
