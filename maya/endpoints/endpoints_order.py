@@ -397,7 +397,7 @@ async def orders_record_get(request: Request):
     record, meta_data, record_and_types = await get_record_data(request, record)
 
     summary = record_and_types.get("summary", {}).get("value")
-    if summary and len(summary) > 100:
+    if summary and len(summary) > utils_orders.MAX_ORDER_SUMMARY_LENGTH:
         record_and_types = {
             **record_and_types,
             "summary": {**record_and_types["summary"], "value": utils_orders.get_order_summary(summary)},

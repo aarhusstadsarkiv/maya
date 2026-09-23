@@ -10,13 +10,6 @@ from maya.records.meta_data_record import is_orderable_by_form
 log = get_log()
 
 
-def get_order_summary(summary: str | None) -> str:
-    """Limit abstracts in order views to 100 characters, including the ellipsis."""
-    if not summary:
-        return ""
-    return summary[:97] + "..." if len(summary) > 100 else summary
-
-
 @dataclasses.dataclass
 class RecordLocation:
     """
@@ -75,6 +68,14 @@ ORDER_STATUS_USER_HUMAN = {
 DEADLINE_DAYS_RENEWAL = 5
 DEADLINE_DAYS = 30
 MAX_ACTIVE_ORDERS_PER_USER = 100
+MAX_ORDER_SUMMARY_LENGTH = 150
+
+
+def get_order_summary(summary: str | None) -> str:
+    """Limit abstracts in order views, including the ellipsis."""
+    if not summary:
+        return ""
+    return summary[: MAX_ORDER_SUMMARY_LENGTH - 3] + "..." if len(summary) > MAX_ORDER_SUMMARY_LENGTH else summary
 
 
 def get_single_order_message(order: dict) -> str:
