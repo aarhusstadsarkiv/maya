@@ -90,11 +90,16 @@
         <thead>
             <tr>
                 <th>ID</th>
+                {% if filters.filter_status != 'order_history' %}
+                <th>
+                    <input type="checkbox" class="location-select-all"
+                        title="Vælg alle til lokationsændring.&#10;Vælg bestillinger med afkrydsningsfelterne til venstre for lokationerne.&#10;Når du ændrer én valgt lokation, ændres alle valgte lokationer.&#10;Klik Opdatér for at gemme."
+                        aria-label="Vælg alle bestillinger på denne side til lokationsændring">
+                </th>
+                {% endif %}
                 <th>
                     {% if filters.filter_status != 'order_history' %}
                     <a href="#" title="Opdatér lokationer" class="action-link update-locations">Opdatér</a>
-                    {% else %}
-                    Lokation
                     {% endif %}
                 </th>
                 <th>
@@ -129,7 +134,17 @@
             {% set queued = '' %}
             {% endif %}
             <tr class="{{ queued }}">
-                <td><a title="Se logs for denne bestilling" href="/admin/orders/logs?order_id={{ order.order_id }}">{{ order.order_id}}</a></td>
+                <td>
+                    <a title="Se logs for denne bestilling" href="/admin/orders/logs?order_id={{ order.order_id }}">{{ order.order_id}}</a>
+                </td>
+                {% if filters.filter_status != 'order_history' %}
+                <td class="width-50">
+                    <input type="checkbox" class="location-checkbox" data-order-id="{{ order.order_id }}"
+                        aria-label="Vælg bestilling {{ order.order_id }} til lokationsændring"
+                        {% if not order.allow_location_change %}disabled{% endif %}>
+                </td>
+                {% endif %}
+
                 <td>
                     {% if order.allow_location_change %}
                     {% set location_change_disabled = "" %}
@@ -221,6 +236,9 @@ at benytte det. Du må først afslutte den aktive bestilling, før du kan ændre
             <tr>
                 <td></td>
 
+                {% if filters.filter_status != 'order_history' %}
+                <td></td>
+                {% endif %}
                 <td>
                     {% if filters.filter_status != 'order_history' %}
                     <a href="#" title="Opdatér lokationer" class="action-link update-locations">Opdatér</a>
@@ -346,6 +364,48 @@ at benytte det. Du må først afslutte den aktive bestilling, før du kan ændre
      */
     const locationElements = [...document.querySelectorAll('.location')];
     const initialLocationValues = locationElements.map(element => element.value);
+    const locationCheckboxes = [...document.querySelectorAll('.location-checkbox:not(:disabled)')];
+    const locationSelectAll = document.querySelector('.location-select-all');
+
+    function syncLocationSelection() {
+        const checkedCount = locationCheckboxes.filter(checkbox => checkbox.checked).length;
+        locationCheckboxes.forEach(checkbox => {
+            checkbox.closest('tr').classList.toggle('location-selected', checkbox.checked);
+        });
+        if (locationSelectAll) {
+            locationSelectAll.disabled = locationCheckboxes.length === 0;
+            locationSelectAll.checked = checkedCount > 0 && checkedCount === locationCheckboxes.length;
+            locationSelectAll.indeterminate = checkedCount > 0 && checkedCount < locationCheckboxes.length;
+        }
+    }
+
+    locationCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', syncLocationSelection);
+    });
+    if (locationSelectAll) {
+        locationSelectAll.addEventListener('change', () => {
+            locationCheckboxes.forEach(checkbox => {
+                checkbox.checked = locationSelectAll.checked;
+            });
+            syncLocationSelection();
+        });
+    }
+    syncLocationSelection();
+
+    locationElements.forEach(element => {
+        element.addEventListener('change', () => {
+            const checkbox = element.closest('tr').querySelector('.location-checkbox');
+            if (element.disabled || !checkbox || checkbox.disabled || !checkbox.checked) {
+                return;
+            }
+            locationCheckboxes.filter(checkbox => checkbox.checked).forEach(checkbox => {
+                const location = checkbox.closest('tr').querySelector('.location');
+                if (!location.disabled) {
+                    location.value = element.value;
+                }
+            });
+        });
+    });
 
     // Function that on submit checks if any location has changed to RecordLocation.READING_ROOM 
     // If this is the case make a confirm dialog, as this will send mails to users with access to the record(s)
