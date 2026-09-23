@@ -165,7 +165,7 @@ Typical messages:
 
 ## Refreshing order materials
 
-Apply the orders schema migration before deploying the updated application or cron:
+Apply the orders schema migration before deploying the updated application or refresh command:
 
 ```sh
 BASE_DIR=sites/aarhus python bin/migrate_orders.py
@@ -177,11 +177,12 @@ New orders and material refreshes use `utils_orders.get_mag_location_string()`.
 To add another Magasin later, update that mapping and run the refresh.
 
 ```sh
-maya cron sites/aarhus
+maya refresh-order-records sites/aarhus
 ```
 
-`maya cron sites/aarhus` always refreshes materials after expiry and
-renewal emails. Every local record is fetched once, including historical material.
+`maya refresh-order-records` runs independently and can be scheduled separately.
+`maya cron` only expires orders and sends renewal emails.
+Every local record is fetched once, including historical material.
 The refresh bypasses the page cache and uses the configured API key and the same
 record conversion/site hooks as order creation, without an interactive user session.
 It updates the title, metadata, display fields and Magasin. It does not change
@@ -189,7 +190,7 @@ staff-controlled locations, orders, deadlines, queues or order logs.
 
 Failed fetches (including deleted upstream records) or conversions keep the previous
 snapshot and are logged individually; other records continue. The command reports
-updated/failed counts; individual record failures do not fail the cron command.
+updated/failed counts; individual record failures do not fail the refresh command.
 Database write transactions are kept short and do not span API requests.
 
 The Magasin dropdown and saved administrator preference are a separate follow-up.

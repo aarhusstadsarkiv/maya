@@ -148,10 +148,8 @@ async def _run_cron_tasks() -> None:
 
     - Expire orders
     - Send renewal emails
-    - Refresh locally stored order materials
     """
     from maya.orders.service import cron_orders_expire, cron_renewal_emails
-    from maya.orders.refresh import cron_refresh_records
 
     # Keep each scheduled order task independent.
     try:
@@ -163,13 +161,8 @@ async def _run_cron_tasks() -> None:
     except Exception:
         logger.exception("Renewal email task failed")
 
-    try:
-        await cron_refresh_records()
-    except Exception:
-        logger.exception("Material refresh task failed")
 
-
-@cli.command(help="Run scheduled cron tasks (orders expire, renewal emails, material refresh).")
+@cli.command(help="Run scheduled cron tasks (orders expire, renewal emails).")
 @click.argument("base_dir")
 def cron(base_dir: str):
     """
@@ -179,6 +172,20 @@ def cron(base_dir: str):
     base_dir = _get_base_dir(base_dir)
     os.environ["BASE_DIR"] = base_dir
     asyncio.run(_run_cron_tasks())
+
+
+@cli.command(name="refresh-order-records", help="Refresh locally stored order materials from the API.")
+@click.argument("base_dir")
+def refresh_order_records(base_dir: str):
+    base_dir = _get_base_dir(base_dir)
+    os.environ["BASE_DIR"] = base_dir
+
+    from maya.orders.refresh import cron_refresh_records
+
+    try:
+        asyncio.run(cron_refresh_records())
+    except Exception:
+        logger.exception("Material refresh task failed")
 
 
 @cli.command(name="sitemap", help="Generate sitemap files in BASE_DIR/static/sitemap.")
