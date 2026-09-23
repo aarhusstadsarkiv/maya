@@ -369,9 +369,6 @@ at benytte det. Du må først afslutte den aktive bestilling, før du kan ændre
 
     function syncLocationSelection() {
         const checkedCount = locationCheckboxes.filter(checkbox => checkbox.checked).length;
-        locationCheckboxes.forEach(checkbox => {
-            checkbox.closest('tr').classList.toggle('location-selected', checkbox.checked);
-        });
         if (locationSelectAll) {
             locationSelectAll.disabled = locationCheckboxes.length === 0;
             locationSelectAll.checked = checkedCount > 0 && checkedCount === locationCheckboxes.length;
