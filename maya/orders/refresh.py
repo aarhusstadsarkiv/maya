@@ -54,5 +54,5 @@ async def cron_refresh_records() -> dict[str, int]:
                 result["failed"] += 1
                 runtime.cron_log.exception("Failed to refresh material %s", record_id)
 
-    runtime.cron_log.info("Material refresh finished: %s", result)
+    runtime.cron_log.info("Materials refreshed: %s; failed: %s", result["updated"], result["failed"])
     return result

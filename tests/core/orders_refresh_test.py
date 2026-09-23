@@ -12,7 +12,6 @@ from maya.core.dynamic_settings import init_settings
 from maya.core.migration import Migration
 from maya.migrations.orders import migrations_orders
 from maya.orders import refresh, runtime, utils_orders
-from maya.commands import cli
 
 init_settings()
 
@@ -71,17 +70,6 @@ class TestRefresh(unittest.IsolatedAsyncioTestCase):
                 json.loads(connection.execute("SELECT record_and_types FROM records WHERE record_id='two'").fetchone()[0]), {"title": "New"}
             )
 
-    async def test_refresh_only_skips_other_tasks(self):
-        with (
-            patch.object(refresh, "cron_refresh_records", new=AsyncMock(return_value={"updated": 3, "failed": 0})) as update,
-            patch("maya.orders.service.cron_orders_expire", new=AsyncMock()) as expire,
-            patch("maya.orders.service.cron_renewal_emails", new=AsyncMock()) as renew,
-        ):
-            await cli._run_cron_tasks(refresh_records_only=True)
-        update.assert_awaited_once()
-        expire.assert_not_awaited()
-        renew.assert_not_awaited()
-
     async def test_fetch_converts_material_without_a_user_session(self):
         with open("tests/data/record_and_types_000309478.json") as source:
             record = {key: field["value"] for key, field in json.load(source).items()}
@@ -104,12 +92,14 @@ class TestRefresh(unittest.IsolatedAsyncioTestCase):
         with self.assertRaises(ValueError):
             await refresh.fetch_record_data(client, "one")
 
-    async def test_failed_refresh_returns_cli_error(self):
-        import click
-
-        with patch.object(refresh, "cron_refresh_records", new=AsyncMock(return_value={"updated": 0, "failed": 1})):
-            with self.assertRaises(click.ClickException):
-                await cli._run_cron_tasks(refresh_records_only=True)
+    async def test_failed_refresh_reports_counts_without_raising(self):
+        with (
+            patch.object(refresh, "fetch_record_data", new=AsyncMock(side_effect=RuntimeError("Unavailable"))),
+            patch.object(refresh.runtime.cron_log, "info") as log_info,
+        ):
+            result = await refresh.cron_refresh_records()
+        self.assertEqual(result, {"updated": 0, "failed": 3})
+        log_info.assert_any_call("Materials refreshed: %s; failed: %s", 0, 3)
 
 
 if __name__ == "__main__":

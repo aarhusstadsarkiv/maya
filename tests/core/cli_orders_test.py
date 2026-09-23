@@ -15,10 +15,10 @@ init_settings()
 
 class TestOrdersCli(unittest.TestCase):
 
-    def test_run_cron_tasks_calls_both_order_crons(self):
-        asyncio.run(self._test_run_cron_tasks_calls_both_order_crons())
+    def test_run_cron_tasks_calls_all_order_crons(self):
+        asyncio.run(self._test_run_cron_tasks_calls_all_order_crons())
 
-    async def _test_run_cron_tasks_calls_both_order_crons(self):
+    async def _test_run_cron_tasks_calls_all_order_crons(self):
         from maya.orders import service as orders_service
         from maya.orders import refresh
 
@@ -32,6 +32,20 @@ class TestOrdersCli(unittest.TestCase):
         refresh_mock.assert_awaited_once()
         expire_mock.assert_awaited_once()
         renew_mock.assert_awaited_once()
+
+
+    def test_refresh_task_failure_is_logged(self):
+        async def run():
+            with (
+                patch("maya.orders.refresh.cron_refresh_records", new=AsyncMock(side_effect=RuntimeError("Database unavailable"))),
+                patch("maya.orders.service.cron_orders_expire", new=AsyncMock()),
+                patch("maya.orders.service.cron_renewal_emails", new=AsyncMock()),
+                patch.object(cli.logger, "exception") as log_exception,
+            ):
+                await cli._run_cron_tasks()
+            log_exception.assert_called_once_with("Material refresh task failed")
+
+        asyncio.run(run())
 
 
 if __name__ == "__main__":

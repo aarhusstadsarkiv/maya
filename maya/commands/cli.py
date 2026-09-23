@@ -142,7 +142,7 @@ def server_dev(port: int, workers: int, host: str, base_dir: str, reload=True):
         exit(1)
 
 
-async def _run_cron_tasks(refresh_records_only: bool = False) -> None:
+async def _run_cron_tasks() -> None:
     """
     Run nightly cron tasks:
 
@@ -153,34 +153,32 @@ async def _run_cron_tasks(refresh_records_only: bool = False) -> None:
     from maya.orders.service import cron_orders_expire, cron_renewal_emails
     from maya.orders.refresh import cron_refresh_records
 
-    if not refresh_records_only:
-        # Keep each scheduled order task independent.
-        try:
-            await cron_orders_expire()
-        except Exception:
-            logger.exception("Order expiry task failed")
-        try:
-            await cron_renewal_emails()
-        except Exception:
-            logger.exception("Renewal email task failed")
+    # Keep each scheduled order task independent.
+    try:
+        await cron_orders_expire()
+    except Exception:
+        logger.exception("Order expiry task failed")
+    try:
+        await cron_renewal_emails()
+    except Exception:
+        logger.exception("Renewal email task failed")
 
-    result = await cron_refresh_records()
-    click.echo(f"Materials refreshed: {result['updated']}; failed: {result['failed']}")
-    if result["failed"]:
-        raise click.ClickException("Some materials could not be refreshed. See the cron log.")
+    try:
+        await cron_refresh_records()
+    except Exception:
+        logger.exception("Material refresh task failed")
 
 
 @cli.command(help="Run scheduled cron tasks (orders expire, renewal emails, material refresh).")
 @click.argument("base_dir")
-@click.option("--refresh-records-only", is_flag=True, help="Only refresh locally stored order materials.")
-def cron(base_dir: str, refresh_records_only: bool):
+def cron(base_dir: str):
     """
     Example usage:
         maya cron sites/aarhus
     """
     base_dir = _get_base_dir(base_dir)
     os.environ["BASE_DIR"] = base_dir
-    asyncio.run(_run_cron_tasks(refresh_records_only=refresh_records_only))
+    asyncio.run(_run_cron_tasks())
 
 
 @cli.command(name="sitemap", help="Generate sitemap files in BASE_DIR/static/sitemap.")
