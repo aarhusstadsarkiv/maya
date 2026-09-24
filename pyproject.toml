@@ -46,6 +46,7 @@ exclude = [".venv", ".venv-docs", "tests", "example-config", "build", "bin-local
 
 [tool.bump_version]
 version_file = "maya/__init__.py"
+uv_lock = true
 
 [tool.setuptools.package-data]
 maya = ["locales/**", "templates/**", "static/**", ".env-dist"]
