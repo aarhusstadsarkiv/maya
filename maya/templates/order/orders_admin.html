@@ -38,8 +38,7 @@
         <option value="{{ key }}" {% if filters.filter_location==key|string %}selected{% endif %}>{{ value }}</option>
         {% endfor %}
     </select>
-    <label for="filter_magasin">Magasin:</label>
-    <select name="filter_magasin" id="filter_magasin">
+    <select name="filter_magasin" id="filter_magasin" aria-label="Magasin">
         {% for key, value in magasin_options.items() %}
         <option value="{{ key }}" {% if filters.filter_magasin == key %}selected{% endif %}>{{ value }}</option>
         {% endfor %}
@@ -530,7 +529,7 @@ at benytte det. Du må først afslutte den aktive bestilling, før du kan ændre
         });
     });
 
-    // Clear search filters (except filter_status) and submit
+    // Clear search inputs, preserving select filters, and submit
     document.querySelector('.clear-search-filters').addEventListener('click', function (event) {
         event.preventDefault();
 
@@ -540,7 +539,6 @@ at benytte det. Du må først afslutte den aktive bestilling, før du kan ændre
             }
         });
 
-        document.querySelector("#filter_magasin").value = "all";
         resetFilterOffset();
         submitFilteredForm();
     });
