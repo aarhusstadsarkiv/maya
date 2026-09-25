@@ -1,4 +1,5 @@
 from starlette.requests import Request
+from starlette.exceptions import HTTPException
 from starlette.responses import JSONResponse, RedirectResponse
 from maya.core.templates import templates
 from maya.core.context import get_context
@@ -8,6 +9,7 @@ from maya.core.logging import get_log
 from maya.orders import utils_orders
 from maya.orders import service as orders_service
 from maya.orders.types import OrderFilter
+from maya.orders.constants import MAGASIN_FILTER_OPTIONS
 from maya.core import flash
 from maya.core.api_error import OpenAwsException
 from maya.endpoints.endpoints_utils import get_record_data
@@ -334,7 +336,12 @@ async def orders_admin_get(request: Request):
     me = await api.users_me_get(request)
     await orders_service.replace_employee(me)
 
+    filter_magasin = request.query_params.get("filter_magasin", "all")
+    if filter_magasin not in MAGASIN_FILTER_OPTIONS:
+        raise HTTPException(400, "Invalid Magasin filter")
+
     filters = OrderFilter(
+        filter_magasin=filter_magasin,
         filter_status=request.query_params.get("filter_status", "active"),
         filter_location=request.query_params.get("filter_location", ""),
         filter_email=request.query_params.get("filter_email", ""),
@@ -358,6 +365,7 @@ async def orders_admin_get(request: Request):
         "title": "Bestillinger",
         "orders": orders,
         "filters": updated_filters,
+        "magasin_options": MAGASIN_FILTER_OPTIONS,
         "locations": utils_orders.RECORD_LOCATION_HUMAN,
         "ORDER_STATUS": utils_orders.ORDER_STATUS,
     }

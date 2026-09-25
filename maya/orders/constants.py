@@ -14,5 +14,7 @@ class LogMessages:
 LOG_MESSAGES = LogMessages()
 SYSTEM_USER_ID = "SYSTEM"
 
+MAGASIN_FILTER_OPTIONS = {"all": "Alle", "MAG": "MAG", "BTV": "BTV"}
+
 MAIL_MESSAGE_ORDER_READY_TITLE = "Din bestilling er klar til gennemsyn"
 MAIL_MESSAGE_ORDER_RENEW_TITLE = "Udløb af materiale"

@@ -193,4 +193,11 @@ snapshot and are logged individually; other records continue. The command report
 updated/failed counts; individual record failures do not fail the refresh command.
 Database write transactions are kept short and do not span API requests.
 
-The Magasin dropdown and saved administrator preference are a separate follow-up.
+## Magasin filtering
+
+The `/admin/orders` Magasin selector offers Alle, MAG and BTV. The URL parameter
+`filter_magasin` defaults to `all`; MAG and BTV match the indexed `records.magasin`
+column before pagination in active orders, completed materials and history.
+Changing the selection starts at the first page. “Ryd filtre” restores Alle.
+The selection is not saved per administrator and requires no additional migration.
+Options and request validation share `MAGASIN_FILTER_OPTIONS` in `constants.py`.

@@ -38,6 +38,12 @@
         <option value="{{ key }}" {% if filters.filter_location==key|string %}selected{% endif %}>{{ value }}</option>
         {% endfor %}
     </select>
+    <label for="filter_magasin">Magasin:</label>
+    <select name="filter_magasin" id="filter_magasin">
+        {% for key, value in magasin_options.items() %}
+        <option value="{{ key }}" {% if filters.filter_magasin == key %}selected{% endif %}>{{ value }}</option>
+        {% endfor %}
+    </select>
     <input type="text" name="filter_email" placeholder="E-mail" value="{{ filters.filter_email }}">
     <input type="text" name="filter_user" placeholder="Brugernavn" value="{{ filters.filter_user }}">
 
@@ -534,6 +540,7 @@ at benytte det. Du må først afslutte den aktive bestilling, før du kan ændre
             }
         });
 
+        document.querySelector("#filter_magasin").value = "all";
         resetFilterOffset();
         submitFilteredForm();
     });

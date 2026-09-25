@@ -10,6 +10,7 @@ class OrderFilter:
     """
 
     filter_status: str = "active"
+    filter_magasin: str = "all"
     filter_location: Optional[str] = ""
     filter_email: Optional[str] = ""
     filter_user: Optional[str] = ""

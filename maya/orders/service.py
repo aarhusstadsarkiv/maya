@@ -464,6 +464,8 @@ async def get_logs(order_id: int = 0, limit: int = 100, offset: int = 0) -> list
 
 def _get_and_filters_str_and_values(filters) -> tuple:
     search_filters = []
+    if filters.filter_magasin != "all":
+        search_filters.append("r.magasin = :magasin_filter")
     if filters.filter_location:
         search_filters.append("r.location =:location_filter")
     if filters.filter_email:
@@ -474,6 +476,7 @@ def _get_and_filters_str_and_values(filters) -> tuple:
     placeholder_values = {}
     if search_filters:
         placeholder_values = {
+            "magasin_filter": filters.filter_magasin,
             "location_filter": filters.filter_location,
             "email_filter": f"{filters.filter_email}%",
             "user_filter": f"{filters.filter_user}%",
