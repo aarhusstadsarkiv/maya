@@ -82,8 +82,8 @@ The admin action “Retur” posts to
 
 The material must be in `READING_ROOM` (“På læsesalen”), the order must be
 `ORDERED` or `APPLICATION`, and no other `ORDERED`, `QUEUED`, or `APPLICATION`
-order may exist for the same record. The admin page disables
-unavailable actions with an explanation. The service rechecks eligibility inside
+order may exist for the same record. The admin page only shows “Retur”
+when the action is available. The service rechecks eligibility inside
 a write transaction before changing status or sending any notifications.
 
 Completion runs before the location changes to `RETURN_TO_STORAGE` (“Pakket retur”).

@@ -751,7 +751,7 @@ async def get_orders_admin(filters: OrderFilter) -> tuple[list, object]:
                 order = utils_orders.format_order_display(order)
                 record_id = order["record_id"]
                 order["count"] = queued_orders.get(record_id, 0)
-                order["complete_and_return_block_reason"] = await repository.get_complete_and_return_block_reason(crud, order)
+                order["can_return"] = not await repository.get_complete_and_return_block_reason(crud, order)
                 if order["location"] != utils_orders.RECORD_LOCATION.READING_ROOM:
                     order["allow_location_change"] = True
 

@@ -102,9 +102,7 @@ class TestCompleteAndReturn(unittest.IsolatedAsyncioTestCase):
                         self.assertEqual(order["location"], LOCATION.RETURN_TO_STORAGE)
                     else:
                         self.assertIsNone(page.select_one('[data-action="complete_and_return"]'))
-                        disabled = page.select_one('[aria-disabled="true"]')
-                        self.assertEqual(disabled.text, "Retur")
-                        self.assertIn("på læsesalen", disabled["title"])
+                        self.assertIsNone(page.find(string="Retur"))
                         self.assertEqual(response.status_code, 409)
                         self.assertIn("på læsesalen", json.loads(response.body)["message"])
                         self.assertNotIn("flash", request.session)
@@ -203,9 +201,7 @@ class TestCompleteAndReturn(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(response.status_code, 409)
         page = await self.render_orders(OrderFilter())
         self.assertIsNone(page.select_one('[data-action="complete_and_return"]'))
-        disabled = page.select_one('[aria-disabled="true"]')
-        self.assertIsNotNone(disabled)
-        self.assertIn("brugere i kø", disabled["title"])
+        self.assertIsNone(page.find(string="Retur"))
         self.assertIsNotNone(page.select_one('[data-action="completed"]'))
 
         # Ordinary completion continues to promote and notify the next user.
@@ -219,4 +215,4 @@ class TestCompleteAndReturn(unittest.IsolatedAsyncioTestCase):
             with self.subTest(status=status):
                 page = await self.render_orders(OrderFilter(filter_status=status))
                 self.assertIsNone(page.select_one('[data-action="complete_and_return"]'))
-                self.assertIsNone(page.select_one('[aria-disabled="true"]'))
+                self.assertIsNone(page.find(string="Retur"))
