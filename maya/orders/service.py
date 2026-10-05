@@ -387,6 +387,21 @@ async def update_order(
         return ready_order_to_notify
 
 
+async def complete_and_return_order(user_id: str, order_id: int):
+    """Complete an order and pack its material for return in one transaction."""
+    database_connection = DatabaseConnection(runtime.orders_url)
+    async with database_connection.write_transaction_scope_async() as connection:
+        crud = CRUD(connection)
+        order = await repository.get_order_one(crud, order_id=order_id)
+        reason = await repository.get_complete_and_return_block_reason(crud, order)
+        if reason:
+            raise ValueError(reason)
+
+        # Check before completing: completion otherwise promotes and emails queued users.
+        await update_order_status_with_crud(crud, user_id, order_id, utils_orders.ORDER_STATUS.COMPLETED)
+        await update_location_with_crud(crud, user_id, order_id, utils_orders.RECORD_LOCATION.RETURN_TO_STORAGE)
+
+
 async def bulk_update_locations(user_id: str, orders_and_locations: list[dict]):
     """
     Update multiple order locations and send grouped ready mails per user when relevant.
@@ -736,6 +751,7 @@ async def get_orders_admin(filters: OrderFilter) -> tuple[list, object]:
                 order = utils_orders.format_order_display(order)
                 record_id = order["record_id"]
                 order["count"] = queued_orders.get(record_id, 0)
+                order["complete_and_return_block_reason"] = await repository.get_complete_and_return_block_reason(crud, order)
                 if order["location"] != utils_orders.RECORD_LOCATION.READING_ROOM:
                     order["allow_location_change"] = True
 

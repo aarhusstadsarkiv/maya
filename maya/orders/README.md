@@ -74,6 +74,23 @@ Flow:
    set `expire_at`, send ready mail, mark `message_sent=1`, and log `MAIL_SENT`.
 6. Log `STATUS_CHANGED` for the promoted order too.
 
+## Complete and pack for return
+
+The admin action “Retur” posts to
+`/admin/orders/patch/{order_id}/complete-and-return` and calls
+`service.complete_and_return_order()` with employee permissions.
+
+The material must be in `READING_ROOM` (“På læsesalen”), the order must be
+`ORDERED` or `APPLICATION`, and no other `ORDERED`, `QUEUED`, or `APPLICATION`
+order may exist for the same record. The admin page disables
+unavailable actions with an explanation. The service rechecks eligibility inside
+a write transaction before changing status or sending any notifications.
+
+Completion runs before the location changes to `RETURN_TO_STORAGE` (“Pakket retur”).
+Both changes and their usual log entries commit together or roll back together.
+The combined action sends no mail and never promotes a queued order. The ordinary
+“Afslut” action keeps its existing queue promotion behavior.
+
 ## Application promotion
 
 Entry point:

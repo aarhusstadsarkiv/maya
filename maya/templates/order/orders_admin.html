@@ -227,6 +227,15 @@ at benytte det. Du må først afslutte den aktive bestilling, før du kan ændre
                         <a class="action-link" data-id="{{order.order_id}}" data-action="completed"
                             title="Brugeren er færdig med bestillingen" href="#">Afslut</a>
                     </span>
+                    {% if order.complete_and_return_block_reason %}
+                    <span class="action-link disabled" role="button" aria-disabled="true"
+                        title="{{ order.complete_and_return_block_reason }}">Retur</span>
+                    {% else %}
+                    <span class="complete-order">
+                        <a class="action-link" data-id="{{ order.order_id }}" data-action="complete_and_return"
+                            title="Afslut bestillingen og ændr materialets lokation til Pakket retur" href="#">Retur</a>
+                    </span>
+                    {% endif %}
                         {% if order.order_status == ORDER_STATUS.APPLICATION %}
                         <span class="complete-order">
                             <a class="action-link" data-id="{{order.order_id}}" data-action="promote_application"
@@ -305,7 +314,7 @@ at benytte det. Du må først afslutte den aktive bestilling, før du kan ændre
     const filterOffsetInput = document.querySelector('#filter_offset');
 
     /**
-     * Section that handles FINISHED (afsluttet) and PROMOTE_APPLICATION (godkend ansøgning) actions for orders
+     * Handles order completion, completion with return, and application approval.
      */
     async function handleUserStatusClick(event) {
 
@@ -314,7 +323,7 @@ at benytte det. Du må først afslutte den aktive bestilling, før du kan ændre
 
         try {
 
-            const element = event.target;
+            const element = event.currentTarget;
             const action = element.dataset.action;
 
             let data = {};
@@ -328,6 +337,13 @@ at benytte det. Du må først afslutte den aktive bestilling, før du kan ændre
                     'order_status': OrderStatus.COMPLETED,
                 }
                 url = '/admin/orders/patch/' + element.dataset.id;
+            }
+
+            if (action === 'complete_and_return') {
+                if (!confirm('Vil du afslutte bestillingen og ændre materialets lokation til “Pakket retur”?')) {
+                    return;
+                }
+                url = '/admin/orders/patch/' + element.dataset.id + '/complete-and-return';
             }
 
             if (action === 'promote_application') {

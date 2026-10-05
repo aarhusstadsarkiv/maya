@@ -122,6 +122,35 @@ async def allow_location_change(crud, record_id: str, raise_exception: bool = Fa
     return True
 
 
+async def get_complete_and_return_block_reason(crud, order: dict) -> str:
+    """Shared eligibility check for the admin page and the combined return action."""
+    if not order:
+        return "Bestillingen findes ikke."
+    if order["order_status"] not in [utils_orders.ORDER_STATUS.ORDERED, utils_orders.ORDER_STATUS.APPLICATION]:
+        return "Kun aktive bestillinger og ansøgninger kan afsluttes og pakkes retur."
+    if order["location"] != utils_orders.RECORD_LOCATION.READING_ROOM:
+        return "Materialet skal være på læsesalen for at kunne pakkes retur."
+
+    other_order = await crud.query_one(
+        """
+        SELECT order_id FROM orders
+        WHERE record_id = :record_id AND order_id != :order_id
+          AND order_status IN (:ordered, :queued, :application)
+        LIMIT 1
+        """,
+        {
+            "record_id": order["record_id"],
+            "order_id": order["order_id"],
+            "ordered": utils_orders.ORDER_STATUS.ORDERED,
+            "queued": utils_orders.ORDER_STATUS.QUEUED,
+            "application": utils_orders.ORDER_STATUS.APPLICATION,
+        },
+    )
+    if other_order:
+        return "Materialet har andre aktive bestillinger, ansøgninger eller brugere i kø."
+    return ""
+
+
 async def has_active_order_on_record(crud, user_id: str, record_id: str):
     statuses = [utils_orders.ORDER_STATUS.ORDERED, utils_orders.ORDER_STATUS.QUEUED, utils_orders.ORDER_STATUS.APPLICATION]
     return await get_order_one(crud, statuses=statuses, record_id=record_id, user_id=user_id)

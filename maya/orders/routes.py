@@ -43,6 +43,12 @@ online_ordering = [
         methods=["POST"],
     ),
     Route(
+        "/admin/orders/patch/{order_id:int}/complete-and-return",
+        endpoint=endpoints_order.orders_admin_complete_and_return,
+        name="orders_admin_complete_and_return",
+        methods=["POST"],
+    ),
+    Route(
         "/admin/orders/patch/{order_id:int}/promote",
         endpoint=endpoints_order.orders_admin_promote_application,
         name="orders_admin_patch_promote_application",

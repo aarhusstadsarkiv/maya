@@ -291,6 +291,25 @@ async def orders_admin_patch_single(request: Request):
         )
 
 
+async def orders_admin_complete_and_return(request: Request):
+    """Complete an order and mark its material as packed for return."""
+    try:
+        await is_authenticated_json(request, must_be_verified=True, permissions=["employee"])
+        me = await api.users_me_get(request)
+        await orders_service.complete_and_return_order(me["id"], request.path_params["order_id"])
+
+        message = "Bestillingen er afsluttet, og materialets lokation er ændret til Pakket retur"
+        flash.set_message(request, message, type="success")
+        return JSONResponse({"error": False, "message": message})
+    except AuthExceptionJSON as e:
+        return JSONResponse({"error": True, "message": str(e)}, status_code=403)
+    except ValueError as e:
+        return JSONResponse({"error": True, "message": str(e)}, status_code=409)
+    except Exception:
+        log.exception("Error in orders_admin_complete_and_return")
+        return JSONResponse({"error": True, "message": "Bestillingen kunne ikke afsluttes og pakkes retur."}, status_code=500)
+
+
 async def orders_admin_promote_application(request: Request):
     """
     Patch a single order as admin to promote an application to an order
