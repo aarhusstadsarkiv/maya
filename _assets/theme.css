@@ -1,0 +1,28 @@
+:root {
+    --md-primary-fg-color: #445877
+}
+@media screen and (min-width: 60em) {
+    .md-search__form {
+      background-color: #80829342;
+    }
+}
+.md-header,
+.md-header--shadow {
+    box-shadow: none;
+}
+/* hide navigation in footer */
+.md-footer-nav {
+    display: none;
+}
+
+.md-nav__item--section {
+    display: block;
+    margin: 2em 0;
+}
+
+.md-header__button.md-logo img, .md-header__button.md-logo svg {
+    fill: currentcolor;
+    display: block;
+    max-height: 1.4rem;
+    width: auto;
+  }
