@@ -61,6 +61,9 @@ search = "<!-- LATEST-VERSION-UV -->"
 replace = "\tuv tool install git+https://github.com/aarhusstadsarkiv/maya@{version}\n"
 
 [dependency-groups]
+docs = [
+    "mkdocs-material==9.7.7",
+]
 dev = [
     "autopep8==2.0.1",
     "beautifulsoup4==4.12.2",
