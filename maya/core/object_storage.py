@@ -8,6 +8,7 @@ import boto3
 AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID")
 AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY")
 BOTO3_EXPIRE = 3600
+_s3_client = None
 
 log = get_log()
 
@@ -80,23 +81,26 @@ async def _get_presigned_url(url: str):
 
     cache_key = f"boto3_{url}"
     database_connection = DatabaseConnection(database_url)
-    async with database_connection.write_transaction_scope_async() as connection:
+    async with database_connection.transaction_scope_async() as connection:
+        cached_url = await DatabaseCache(connection).get(cache_key, expire_in=BOTO3_EXPIRE)
 
+    if cached_url:
+        return cached_url
+
+    # Only misses need the write lock. Recheck after acquiring it because
+    # another worker may have filled the cache since our initial read.
+    async with database_connection.write_transaction_scope_async() as connection:
         database_cache = DatabaseCache(connection)
         cached_url = await database_cache.get(cache_key, expire_in=BOTO3_EXPIRE)
-
         if cached_url:
             return cached_url
 
-        # Generate a new pre-signed URL
         try:
             presigned_url = await _generate_presigned_url(url)
-
         except Exception:
             log.exception("Error generating pre-signed URL")
             return url
 
-        # Store the generated URL in cache
         await database_cache.set(cache_key, presigned_url)
     return presigned_url
 
@@ -110,13 +114,7 @@ async def _generate_presigned_url(url: str) -> str:
     # Get object key which is "520/000520432_f.jpg" part of the URL
     object_key = url.split("https://nbg1.your-objectstorage.com/aca-access/")[-1]
 
-    # Initialize the S3 client
-    s3 = boto3.client(
-        "s3",
-        endpoint_url="https://nbg1.your-objectstorage.com",
-        aws_access_key_id=AWS_ACCESS_KEY_ID,
-        aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
-    )
+    s3 = _get_s3_client()
 
     # Generate the pre-signed URL
     url = s3.generate_presigned_url(
@@ -126,3 +124,22 @@ async def _generate_presigned_url(url: str) -> str:
     )
 
     return url
+
+
+def _get_s3_client():
+    global _s3_client
+    if _s3_client is None:
+        _s3_client = boto3.client(
+            "s3",
+            endpoint_url="https://nbg1.your-objectstorage.com",
+            aws_access_key_id=AWS_ACCESS_KEY_ID,
+            aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
+        )
+    return _s3_client
+
+
+def close_s3_client() -> None:
+    global _s3_client
+    client, _s3_client = _s3_client, None
+    if client is not None:
+        client.close()

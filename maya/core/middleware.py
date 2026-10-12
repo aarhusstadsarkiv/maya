@@ -153,17 +153,14 @@ class ApiLogMiddleware(BaseHTTPMiddleware):
     """
 
     async def dispatch(self, request: Request, call_next):
-        response = await call_next(request)
+        if request.url.path.startswith("/static"):
+            return await call_next(request)
 
-        # ignore /static
-        path = request.url.path
-        if path.startswith("/static"):
+        with api_client.collect_timings():
+            response = await call_next(request)
+            total_response_time = api.get_time_used(request)
+            log.debug(json.dumps(total_response_time, indent=4, ensure_ascii=False))
             return response
-
-        total_response_time = api.get_time_used(request)
-        log.debug(json.dumps(total_response_time, indent=4, ensure_ascii=False))
-        api_client.reset_time_used()
-        return response
 
 
 class NoCacheMiddleware(BaseHTTPMiddleware):

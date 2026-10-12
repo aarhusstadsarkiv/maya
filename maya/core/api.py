@@ -39,7 +39,7 @@ def get_time_used(request: Request) -> typing.Any:
 
     total_time_request = time_end - time_begin
     time_table = {
-        "api_calls": api_client.REQUEST_TIME_USED,
+        "api_calls": api_client.get_time_used(),
         "total_time_request": total_time_request,
     }
 

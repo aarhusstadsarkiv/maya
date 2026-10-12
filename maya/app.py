@@ -10,6 +10,7 @@ from maya.core.middleware import middleware
 from maya.core.exception_handlers import exception_handlers
 from maya.core.hooks import get_hooks
 from maya.core.paths import get_data_dir_path
+from maya.core import api_client, object_storage
 import contextlib
 import os
 import sys
@@ -40,8 +41,10 @@ async def lifespan(app):
         if api_key == "api_key":
             log.error("API_KEY is missing. Please set the API_KEY environment variable before running the app.")
             raise RuntimeError("Missing required environment variable: API_KEY")
-        yield
+        async with api_client.client_lifespan():
+            yield
     finally:
+        object_storage.close_s3_client()
         log.info("App lifecycle ended")
 
 
