@@ -91,6 +91,11 @@ settings: Settings = {
             "paths": ["/search"],
         },
         {
+            "max": 8,
+            "retry_after": 5,
+            "paths": ["/records/*"],
+        },
+        {
             "max": 100,
             "retry_after": 5,
             "paths": ["/static/*"],
