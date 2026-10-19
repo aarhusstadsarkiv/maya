@@ -14,7 +14,9 @@
     @media (max-width: 1200px) {
         .home-search-container {
             background-size: cover;
-            background-position: center center;       
+            background-position: center center; 
+            /* aspect-ratio added only temporarily to align image better on smaller screens. Should be removed when we have a better image for the front page. */
+            aspect-ratio: 1672 / 941;  
         }
     }
 
@@ -49,15 +51,13 @@
 
     const homeSearchContainer = document.querySelector('.home-search-container');
     const frontpageImages = [
-        /*
-        '/static/frontpage/image_1.jpg',
-        '/static/frontpage/image_2.jpg',
-        */
-        '/static/frontpage/image_3.jpg',
-        '/static/frontpage/image_4.jpg',
-        '/static/frontpage/image_5.jpg',
-        '/static/frontpage/image_6.jpg',
-        '/static/frontpage/image_7.jpg',
+        '/static/frontpage/begivenhed-edited.jpg',
+        
+        // '/static/frontpage/image_3.jpg',
+        // '/static/frontpage/image_4.jpg',
+        // '/static/frontpage/image_5.jpg',
+        // '/static/frontpage/image_6.jpg',
+        // '/static/frontpage/image_7.jpg',
     ];
     const randomIndex = Math.floor(Math.random() * frontpageImages.length);
     homeSearchContainer.style.backgroundImage = `url("${frontpageImages[randomIndex]}")`;
