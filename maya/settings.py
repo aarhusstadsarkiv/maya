@@ -8,14 +8,13 @@ import os
 from maya.core.dotenv_local import load
 from maya.settings_types import Settings
 import maya
-import secrets
 
 load()
 
 # ENV variables
 api_key: str = os.getenv("API_KEY", "")
 environment: str = os.getenv("ENVIRONMENT", "production")
-session_secret: str = os.getenv("SESSION_SECRET", secrets.token_hex(32))
+session_secret: str = os.getenv("SESSION_SECRET", "")
 
 # Log level
 log_level = logging.DEBUG

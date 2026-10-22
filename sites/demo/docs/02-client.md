@@ -40,8 +40,8 @@ In `.env` you may set the following:
 # API_KEY is required for the client to work. You may request an API key from Aarhus Stadsarkiv.
 API_KEY=your_api_key
 
-# SESSION Secret
-SECRET=some_secret
+# Required session signing secret: replace with output from `maya server-secret`.
+SESSION_SECRET=your_generated_secret
 
 # development or production
 # If ENVIRONMENT is set to production, the log level is INFO
@@ -54,6 +54,11 @@ You may generate a new secret using the following command:
 ```bash
 maya server-secret
 ```
+
+Set `SESSION_SECRET` to the generated value and keep it the same across workers
+and restarts. A site's `session_secret` setting can also override the value.
+The application refuses to start if the effective secret is missing, empty,
+whitespace-only, or the literal `None`.
 
 ## language.yml
 
