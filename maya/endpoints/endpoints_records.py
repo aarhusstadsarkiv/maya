@@ -11,6 +11,7 @@ from maya.core.logging import get_log
 from maya.core import api
 from maya.core import cookie
 from maya.core.dataclasses import RecordPagination
+from maya.core.proxy_validation import validate_proxy_id
 import asyncio
 import json
 import typing
@@ -192,8 +193,7 @@ async def records_get(request: Request):
     """
 
     record_id = request.path_params["record_id"]
-    if not record_id.isdigit():
-        raise HTTPException(404)
+    validate_proxy_id(record_id)
 
     record_pagination, record = await asyncio.gather(_get_record_pagination(request), api.proxies_record_get_by_id(request, record_id))
     record, meta_data, record_and_types = await get_record_data(request, record)
@@ -217,11 +217,13 @@ async def records_get_misc(request: Request):
     Mostly JSON for debugging.
     Also some simple HTML rendering.
     """
+    record_id = request.path_params["record_id"]
+    type = request.path_params["type"]
+    validate_proxy_id(record_id)
+    if type not in {"record_original", "record", "meta_data", "record_and_types"}:
+        raise HTTPException(404, detail="type not found")
+
     try:
-
-        record_id = request.path_params["record_id"]
-        type = request.path_params["type"]
-
         record = await api.proxies_record_get_by_id(request, record_id)
         record_original = copy.deepcopy(record)
 

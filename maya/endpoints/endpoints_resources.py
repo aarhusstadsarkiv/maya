@@ -18,6 +18,7 @@ from maya.core import api
 from maya.resources import resource_alter
 from maya.core.hooks import get_hooks
 from maya.core.object_storage import set_presigned_urls_resource
+from maya.core.proxy_validation import validate_resource_path
 import json
 
 log = get_log()
@@ -55,28 +56,12 @@ async def _get_resource_context(request):
 
 
 async def get_resource(request: Request):
-    resource_templates = {
-        "collections": "resources/collections.html",
-        "people": "resources/people.html",
-        "locations": "resources/locations.html",
-        "creators": "resources/creators.html",
-        "events": "resources/events.html",
-        "organisations": "resources/organisations.html",
-        "collectors": "resources/collectors.html",
-    }
-
     resource_type = request.path_params["resource_type"]
-    if resource_type not in resource_templates:
-        raise HTTPException(status_code=404, detail="Resource type not found")
-
     id = request.path_params["id"]
-
-    # check if id is a number
-    if not id.isdigit():
-        raise HTTPException(status_code=404, detail="Resource id not found")
+    validate_resource_path(resource_type, id)
 
     context = await _get_resource_context(request)
-    template_path = resource_templates[resource_type]
+    template_path = f"resources/{resource_type}.html"
     response = templates.TemplateResponse(request, template_path, context)
     return response
 
@@ -85,6 +70,7 @@ async def get_resource_json(request: Request):
     id = request.path_params["id"]
     json_type = request.path_params["type"]
     resource_type = request.path_params["resource_type"]
+    validate_resource_path(resource_type, id)
 
     if json_type == "api":
         resource_api = await api.proxies_get_resource(request, resource_type, id)

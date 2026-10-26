@@ -5,6 +5,7 @@ from maya.core.api_error import OpenAwsException
 from maya.core import api
 from maya.core.relations import format_relations, sort_data
 from maya.core.auth import is_authenticated
+from maya.core.proxy_validation import validate_resource_path
 
 log = get_log()
 
@@ -29,6 +30,7 @@ async def relations_get(request: Request):
 
     type = request.path_params.get("type", "")
     id = request.path_params.get("id", "")
+    validate_resource_path(type, id, allow_records=True)
     try:
         relations = await api.proxies_get_relations(request, type, id)
         relations_formatted = format_relations(type, relations)

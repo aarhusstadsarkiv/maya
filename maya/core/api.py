@@ -18,6 +18,7 @@ from maya.core.dynamic_settings import settings
 from maya.core import query
 from maya.core.logging import get_log
 from maya.core.proxy_cache import proxy_cache_get, proxy_cache_set, proxy_record_cache_key
+from maya.core.proxy_validation import validate_proxy_id, validate_resource_path
 from urllib.parse import quote
 import typing
 from time import time
@@ -326,6 +327,7 @@ async def proxies_record_get_by_id(request: Request, record_id: str) -> typing.A
     GET a record from the api if not logged in
     """
 
+    validate_proxy_id(record_id)
     logged_in = await is_logged_in(request)
     cache_key = proxy_record_cache_key(record_id)
     if not logged_in:
@@ -399,6 +401,7 @@ async def proxies_get_resource(request, type: str, id: str) -> typing.Any:
     """
     GET a resource from the api
     """
+    validate_resource_path(type, id)
     async with api_client.get_async_client() as client:
         url = base_url + f"/proxy/{type}/{id}"
         response = await client.get(url)
@@ -420,6 +423,7 @@ async def proxies_get_relations(request: Request, type: str, id: str) -> typing.
     GET relations from the api
     """
 
+    validate_resource_path(type, id, allow_records=True)
     async with api_client.get_async_client() as client:
         url = base_url + f"/proxy/{type}/{id}/relations"
         response = await client.get(url)
