@@ -20,7 +20,12 @@ import urllib.parse
 log = get_log()
 
 
-def _get_default_next_url(request: Request) -> str:
+def _get_login_redirect(request: Request) -> str:
+    """Use a safe requested destination or return to the user's last search."""
+    next_url = sanitize_next_url(request.query_params.get("next"))
+    if next_url:
+        return next_url
+
     search_query_str = cookie.get_search_query_str(request)
     if search_query_str:
         return f"/search?{search_query_str}"
@@ -33,16 +38,8 @@ async def auth_login_get(request: Request):
     """
     is_logged_in = await api.is_logged_in(request)
 
-    post_url = "/auth/login"
-    next_url = sanitize_next_url(request.query_params.get("next"))
-
-    if next_url:
-        encoded_next_url = urllib.parse.quote_plus(next_url)
-        post_url = f"/auth/login?next={encoded_next_url}"
-    else:
-        next_url = _get_default_next_url(request)
-        encoded_next_url = urllib.parse.quote_plus(next_url)
-        post_url = f"/auth/login?next={encoded_next_url}"
+    next_url = _get_login_redirect(request)
+    post_url = f"/auth/login?next={urllib.parse.quote_plus(next_url)}"
 
     context_values = {
         "title": translate("Login"),
@@ -58,15 +55,10 @@ async def auth_login_post(request: Request):
     """
     Login POST endpoint
     """
-    next_url = sanitize_next_url(request.query_params.get("next"))
-
     try:
         await api.auth_login_post(request)
         flash.set_message(request, translate("You have been logged in."), type="success")
-        if next_url:
-            return JSONResponse({"error": False, "redirect": next_url})
-        else:
-            return JSONResponse({"error": False, "redirect": _get_default_next_url(request)})
+        return JSONResponse({"error": False, "redirect": _get_login_redirect(request)})
 
     except OpenAwsException as e:
         log.info(f"OpenAwsException in auth_login_post: {e}")
@@ -313,7 +305,7 @@ async def auth_reset_password_post(request: Request):
 
 async def auth_send_verify_email(request: Request):
     """
-    Send verify email endpoint
+    Send a verification email after a protected POST from the profile form.
     """
     try:
         await api.auth_request_verify_post(request)
@@ -330,4 +322,4 @@ async def auth_send_verify_email(request: Request):
         log.exception("Error in auth_send_verify_email")
         flash.set_message(request, str(e), type="error", use_settings=True)
 
-    return RedirectResponse(url="/auth/me?sent_mail=1", status_code=302)
+    return RedirectResponse(url="/auth/me?sent_mail=1", status_code=303)

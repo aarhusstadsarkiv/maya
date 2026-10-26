@@ -27,10 +27,15 @@ def _get_redirect_url(request: Request):
 
 def sanitize_next_url(next_url: str | None) -> str | None:
     """
-    Return a safe relative redirect target or None.
-    Reject absolute URLs and redirects back to the login page to avoid loops.
+    Return a local absolute path, including its query and fragment, or None.
+    Reject browser URL ambiguities and redirects back to the login page.
     """
-    if not next_url:
+    if not next_url or not next_url.startswith("/") or next_url.startswith("//"):
+        return None
+
+    # Browsers treat backslashes as slashes and discard some control characters.
+    # Reject these before parsing so validation sees the same destination.
+    if "\\" in next_url or any(ord(character) < 32 or ord(character) == 127 for character in next_url):
         return None
 
     parsed = urllib.parse.urlsplit(next_url)
@@ -43,7 +48,7 @@ def sanitize_next_url(next_url: str | None) -> str | None:
     if parsed.path == "/auth/login":
         return None
 
-    return urllib.parse.urlunsplit(("", "", parsed.path, parsed.query, parsed.fragment))
+    return next_url
 
 
 def _log_401_error(request: Request, message: str):

@@ -137,7 +137,7 @@ routes = [
     # verify request token sent by email
     Route("/auth/verify/{token:str}", endpoint=endpoints_auth.auth_verify, name="auth_verify"),
     # send verify email again
-    Route("/auth/send-verify-email", endpoint=endpoints_auth.auth_send_verify_email, name="auth_send_verify_email"),
+    Route("/auth/send-verify-email", endpoint=endpoints_auth.auth_send_verify_email, name="auth_send_verify_email", methods=["POST"]),
     Route("/search", endpoint=endpoints_search.search_get, name="search_get"),
     Route("/auto_complete", endpoint=endpoints_search.records_auto_complete_search, name="records_auto_complete_search"),
     Route("/auto_complete_relations", endpoint=endpoints_search.records_auto_complete_relations, name="records_auto_complete_relations"),

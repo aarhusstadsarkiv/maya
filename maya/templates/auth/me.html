@@ -68,7 +68,9 @@
             <div class="label">Verificer e-mail</div>
             <div class="content">
                 {% if not sent_mail %}
-                <p><a href="/auth/send-verify-email">{{ translate("Send verification email") }}</a></p>
+                <form method="post" action="/auth/send-verify-email">
+                    <button type="submit">{{ translate("Send verification email") }}</button>
+                </form>
                 {% else %}
                 <p>E-mail er afsendt</p>
                 {% endif %}
