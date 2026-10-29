@@ -84,25 +84,38 @@ def record_challenge_outcome(request, outcome, reason=None):
 
 
 class SearchChallengeMiddleware(BaseHTTPMiddleware):
-    def __init__(self, app, secret: str):
+    def __init__(self, app, secret: str, allowed_ips: list[str] | None = None):
         super().__init__(app)
         if not secret or secret.strip() == "None":
             raise ValueError("Search challenge requires a persistent session_secret")
         self.challenge = URLSafeTimedSerializer(secret, salt="maya-search-challenge-v2")
         self.clearance = URLSafeTimedSerializer(secret, salt="maya-search-clearance-v2")
         self.ip_key = hmac.digest(secret.encode(), b"maya-search-ip-v1", "sha256")
+        if allowed_ips is not None and (not isinstance(allowed_ips, list) or not all(isinstance(ip, str) for ip in allowed_ips)):
+            raise ValueError("search_challenge_allowed_ips must be a list of IP address strings")
+        self.allowed_ips = frozenset(self.normalize_ip(ip) for ip in (allowed_ips or []))
 
-    def ip_fingerprint(self, request):
+    @staticmethod
+    def normalize_ip(value):
+        address = ipaddress.ip_address(value)
+        if isinstance(address, ipaddress.IPv6Address) and address.ipv4_mapped:
+            address = address.ipv4_mapped
+        return address
+
+    def client_ip(self, request):
         # Only use the ASGI server's client address. Forwarded headers must be
         # resolved by the server using its trusted-proxy configuration.
         if request.client is None:
             return None
         try:
-            address = ipaddress.ip_address(request.client.host)
+            return self.normalize_ip(request.client.host)
         except ValueError:
             return None
-        if isinstance(address, ipaddress.IPv6Address) and address.ipv4_mapped:
-            address = address.ipv4_mapped
+
+    def ip_fingerprint(self, request):
+        address = self.client_ip(request)
+        if address is None:
+            return None
         return hmac.new(self.ip_key, str(address).encode(), hashlib.sha256).hexdigest()
 
     def clearance_rejection_reason(self, request):
@@ -134,9 +147,10 @@ class SearchChallengeMiddleware(BaseHTTPMiddleware):
             return await self.verify(request)
         if path != "/search" and not path.startswith("/search/"):
             return await call_next(request)
-        reason = self.clearance_rejection_reason(request)
+        allowlisted = self.client_ip(request) in self.allowed_ips
+        reason = None if allowlisted else self.clearance_rejection_reason(request)
         if reason is None:
-            record_challenge_outcome(request, "allowed")
+            record_challenge_outcome(request, "allowed", "allowlisted_ip" if allowlisted else None)
             response = await call_next(request)
             response.headers["Cache-Control"] = "private, no-store"
             return response

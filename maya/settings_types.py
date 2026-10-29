@@ -86,6 +86,7 @@ class Settings(TypedDict, total=True):
     search_base_url: str
     search_keep_results: bool
     search_challenge_enabled: bool
+    search_challenge_allowed_ips: list[str]
     concurrency_limits: list[ConcurrencyLimitSettings]
 
     facets_enabled: list[str]

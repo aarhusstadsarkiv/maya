@@ -66,6 +66,7 @@ settings: Settings = {
     "search_base_url": "/search",
     "search_keep_results": True,
     "search_challenge_enabled": True,
+    "search_challenge_allowed_ips": [],
     "concurrency_limits": [
         {
             "max": 4,

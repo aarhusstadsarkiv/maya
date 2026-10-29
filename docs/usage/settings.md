@@ -54,6 +54,26 @@ be reused for its lifetime and requests still reach Python. Keep concurrency
 limits and upstream traffic protection. No database or additional service is
 required. Restart Maya after deploying; no Caddy plugin is needed.
 
+#### Office IP exemptions
+
+`search_challenge_allowed_ips` defaults to an empty list. List individual public
+IPv4 or IPv6 addresses to let legacy office clients use `/search` and its
+subpaths (including `/search/json`) without JavaScript or a verification cookie:
+
+```yaml
+search_challenge_allowed_ips:
+  - "192.0.2.10"  # Example only; replace with your office's public IP.
+```
+
+Ranges, CIDR notation, and hostnames are not accepted. Everyone sharing a listed
+public IP is exempt. The same trusted ASGI client address used for IP binding is
+used here; supplied forwarding headers are not read directly. Concurrency
+limits, authentication, and authorization still apply. Exempt requests log
+`challenge=allowed reason=allowlisted_ip` and do not issue verification cookies.
+Keep actual office addresses in untracked local settings. For a deployed site
+using a separate `BASE_DIR` such as `local`, add the setting there and
+restart Maya; upgrading the package alone does not copy site settings.
+
 #### Challenge access logging
 
 The existing access log includes `challenge=issued`, `challenge=passed`,

@@ -354,7 +354,9 @@ middleware.append(
 middleware.append(Middleware(RequestBeginMiddleware))
 
 if settings["search_challenge_enabled"]:
-    middleware.append(Middleware(SearchChallengeMiddleware, secret=settings["session_secret"]))
+    middleware.append(
+        Middleware(SearchChallengeMiddleware, secret=settings["session_secret"], allowed_ips=settings["search_challenge_allowed_ips"])
+    )
 
 if settings["log_api_calls"]:
     middleware.append(Middleware(ApiLogMiddleware))

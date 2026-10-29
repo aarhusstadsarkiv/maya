@@ -24,7 +24,13 @@ class SearchChallengeTest(IsolatedAsyncioTestCase):
 
         app = Starlette(
             routes=[Route("/search", search), Route("/search/json", search), Route("/records/1", search)],
-            middleware=[Middleware(SearchChallengeMiddleware, secret="test-secret")],
+            middleware=[
+                Middleware(
+                    SearchChallengeMiddleware,
+                    secret="test-secret",
+                    allowed_ips=["198.51.100.6"] + [f"192.0.2.{n}" for n in range(34, 39)],
+                )
+            ],
         )
 
         async def observed(scope, receive, send):
@@ -224,3 +230,27 @@ class SearchChallengeTest(IsolatedAsyncioTestCase):
         self.assertEqual(response.headers["content-language"], "da")
         self.assertIn("Bekræftelsen mislykkedes", response.text)
         self.assertIn("prøv igen", response.text)
+
+    async def test_office_allowlist_skips_challenge_without_setting_cookie(self):
+        for ip in ["198.51.100.6", "::ffff:198.51.100.6"] + [f"192.0.2.{n}" for n in range(34, 39)]:
+            self.transport.client = (ip, 1234)
+            for path in ("/search?q=office", "/search/json"):
+                response = await self.client.get(path)
+                self.assertEqual(response.text, "search results")
+                self.assert_outcome("allowed", "allowlisted_ip")
+                self.assertNotIn("set-cookie", response.headers)
+                self.assertEqual(response.headers["cache-control"], "private, no-store")
+
+    async def test_allowlist_does_not_match_neighbours_or_forwarded_headers(self):
+        for ip in ("192.0.2.33", "192.0.2.39", "198.51.100.7"):
+            self.transport.client = (ip, 1234)
+            response = await self.client.get("/search", headers={"X-Forwarded-For": "198.51.100.6"})
+            self.assertIn("Checking your browser", response.text)
+            self.assert_outcome("issued", "missing_cookie")
+        self.assertEqual(self.calls, 0)
+
+    def test_allowlist_configuration_requires_exact_ip_addresses(self):
+        self.assertEqual(SearchChallengeMiddleware(None, "secret").allowed_ips, frozenset())
+        for value in ("198.51.100.6", ["192.0.2.34-38"], ["192.0.2.0/24"], ["office.example"], [123]):
+            with self.subTest(value=value), self.assertRaises(ValueError):
+                SearchChallengeMiddleware(None, "secret", allowed_ips=value)
