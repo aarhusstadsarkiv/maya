@@ -1,0 +1,48 @@
+/* Inlined by the challenge middleware: no theme or font requests needed. */
+* { box-sizing: border-box; }
+body {
+    margin: 0;
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    padding: 1.5rem;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    line-height: 1.6;
+    color: #24303b;
+    background: #f5f6f7;
+}
+main {
+    width: 100%;
+    max-width: 30rem;
+    padding: 2rem;
+    border: 1px solid #dce1e5;
+    border-radius: .5rem;
+    background: #fff;
+}
+h1 { margin: 0 0 .75rem; font-size: 1.5rem; line-height: 1.3; }
+p { margin: 0 0 1.5rem; }
+.loadingspinner {
+    width: 1.5em;
+    height: 1.5em;
+    margin-bottom: 1rem;
+    border: .25em solid #dce1e5;
+    border-top-color: #24618c;
+    border-radius: 50%;
+    animation: loadingspin 1s linear infinite;
+}
+[hidden] { display: none; }
+@keyframes loadingspin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) {
+    .loadingspinner { animation: none; }
+}
+button {
+    padding: .65rem 1rem;
+    border: 1px solid #24618c;
+    border-radius: .25rem;
+    font: inherit;
+    color: #fff;
+    background: #24618c;
+    cursor: pointer;
+}
+button:disabled { color: #53606b; background: #e8ecef; border-color: #dce1e5; cursor: wait; }
+button:focus-visible { outline: 3px solid #24618c; outline-offset: 3px; }

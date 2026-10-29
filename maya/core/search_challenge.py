@@ -24,6 +24,7 @@ TOKEN_TTL = 300
 CLEARANCE_TTL = 1800
 DIFFICULTY = 3  # SHA-256 hexadecimal zeroes: approximately 4096 attempts.
 SCRIPT = (Path(__file__).resolve().parent.parent / "static/js/search-challenge.js").read_text(encoding="utf-8")
+STYLE = (Path(__file__).resolve().parent.parent / "static/css/search-challenge.css").read_text(encoding="utf-8")
 
 
 class SearchChallengeMiddleware(BaseHTTPMiddleware):
@@ -73,21 +74,24 @@ class SearchChallengeMiddleware(BaseHTTPMiddleware):
         response = HTMLResponse(
             '<!doctype html><html lang="en"><meta charset="utf-8">'
             '<meta name="viewport" content="width=device-width, initial-scale=1">'
-            "<title>Checking your browser</title><body><main><h1>Checking your browser</h1>"
+            f"<title>Checking your browser</title><style nonce=\"{script_nonce}\">{STYLE}</style>"
+            '<body><main><h1>Checking your browser</h1>'
+            '<div id="loader" class="loadingspinner" aria-hidden="true" hidden></div>'
             '<p id="status" role="status">Please wait a moment before continuing to search.</p>'
             "<noscript>JavaScript and cookies are required to search. Please enable them and reload this page.</noscript>"
             f'<form id="challenge" method="post" action="{VERIFY_PATH}">'
             f'<input type="hidden" name="token" value="{html.escape(token, quote=True)}">'
             '<input type="hidden" name="solution" value="">'
             f'<input type="hidden" id="difficulty" value="{DIFFICULTY}">'
-            f'<input type="hidden" id="wait" value="{MIN_WAIT * 1000 + 250}"></form>'
+            f'<input type="hidden" id="wait" value="{MIN_WAIT * 1000 + 250}">'
+            '<button id="continue-search" type="submit" disabled>Continue to search</button></form>'
             f'<script nonce="{script_nonce}">{SCRIPT}</script></main></body></html>',
             headers={
                 "Cache-Control": "no-store",
                 "X-Robots-Tag": "noindex, nofollow",
                 "Referrer-Policy": "same-origin",
                 "Content-Security-Policy": (
-                    f"default-src 'none'; script-src 'nonce-{script_nonce}'; "
+                    f"default-src 'none'; script-src 'nonce-{script_nonce}'; style-src 'nonce-{script_nonce}'; "
                     "form-action 'self'; base-uri 'none'; frame-ancestors 'none'"
                 ),
             },

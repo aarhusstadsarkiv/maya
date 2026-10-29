@@ -2,6 +2,18 @@
 (async () => {
     const status = document.getElementById('status');
     const form = document.getElementById('challenge');
+    const continueButton = document.getElementById('continue-search');
+    const loader = document.getElementById('loader');
+    loader.hidden = false;
+    let ready = false;
+    form.addEventListener('submit', event => {
+        if (!ready) {
+            event.preventDefault();
+            return;
+        }
+        status.textContent = 'Continuing to search…';
+        loader.hidden = false;
+    });
     const started = performance.now();
     try {
         if (!crypto.subtle) throw new Error('Secure browser required');
@@ -20,9 +32,12 @@
         }
         const remaining = Number(document.getElementById('wait').value) - (performance.now() - started);
         if (remaining > 0) await new Promise(resolve => setTimeout(resolve, remaining));
-        status.textContent = 'Continuing to search…';
-        form.submit();
+        ready = true;
+        loader.hidden = true;
+        continueButton.disabled = false;
+        status.textContent = 'Your browser is ready. Select “Continue to search” to proceed.';
     } catch (error) {
+        loader.hidden = true;
         status.textContent = 'Unable to verify this browser. Enable JavaScript and cookies, use HTTPS, and reload to try again.';
     }
 })();

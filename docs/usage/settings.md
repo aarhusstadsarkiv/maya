@@ -17,7 +17,9 @@ search_keep_results: false
 
 `search_challenge_enabled` defaults to `true`. Before `/search` runs any API
 calls, visitors complete an automatic JavaScript proof of work and a minimum
-two-second wait. The wait happens in the browser and is checked by the server;
+two-second wait, then select **Continue to search**. The button becomes available
+only when both checks are complete; there is no automatic redirect. It supports
+mouse and keyboard activation. The wait happens in the browser and is checked by the server;
 no server worker sleeps. Successful verification sets an HttpOnly, SameSite=Lax
 cookie valid for 30 minutes (Secure on HTTPS). Search filters are preserved.
 
