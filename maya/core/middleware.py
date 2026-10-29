@@ -48,6 +48,7 @@ from maya.core import api, api_client
 from maya.core.hooks import get_hooks
 from maya.core.api_error import OpenAwsException
 from maya.settings_types import ConcurrencyLimitSettings
+from maya.core.search_challenge import SearchChallengeMiddleware
 from starlette.responses import JSONResponse, PlainTextResponse
 
 log = get_log()
@@ -340,6 +341,9 @@ middleware.append(
     )
 )
 middleware.append(Middleware(RequestBeginMiddleware))
+
+if settings["search_challenge_enabled"]:
+    middleware.append(Middleware(SearchChallengeMiddleware, secret=settings["session_secret"]))
 
 if settings["log_api_calls"]:
     middleware.append(Middleware(ApiLogMiddleware))

@@ -65,6 +65,7 @@ settings: Settings = {
     "main_menu_sections": [],
     "search_base_url": "/search",
     "search_keep_results": True,
+    "search_challenge_enabled": True,
     "concurrency_limits": [
         {
             "max": 4,
