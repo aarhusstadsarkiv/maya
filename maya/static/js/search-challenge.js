@@ -11,7 +11,7 @@
             event.preventDefault();
             return;
         }
-        status.textContent = 'Continuing to search…';
+        status.textContent = status.dataset.continuing;
         loader.hidden = false;
     });
     const started = performance.now();
@@ -35,9 +35,9 @@
         ready = true;
         loader.hidden = true;
         continueButton.disabled = false;
-        status.textContent = 'Your browser is ready. Select “Continue to search” to proceed.';
+        status.textContent = status.dataset.ready;
     } catch (error) {
         loader.hidden = true;
-        status.textContent = 'Unable to verify this browser. Enable JavaScript and cookies, use HTTPS, and reload to try again.';
+        status.textContent = status.dataset.error;
     }
 })();

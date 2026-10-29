@@ -48,7 +48,7 @@ from maya.core import api, api_client
 from maya.core.hooks import get_hooks
 from maya.core.api_error import OpenAwsException
 from maya.settings_types import ConcurrencyLimitSettings
-from maya.core.search_challenge import SearchChallengeMiddleware
+from maya.core.search_challenge import SearchChallengeMiddleware, VERIFY_PATH
 from starlette.responses import JSONResponse, PlainTextResponse
 
 log = get_log()
@@ -252,6 +252,10 @@ class AccessLogMiddleware(BaseHTTPMiddleware):
         method = request.method
         path = request.url.path
         query_string = request.url.query
+        if path == VERIFY_PATH:
+            # Verification belongs in the POST body. Do not log tokens even
+            # when a client accidentally sends them in a query string.
+            query_string = ""
         if query_string:
             query_string = f"?{query_string}"
         user_agent = request.headers.get("user-agent", "-")
@@ -273,10 +277,17 @@ class AccessLogMiddleware(BaseHTTPMiddleware):
             # Log response details after it's processed
             status_code = response.status_code
             duration = time() - start_time
+            state = getattr(request, "state", None)
+            outcome = getattr(state, "challenge_outcome", None)
+            reason = getattr(state, "challenge_reason", None)
+            challenge_fields = f" challenge={outcome}" if outcome else ""
+            if outcome and reason:
+                challenge_fields += f" reason={reason}"
 
             # Log the access information to access.log, including client IP and port
             access_log.info(
-                f'{client_ip}:{client_port} - "{method} {path}{query_string}" ' f'{status_code} {duration:.4f}s ua="{user_agent}'
+                f'{client_ip}:{client_port} - "{method} {path}{query_string}" '
+                f'{status_code} {duration:.4f}s ua={json.dumps(user_agent, ensure_ascii=False)}{challenge_fields}'
             )
 
             return response

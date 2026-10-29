@@ -1,5 +1,7 @@
 import asyncio
+import hashlib
 import os
+import re
 from types import SimpleNamespace
 from unittest import IsolatedAsyncioTestCase
 from unittest.mock import AsyncMock, patch
@@ -10,6 +12,7 @@ os.environ.setdefault("BASE_DIR", "sites/aarhus")
 
 from maya.core.logging_context import get_client_ip
 from maya.core.middleware import AccessLogMiddleware, ConcurrencyLimitMiddleware, SameOriginMiddleware
+from maya.core.search_challenge import COOKIE, VERIFY_PATH, SearchChallengeMiddleware
 
 
 class FakeRequest:
@@ -19,6 +22,46 @@ class FakeRequest:
 
 
 class MiddlewareTest(IsolatedAsyncioTestCase):
+    async def test_challenge_outcomes_in_real_access_log_without_tokens(self):
+        import httpx2
+        from starlette.applications import Starlette
+        from starlette.middleware import Middleware
+        from starlette.responses import PlainTextResponse
+        from starlette.routing import Route
+
+        async def search(request):
+            return PlainTextResponse("upstream timeout", status_code=504)
+
+        gate = SearchChallengeMiddleware(None, "test-secret")
+        app = Starlette(
+            routes=[Route("/search", search), Route("/records/1", search)],
+            middleware=[Middleware(AccessLogMiddleware), Middleware(SearchChallengeMiddleware, secret="test-secret")],
+        )
+        with patch("maya.core.middleware.access_log") as logger:
+            async with httpx2.AsyncClient(transport=httpx2.ASGITransport(app=app), base_url="https://testserver") as client:
+                page = await client.get("/search?q=archive")
+                self.assertIn("challenge=issued reason=missing_cookie", logger.info.call_args.args[0])
+                token = re.search(r'name="token" value="([^"]+)"', page.text)[1]
+                data = gate.challenge.loads(token)
+                data["issued"] -= 3
+                token = gate.challenge.dumps(data)
+                solution = next(str(n) for n in range(1000000) if hashlib.sha256(f"{token}:{n}".encode()).hexdigest().startswith("000"))
+                await client.post(VERIFY_PATH + "?token=must-not-be-logged", data={"token": token, "solution": "invalid"})
+                self.assertIn("challenge=failed reason=invalid_proof", logger.info.call_args.args[0])
+                await client.post(VERIFY_PATH, data={"token": token, "solution": solution})
+                self.assertIn("303", logger.info.call_args.args[0])
+                self.assertTrue(logger.info.call_args.args[0].endswith("challenge=passed"))
+                cookie = client.cookies.get(COOKIE)
+                await client.get("/search?q=archive")
+                self.assertIn("504", logger.info.call_args.args[0])
+                self.assertTrue(logger.info.call_args.args[0].endswith("challenge=allowed"))
+                await client.get("/records/1")
+                self.assertNotIn("challenge=", logger.info.call_args.args[0])
+                self.assertEqual(logger.info.call_count, 5)
+                output = "\n".join(call.args[0] for call in logger.info.call_args_list)
+                for private in (token, cookie, data["nonce"], data["ip"], "test-secret", "must-not-be-logged"):
+                    self.assertNotIn(private, output)
+
     async def test_access_log_exposes_client_ip_to_request_logs_and_resets_it(self):
         middleware = AccessLogMiddleware(app=None)
         request = FakeRequest()
