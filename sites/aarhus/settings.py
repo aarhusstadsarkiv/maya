@@ -88,7 +88,7 @@ settings: Settings = {
         {
             "max": 8,
             "retry_after": 5,
-            "paths": ["/search"],
+            "paths": ["/search", "/search/", "/search/json"],
         },
         {
             "max": 8,
