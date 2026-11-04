@@ -19,16 +19,35 @@
 
 <div class="container-table">
 
-    <!-- Quick client-side filter -->
-    <div class="table-filter">
-        <label for="user-filter">Filtrer brugere:</label>
-        <input
-            type="text"
-            id="user-filter"
-            placeholder="E-mail eller navn..."
-            autocomplete="off"
-        >
-    </div>
+    <form class="table-filter" method="get" action="{{ url_for('admin_users_get') }}">
+        <div class="filter-options">
+            <div class="filter-field">
+            <label for="user-filter">Filtrer brugere:</label>
+            <input type="search" id="user-filter" name="pattern" value="{{ pattern }}"
+                   placeholder="E-mail eller navn..." autocomplete="off">
+            </div>
+            <label class="filter-field">
+                <input type="checkbox" name="is_verified" value="true"{% if verified_only %} checked{% endif %}>
+                Er verificeret
+            </label>
+            <div class="filter-field">
+            <label for="user-order">Sortér efter:</label>
+            <select id="user-order" name="order">
+                {% for field, label in sort_fields.items() %}
+                <option value="{{ field }}"{% if order == field %} selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+            </div>
+            <div class="filter-field">
+            <label for="user-direction">Rækkefølge:</label>
+            <select id="user-direction" name="descending">
+                <option value="true"{% if descending %} selected{% endif %}>Faldende</option>
+                <option value="false"{% if not descending %} selected{% endif %}>Stigende</option>
+            </select>
+            </div>
+        </div>
+        <button type="submit">Søg</button>
+    </form>
 
     <table>
         <thead>
@@ -57,7 +76,7 @@
 
                 <td>{{ user.permission_translated }}</td>
                 <td>                    
-                    {{ format_date(user.timestamp) }}
+                    {{ format_date(user.created_at | default(user.timestamp)) }}
                 </td>
 
                 <td>
@@ -65,18 +84,21 @@
                     <a class="action-link delete-user" data-uuid="{{ user.id }}" href="#">Slet</a>   
                 </td>
             </tr>
+        {% else %}
+            <tr><td colspan="6">Ingen brugere fundet.</td></tr>
         {% endfor %}
-    
+        </tbody>
     </table>
     <div class="action-links">
+        <span>Side {{ page_number }}</span>
         {% if has_previous %}
-        <a href="/admin/users/?offset={{prev_offset}}">Forrige</a>
+        <a href="{{ prev_url }}">Forrige</a>
         {% else %}
         <span class="disabled">Forrige</span>
         {% endif %}
     
         {% if has_next %}
-        <a href="/admin/users/?offset={{next_offset}}">Næste</a>
+        <a href="{{ next_url }}">Næste</a>
         {% else %}
         <span class="disabled">Næste</span>
         {% endif %}
@@ -129,28 +151,10 @@
         });
     });
 
-    // client side filter on email + display name ---
-    const filterInput = document.querySelector('#user-filter');
-    const tableRows = document.querySelectorAll('.container-table tbody tr');
-
-    if (filterInput) {
-        filterInput.addEventListener('input', () => {
-            const value = filterInput.value.toLowerCase().trim();
-
-            tableRows.forEach(row => {
-                // email is column 0, name is column 1
-                const email = row.cells[0]?.textContent.toLowerCase() || '';
-                const name = row.cells[1]?.textContent.toLowerCase() || '';
-
-                const matches =
-                    value === '' ||
-                    email.includes(value) ||
-                    name.includes(value);
-
-                row.style.display = matches ? '' : 'none';
-            });
-        });
-    }
+    const filterForm = document.querySelector('.table-filter');
+    filterForm.querySelectorAll('select, input[type="checkbox"]').forEach(control => {
+        control.addEventListener('change', () => filterForm.requestSubmit());
+    });
 
 </script>
 <style>
@@ -177,8 +181,35 @@
         margin-bottom: 10px;
     }
 
-    .table-filter input {
-        max-width: 300px;
+    .filter-options {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px 20px;
+        margin-bottom: 12px;
+    }
+
+    .filter-field {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin: 0;
+    }
+
+    .filter-field label {
+        margin: 0;
+        white-space: nowrap;
+    }
+
+    .filter-field input,
+    .filter-field select {
+        width: auto;
+        margin: 0;
+    }
+
+    .filter-field input[type="search"] {
+        width: 240px;
+        max-width: 100%;
     }
 </style>
 

@@ -9,70 +9,76 @@ from maya.core import user
 from maya.core.dynamic_settings import settings
 from maya.core import flash
 from maya.core.translate import translate
-from maya.core import query
+from urllib.parse import urlencode
 import asyncio
 
 log = get_log()
 
 
-def _get_pagination(request: Request):
-    limit = "1000"
-    offset = int(request.query_params.get("offset", "0"))
-    next_offset = str(offset + int(limit))
-    prev_offset = str(max(offset - int(limit), 0))
-
-    return limit, str(offset), next_offset, prev_offset
+USER_SORT_FIELDS = {
+    "display_name": "Navn",
+    "email": "E-mail",
+    "id": "ID",
+    "created_at": "Oprettet",
+    "updated_at": "Opdateret",
+    "last_login": "Seneste login",
+    "is_active": "Er aktiv",
+    "is_verified": "Er verificeret",
+}
+USER_PAGE_SIZE = 100
 
 
 async def admin_users_get(request: Request):
-    """
-    http://localhost:5555/admin/users?limit=10&descending=true&order=email&is_active=true
-    http://localhost:5555/admin/users?limit=10&descending=true&order=email&is_active=true
-    http://localhost:5555/admin/users?limit=10&descending=true&order=timestamp&is_active=true
-
-    order: id, email, timestamp
-
-    """
     await is_authenticated(request, permissions=["admin"])
 
-    limit, offset, next_offset, prev_offset = _get_pagination(request)
+    params = request.query_params
+    try:
+        offset = max(0, int(params.get("offset", "0")))
+    except ValueError:
+        offset = 0
+    order = params.get("order", "created_at")
+    if order not in USER_SORT_FIELDS:
+        order = "created_at"
+    descending = params.get("descending", "true").lower() == "true"
+    pattern = params.get("pattern", "").strip()
+    verified_only = params.get("is_verified", "false").lower() == "true"
+    query_params = {
+        "limit": USER_PAGE_SIZE,
+        "offset": offset,
+        "order": order,
+        "descending": str(descending).lower(),
+        "is_active": "true",
+    }
+    if pattern:
+        query_params["pattern"] = pattern
+    if verified_only:
+        query_params["is_verified"] = "true"
 
-    query_params = [
-        ("limit", limit),
-        ("offset", offset),
-        ("descending", "true"),
-        # ("order", "created_at"),
-        ("is_active", "true"),
-        # ("pattern", "gmail"),
-    ]
-    query_params_next = [
-        ("limit", limit),
-        ("offset", next_offset),
-        ("descending", "true"),
-        # ("order", "created_at"),
-        ("is_active", "true"),
-        # ("pattern", "gmail"),
-    ]
-
-    query_str = query.get_str_from_list(query_params)
-    query_str_next = query.get_str_from_list(query_params_next)
-
-    users, users_next = await asyncio.gather(api.users_get(request, query_str=query_str), api.users_get(request, query_str=query_str_next))
-
-    has_next = bool(users_next)
-    has_previous = int(offset) > 0
+    users = await api.users_get(request, query_str=urlencode(query_params))
+    # The API has no total count. Probe one row beyond a full page.
+    has_next = False
+    if len(users) == USER_PAGE_SIZE:
+        next_params = {**query_params, "limit": 1, "offset": offset + USER_PAGE_SIZE}
+        has_next = bool(await api.users_get(request, query_str=urlencode(next_params)))
 
     for user_ in users:
         permissions = user.permissions_as_list(user_["permissions"])
         user_["permission_translated"] = user.permission_translated(permissions)
 
+    page_url = str(request.url_for("admin_users_get"))
     context_values = {
         "title": "Brugere",
         "users": users,
         "has_next": has_next,
-        "next_offset": next_offset,
-        "has_previous": has_previous,
-        "prev_offset": prev_offset,
+        "next_url": page_url + "?" + urlencode({**query_params, "offset": offset + USER_PAGE_SIZE}),
+        "has_previous": offset > 0,
+        "prev_url": page_url + "?" + urlencode({**query_params, "offset": max(offset - USER_PAGE_SIZE, 0)}),
+        "page_number": offset // USER_PAGE_SIZE + 1,
+        "pattern": pattern,
+        "verified_only": verified_only,
+        "order": order,
+        "descending": descending,
+        "sort_fields": USER_SORT_FIELDS,
     }
 
     context = await get_context(request, context_values=context_values)
