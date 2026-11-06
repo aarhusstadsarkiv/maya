@@ -486,7 +486,7 @@ wheels = [
 
 [[package]]
 name = "maya"
-version = "1.4.50"
+version = "1.4.51"
 source = { editable = "." }
 dependencies = [
     { name = "aiosqlite" },
