@@ -4,8 +4,8 @@ body {
     margin: 0;
     min-height: 100vh;
     display: grid;
-    place-items: center;
-    padding: 1.5rem;
+    place-items: start center;
+    padding: clamp(1.5rem, 25vh, 12rem) 1.5rem 1.5rem;
     font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     line-height: 1.6;
     color: #24303b;
@@ -31,6 +31,8 @@ p { margin: 0 0 1.5rem; }
     animation: loadingspin 1s linear infinite;
 }
 [hidden] { display: none; }
+/* Keep the loader space reserved when verification finishes. */
+.loadingspinner[hidden] { display: block; visibility: hidden; }
 @keyframes loadingspin { to { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) {
     .loadingspinner { animation: none; }
