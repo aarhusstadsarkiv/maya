@@ -44,7 +44,7 @@ class TestRefresh(unittest.IsolatedAsyncioTestCase):
             )
             self.assertIn("idx_records_magasin", [row[1] for row in connection.execute("PRAGMA index_list(records)")])
         for location, expected in [(" BAUTAVEJ ", "BTV"), ("", "MAG"), (None, "MAG"), ("Elsewhere", "MAG")]:
-            self.assertEqual(utils_orders.get_mag_location_string({"resources": {"location": location}}), expected)
+            self.assertEqual(utils_orders.get_mag_location_string({"resources": {"lokation": location}}), expected)
 
     async def test_refresh_preserves_workflow_and_continues_after_failure(self):
         async def fetch(client, record_id):
@@ -53,7 +53,7 @@ class TestRefresh(unittest.IsolatedAsyncioTestCase):
             # Simulate a staff location change while the API call is in flight.
             with sqlite3.connect(self.path) as connection:
                 connection.execute("UPDATE records SET location = 3 WHERE record_id = ?", (record_id,))
-            return {"id": record_id, "meta_title": "New title", "resources": {"location": "Bautavej"}}, {"title": "New"}
+            return {"id": record_id, "meta_title": "New title", "resources": {"lokation": "Bautavej"}}, {"title": "New"}
 
         with sqlite3.connect(self.path) as connection:
             connection.execute("INSERT INTO orders (user_id, order_status, record_id) VALUES ('SYSTEM', 1, 'one')")
@@ -74,7 +74,7 @@ class TestRefresh(unittest.IsolatedAsyncioTestCase):
         with open("tests/data/record_and_types_000309478.json") as source:
             record = {key: field["value"] for key, field in json.load(source).items()}
         record["admin_data"] = {"Æske": "42"}
-        record["resources"] = [{"location": "Bautavej"}]
+        record["resources"] = [{"lokation": "Bautavej"}]
         record["contractual_status"] = {"id": 1}
         response = Mock()
         response.json.return_value = record

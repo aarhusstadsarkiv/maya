@@ -278,7 +278,7 @@ def get_lb_number(record_and_types: dict) -> str:
 
 def get_mag_location_string(meta_data_dict: dict) -> str:
     # MAG, VCV, BTV
-    placement_str = (meta_data_dict.get("resources", {}).get("location") or "").strip().lower()
+    placement_str = (meta_data_dict.get("resources", {}).get("lokation") or "").strip().lower()
     if "bautavej" in placement_str:
         return "BTV"
     if "vejlby centervej" in placement_str:
