@@ -1,6 +1,6 @@
 [project]
 name = "maya"
-version = "1.4.47"
+version = "1.4.48"
 description = "Aarhus City Archives client for generating individual browser-based GUI-clients"
 license = "MIT"
 readme = "README.md"
