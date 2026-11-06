@@ -191,7 +191,10 @@ BASE_DIR=sites/aarhus python bin/migrate_orders.py
 The migration adds an indexed `records.magasin` column and backfills it from the
 stored metadata (Bautavej → BTV; everything else, including missing locations → MAG).
 New orders and material refreshes use `utils_orders.get_mag_location_string()`.
-To add another Magasin later, update that mapping and run the refresh.
+Vejlby Centervej locations map to VCV, including locations with shelf details.
+After deploying this mapping, run the refresh to update existing materials from MAG
+to VCV. No schema migration is needed for this additional value.
+To add another Magasin later, update that mapping and the filter options, then run the refresh.
 
 ```sh
 maya refresh-order-records sites/aarhus
@@ -212,8 +215,8 @@ Database write transactions are kept short and do not span API requests.
 
 ## Magasin filtering
 
-The `/admin/orders` Magasin selector offers Alle magasiner, MAG and BTV. The URL parameter
-`filter_magasin` defaults to `all`; MAG and BTV match the indexed `records.magasin`
+The `/admin/orders` Magasin selector offers Alle magasiner, MAG, BTV and VCV. The URL parameter
+`filter_magasin` defaults to `all`; MAG, BTV and VCV match the indexed `records.magasin`
 column before pagination in active orders, completed materials and history.
 Changing the selection starts at the first page. “Ryd filtre” preserves the selected Magasin.
 The selection is not saved per administrator and requires no additional migration.

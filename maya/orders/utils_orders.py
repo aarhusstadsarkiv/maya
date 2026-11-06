@@ -253,23 +253,36 @@ def format_log_display(log: dict):
 
 
 def get_lb_number(record_and_types: dict) -> str:
+    numbers = []
     admin_data = record_and_types.get("admin_data", {}).get("value", [])
     if admin_data and isinstance(admin_data, list):
         first_admin_data = admin_data[0]
-        box = first_admin_data.get("Æske")
-        if box:
-            return box
-        lbnr = first_admin_data.get("MeE_Lbnr")
-        if lbnr:
-            return lbnr
-    return ""
+        lb_number = first_admin_data.get("Æske") or first_admin_data.get("MeE_Lbnr")
+        if lb_number:
+            numbers.append(str(lb_number))
+
+    for resource in record_and_types.get("resources", {}).get("value", []) or []:
+        storage_ids = resource.get("storage_id") or []
+        if isinstance(storage_ids, str):
+            storage_ids = [storage_ids]
+        for storage_id in storage_ids:
+            if not isinstance(storage_id, str):
+                continue
+            _, separator, number = storage_id.rpartition("-")
+            number = number.strip()
+            if separator and number.isdecimal() and number not in numbers:
+                numbers.append(number)
+
+    return "/".join(numbers)
 
 
 def get_mag_location_string(meta_data_dict: dict) -> str:
-    # MAG, VCU, BTV
+    # MAG, VCV, BTV
     placement_str = (meta_data_dict.get("resources", {}).get("location") or "").strip().lower()
     if "bautavej" in placement_str:
         return "BTV"
+    if "vejlby centervej" in placement_str:
+        return "VCV"
 
     return "MAG"
 
