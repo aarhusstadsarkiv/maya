@@ -509,7 +509,7 @@ async def _get_print_data(request: Request, order_id: int = 0) -> dict:
 
     # get resources
     resources = meta_data.get("resources", {})
-    resources = {k: v for k, v in resources.items() if k in ["barcode", "location", "storage_id"]}
+    resources = {k: v for k, v in resources.items() if k in ["barcode", "location", "lokation", "storage_id"]}
 
     lb_number = utils_orders.get_lb_number(record_and_types)
     if lb_number:
