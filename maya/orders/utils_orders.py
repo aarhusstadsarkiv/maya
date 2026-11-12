@@ -91,10 +91,10 @@ def get_single_order_message(order: dict) -> str:
         message = "Din bestilling er i kø. Du modtager en e-mail fra os, når materialet er klar til gennemsyn."
     elif order["order_status"] == ORDER_STATUS.APPLICATION:
         message = """
-Du skal søge om tilladelse til materialet
+Materialet du har bestil er utilgængeligt og kræver ansøgning. Du kan søge om tilladelse til materialet
 <a target="_blank" href="https://stadsarkiv.aarhus.dk/brug-arkivet/soeg-adgang-til-arkivmateriale">
 via en formular på Stadsarkivets hjemmeside</a>.
-Når vi har behandlet og godkendt din ansøgning modtager du et svar per e-mail.
+Når vi har behandlet og godkendt din ansøgning, modtager du et svar per e-mail.
 """
     return message
 
