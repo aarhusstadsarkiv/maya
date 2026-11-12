@@ -115,6 +115,14 @@ async def auth_bookmarks_post(request: Request):
         me = await api.users_me_get(request)
         user_id = me["id"]
         json_data = await request.json()
+        if (
+            not isinstance(json_data, dict)
+            or json_data.get("action") not in ("add", "delete")
+            or not isinstance(json_data.get("record_id"), str)
+            or not json_data["record_id"].isascii()
+            or not json_data["record_id"].isdigit()
+        ):
+            return JSONResponse({"message": "Invalid bookmark request.", "error": True}, status_code=400)
         filters = {"user_id": user_id, "record_id": json_data["record_id"]}
         insert_values = filters.copy()
 
