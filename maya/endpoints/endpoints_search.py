@@ -18,31 +18,18 @@ from maya.core.hooks import get_hooks
 from maya.records import normalize_dates
 from maya.settings_query_params import settings_query_params
 from maya.core.object_storage import set_presigned_urls_search
+from maya.core.search_query import get_size_sort_view as get_size_sort_view  # Public import used by site hooks.
+from maya.core.search_query import prepare_search_query, prepare_search_request
 
 log = get_log()
 
-ALLOWED_SEARCH_SORTS = {"_score", "date_from", "date_to", "created_at"}
-ALLOWED_SEARCH_VIEWS = {"list", "gallery", "grid"}
 
-
-def _get_api_acceptable_query_params() -> list:
-    api_accept_query_params = []
-    for key, value in settings_query_params.items():
-        if value.get("search_filter"):
-            api_accept_query_params.append(key)
-
-        if value.get("negatable"):
-            api_accept_query_params.append(f"-{key}")
-
-    return api_accept_query_params
-
-
-def _get_search_pagination_data(request: Request, query_str_pagination, total: int):
+def _get_search_pagination_data(query_params: list, query_str_pagination, total: int):
 
     result = {}
 
-    size, _, _ = get_size_sort_view(request)
-    size = int(str(size))
+    values = dict(query_params)
+    size = int(values.get("size", "20"))
     result["size"] = size
 
     result["query_str"] = query_str_pagination
@@ -52,11 +39,7 @@ def _get_search_pagination_data(request: Request, query_str_pagination, total: i
 
     result["total"] = total
 
-    start_ = request.query_params.get("start", "0")
-    if not start_.isdigit():
-        start_ = "0"
-
-    start = int(start_)
+    start = int(values.get("start", "0"))
     result["start"] = start
 
     total_pages = (total // size) + (1 if total % size != 0 else 0)
@@ -68,13 +51,14 @@ def _get_search_pagination_data(request: Request, query_str_pagination, total: i
     return result
 
 
-def _get_dates(request: Request):
+def _get_dates(query_params: list):
     """
-    Get dates from request. Used in date search form
+    Get prepared dates for the date search form
     """
     dates = {}
-    dates_from = request.query_params.get("date_from", None)
-    dates_to = request.query_params.get("date_to", None)
+    values = dict(query_params)
+    dates_from = values.get("date_from")
+    dates_to = values.get("date_to")
 
     # split dates. From format: yyyymmdd and not yyyy-mm-dd
     if dates_from:
@@ -86,124 +70,7 @@ def _get_dates(request: Request):
     return dates
 
 
-def get_size_sort_view(request: Request):
-    """
-    Get size and sort from request. If not set in request, then get from cookies.
-    If not set in cookie use some default values
-    """
-    size = request.query_params.get("size", request.cookies.get("size", "20"))
-
-    # only accept size between 1 and 1000
-    if not size.isdigit():
-        size = "20"
-
-    if int(size) < 1:
-        size = "1"
-
-    if int(size) > 1000:
-        size = "1000"
-
-    sort_default = settings.get("search_default_sort", "date_from")
-    view_default = settings.get("search_default_view", "list")
-
-    if sort_default not in ALLOWED_SEARCH_SORTS:
-        sort_default = "date_from"
-
-    if view_default not in ALLOWED_SEARCH_VIEWS:
-        view_default = "list"
-
-    sort = request.query_params.get("sort", request.cookies.get("sort", sort_default))
-    view = request.query_params.get("view", request.cookies.get("view", view_default))
-
-    if sort not in ALLOWED_SEARCH_SORTS:
-        sort = sort_default
-
-    if view not in ALLOWED_SEARCH_VIEWS:
-        view = view_default
-
-    return size, sort, view
-
-
-def _get_default_query_params(request: Request):
-    """
-    Get default query_params for records search as list of tuples:
-    size, sort, direction
-    """
-    size, sort, view = get_size_sort_view(request)
-    add_list_items = [("size", size), ("sort", sort), ("view", view)]
-
-    direction = None
-    if sort == "date_to":
-        direction = request.query_params.get("direction", "desc")
-
-    if sort == "date_from":
-        direction = request.query_params.get("direction", "asc")
-
-    if sort == "created_at":
-        direction = request.query_params.get("direction", "desc")
-
-    if direction:
-        add_list_items.append(("direction", direction))
-
-    start = request.query_params.get("start", None)
-    if start:
-
-        if not start.isdigit():
-            start = "0"
-
-        add_list_items.append(("start", start))
-
-    return add_list_items
-
-
-def _check_series(query_params: list) -> list:
-    """
-    Check if a collection is set in query params.
-    If not then remove series from query params
-    """
-    collection = None
-    for key, value in query_params:
-        if key == "collection":
-            collection = True
-
-    for key, value in query_params:
-        if key == "series" and not collection:
-            query_params.remove((key, value))
-
-    return query_params
-
-
-def _clean_amp(query_params_before_search: list) -> list:
-    """
-    Remove amp; from query params
-    """
-
-    for i, (key, value) in enumerate(query_params_before_search):
-        query_params_before_search[i] = (key.replace("amp;", ""), value)
-
-    query_params_before_search = [(key, value) for key, value in query_params_before_search if value]
-    return query_params_before_search
-
-
-def _clean_query_params(query_params: list) -> list:
-    query_params = _check_series(query_params)
-    query_params = _clean_amp(query_params)
-
-    # If key equals collection then remove left padded zeros
-    query_params = [(key, value.lstrip("0")) if key == "collection" else (key, value) for key, value in query_params]
-
-    # remove duplicate query params
-    seen = set()
-    deduped = []
-    for pair in query_params:
-        if pair not in seen:
-            seen.add(pair)
-            deduped.append(pair)
-
-    return deduped
-
-
-def _get_facets_and_filters(request: Request, search_result: dict, query_params=[], query_str=""):
+def _get_facets_and_filters(request: Request, search_result: dict, query_params=None, query_str=""):
     """
     Get facets and filters from a search result
     """
@@ -311,42 +178,18 @@ def _get_record_navigation_cache(search_result: dict, query_params: list) -> dic
     }
 
 
-async def get_search_context_values(request: Request, extra_query_params: list = []) -> dict:
+async def get_search_context_values(request: Request, extra_query_params: list | None = None) -> dict:
     """
     Get all context values used on the search page
     extra_query_params: list of tuples that will be added to the query params before search
     """
     hooks = get_hooks(request)
-
-    q = query.get_search(request)
-    size, sort, view = get_size_sort_view(request)
-
-    api_accept_query_params = _get_api_acceptable_query_params()
-
-    # date_to, date_from, created_at, start, direction are read from query params
-    default_query_params = _get_default_query_params(request)
-    default_query_params.extend(extra_query_params)
-
-    query_params_before_search = query.get_list(
-        request,
-        accept_keys=api_accept_query_params,
-        default_query_params=default_query_params,
-    )
-
-    query_params_before_search = _clean_query_params(query_params_before_search)
-
-    # Alter query params before search
-    # E.g. You may want to remove all collections and add a single collection before search
-    query_params_before_search = await hooks.before_get_search(query_params=query_params_before_search)
+    query_params_before_search = await prepare_search_request(request, extra_query_params, hooks=hooks)
+    values = dict(query_params_before_search)
+    size, sort, view = values["size"], values["sort"], values["view"]
+    q = values.get("q", "")
     query_str_search = query.get_str_from_list(query_params_before_search)
-
-    # If q is 1 char long then alter it to "" to avoid 400 error from API
-    # make copy of query_params_before_search
-    query_params_before_search_copy = query_params_before_search.copy()
-    if q and len(q) == 1:
-        query_params_before_search_copy.append(("q", ""))
-
-    search_result = await api.proxies_records(request, query_params_before_search_copy)
+    search_result = await api.proxies_records(request, query_params_before_search)
 
     # Store internal ephemeral navigation state for the record page.
     request.session["record_navigation_cache"] = _get_record_navigation_cache(search_result, query_params_before_search)
@@ -355,7 +198,8 @@ async def get_search_context_values(request: Request, extra_query_params: list =
 
     # Alter query params after search
     # You may want to remove all curators except one after search results are obtained
-    query_params_after_search = await hooks.after_get_search(query_params=query_params_before_search)
+    query_params_after_search = await hooks.after_get_search(query_params=query_params_before_search.copy())
+    query_params_after_search = prepare_search_query(query_params_after_search)
     search_query_str = query.get_str_from_list(query_params_after_search, remove_keys=["start"])
 
     # Get facets and filters
@@ -366,7 +210,7 @@ async def get_search_context_values(request: Request, extra_query_params: list =
         query_str=search_query_str,
     )
 
-    pagination_data = _get_search_pagination_data(request, search_query_str, search_result["total"])
+    pagination_data = _get_search_pagination_data(query_params_before_search, search_query_str, search_result["total"])
 
     context_values = {
         "q": q,
@@ -381,7 +225,7 @@ async def get_search_context_values(request: Request, extra_query_params: list =
         "view": view,
         "facets": facets,
         "facets_filters": facets_filters,
-        "dates": _get_dates(request),
+        "dates": _get_dates(query_params_before_search),
         "pagination_data": pagination_data,
         "meta_tags": {
             "robots": "noindex, follow",
@@ -393,7 +237,7 @@ async def get_search_context_values(request: Request, extra_query_params: list =
 
 async def search_get(request: Request):
 
-    items = request.query_params.multi_items()
+    items = prepare_search_query(request.query_params.multi_items(), ids_view=True)
 
     # check if tuple ('view', 'ids') is in items as this is a special case
     if ("view", "ids") in items:

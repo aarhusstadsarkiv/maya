@@ -19,6 +19,7 @@ from maya.core import query
 from maya.core.logging import get_log
 from maya.core.proxy_cache import proxy_cache_get, proxy_cache_set, proxy_record_cache_key
 from maya.core.proxy_validation import validate_proxy_id, validate_resource_path
+from maya.core.search_query import get_api_search_query, prepare_search_request
 from urllib.parse import quote
 import typing
 from time import time
@@ -353,36 +354,12 @@ async def proxies_record_get_by_id(request: Request, record_id: str) -> typing.A
             response.raise_for_status()
 
 
-def _check_query_params(query_params_before_search: list) -> list:
-    # get size and start from query_params_before_search, e.g.  [("size", "100"), ("start", "1000")]
-    # it is only possible make search results that takes up 10000 records.
-    # So if start + size exceeds 10000 then minimize size to 10000 - start
-
-    size = [value for key, value in query_params_before_search if key == "size"]
-    start = [value for key, value in query_params_before_search if key == "start"]
-
-    max_size = None
-    if size and start:
-        size_val = size[0]
-        start_val = start[0]
-
-        if int(size_val) + int(start_val) > 10000:
-            max_size = 10000 - int(start_val)
-
-    if max_size:
-        query_params_before_search = [(key, value) for key, value in query_params_before_search if key != "size"]
-        query_params_before_search.append(("size", str(max_size)))
-
-    return query_params_before_search
-
-
 async def proxies_records(request: Request, query_params_before_search: typing.Optional[list] = None) -> typing.Any:
     """
     GET search results from the api
 
     """
-    query_params_before_search = query_params_before_search or []
-    query_params_before_search = _check_query_params(query_params_before_search)
+    query_params_before_search = get_api_search_query(query_params_before_search or [])
 
     query_str = query.get_str_from_list(query_params_before_search)
     query_str = quote(query_str)
@@ -475,17 +452,7 @@ async def proxies_records_from_list(request, query_params) -> typing.Any:
     """
     GET search results from the api
     """
-    query_str = query.get_str_from_list(query_params)
-    query_str = quote(query_str)
-
-    async with api_client.get_async_client() as client:
-        url = base_url + "/proxy/records?params=" + query_str
-        response = await client.get(url)
-
-        if response.is_success:
-            return response.json()
-        else:
-            response.raise_for_status()
+    return await proxies_records(request, query_params)
 
 
 async def proxies_auto_complete(request: Request, query_params: list = []) -> typing.Any:
@@ -553,7 +520,7 @@ async def proxies_view_ids(request: Request) -> typing.Any:
 
 
     """
-    items = request.query_params.multi_items()
+    items = await prepare_search_request(request, ids_view=True)
     return await proxies_view_ids_from_list(items)
 
 
@@ -561,11 +528,8 @@ async def proxies_view_ids_from_list(items: list) -> typing.Any:
     """
     Get all ids from the api
     """
-    query_str = ""
-    for key, value in items:
-        query_str += f"{key}={value}&"
-
-    query_str = quote(query_str)
+    items = get_api_search_query(items, ids_view=True)
+    query_str = quote(query.get_str_from_list(items))
 
     async with api_client.get_async_client() as client:
         url = base_url + "/proxy/records?params=" + query_str

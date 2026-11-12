@@ -91,7 +91,10 @@ class HooksSpec:
 
     async def before_get_search(self, query_params: list) -> list:
         """
-        Alter the search query params. Before the search is executed.
+        Alter prepared search parameters before HTML, JSON, or ids searches.
+        Numeric IDs are unpadded. Output is validated and normalized again.
+        To override a single-value parameter, remove it before adding its new
+        value; conflicting duplicates are rejected. Repeated filters are kept.
         """
         return query_params
 

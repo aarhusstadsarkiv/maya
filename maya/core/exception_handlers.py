@@ -15,12 +15,13 @@ from starlette.exceptions import HTTPException
 from starlette.responses import RedirectResponse, JSONResponse
 from starlette.requests import Request
 from maya.core.templates import templates
-from maya.core.context import get_context
+from maya.core.context import get_context, get_error_context
 from maya.core.translate import translate
 from maya.core.logging import get_log
 from maya.core.logging_context import get_request_client_ip
 from maya.core import flash
 from maya.core.auth import AuthException, AuthExceptionJSON
+from maya.core.search_validation import SearchQueryError
 from httpx2 import HTTPStatusError, TimeoutException
 import traceback
 
@@ -51,6 +52,32 @@ async def not_found(request: Request, exc: HTTPException):
     )
     context = await get_context(request, context_values=context_values)
     return templates.TemplateResponse(request, "errors/default.html", context, status_code=404)
+
+
+async def invalid_search_query(request: Request, exc: SearchQueryError):
+    log.warning(
+        "Invalid search query",
+        extra={
+            "client_ip": get_request_client_ip(request),
+            "error_code": 400,
+            "error_url": str(request.url),
+            "exception": exc.detail,
+        },
+    )
+    # Building the normal template context can fetch the current user from the
+    # API. Reject malformed searches without making any backend requests.
+    headers = {"Cache-Control": "no-store"}
+    if request.url.path == "/search/json" or "ids" in request.query_params.getlist("view"):
+        return JSONResponse({"error": True, "message": exc.detail}, status_code=400, headers=headers)
+    context = get_error_context(
+        request,
+        {
+            "title": f"400 {translate('Invalid search')}",
+            "status_code": 400,
+            "human_error": translate("The link contains invalid search information."),
+        },
+    )
+    return templates.TemplateResponse(request, "errors/default.html", context, status_code=400, headers=headers)
 
 
 async def http_status_error(request: Request, exc: HTTPStatusError):
@@ -153,6 +180,7 @@ async def auth_exception_json_handler(request: Request, exc: AuthExceptionJSON):
 exception_handlers = {
     404: not_found,
     500: server_error,
+    SearchQueryError: invalid_search_query,
     HTTPStatusError: http_status_error,
     TimeoutException: http_timeout_error,
     AuthException: auth_exception_handler,

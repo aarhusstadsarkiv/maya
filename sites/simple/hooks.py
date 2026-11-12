@@ -57,13 +57,13 @@ class Hooks(HooksSpec):
         This example only shows online images (content_type 61) and available online (availability 4)
         """
 
+        # This site's availability restriction replaces the user's selection.
+        query_params = [(key, value) for key, value in query_params if key not in {"availability", "-availability"}]
         content_types = [value for key, value in query_params if key == "content_types"]
         if "61" not in content_types:
             query_params.append(("content_types", "61"))
 
-        content_types = [value for key, value in query_params if key == "availability"]
-        if "4" not in content_types:
-            query_params.append(("availability", "4"))
+        query_params.append(("availability", "4"))
 
         return query_params
 

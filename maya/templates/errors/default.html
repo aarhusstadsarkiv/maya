@@ -6,7 +6,7 @@
 {% include "includes/main_title.html" %}
 
 
-{% if get_setting('debug') %}
+{% if get_setting('debug') and (exc or exc_traceback) %}
 <p>{{ exc }}</p>
 <pre>{{ exc_traceback }}</pre>
 {% endif %}

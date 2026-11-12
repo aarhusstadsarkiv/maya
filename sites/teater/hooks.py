@@ -66,9 +66,6 @@ def _alter_record(context: dict) -> dict:
 
 class Hooks(HooksSpec):
 
-    search_context = {}
-    search_query_str = ""
-
     def __init__(self, request):
         super().__init__(request)
         self.curator = "4"
@@ -153,7 +150,7 @@ class Hooks(HooksSpec):
             api.proxies_get_relations(self.request, type, id),
         )
 
-        Hooks.search_context = search_context
+        self.request.state.teater_search_context = search_context
 
         search_result = search_context["search_result"]
         request_url = str(self.request.url)
@@ -184,7 +181,7 @@ class Hooks(HooksSpec):
         This is a small hack in order to set the search cookie on people and events pages.
         So we can browse the inline search results as a normal search.
         """
-        if "endpoint" not in self.request.scope:
+        if response.status_code >= 400 or "endpoint" not in self.request.scope:
             return response
 
         # Ignore static files
@@ -200,7 +197,9 @@ class Hooks(HooksSpec):
             # only set cookie on 'people' and 'events' because we know a search has been performed
             alter_response_on = ["people", "events"]
             if resource_type in alter_response_on:
-                set_response_cookie(response, Hooks.search_context)
+                search_context = getattr(self.request.state, "teater_search_context", None)
+                if search_context is not None:
+                    set_response_cookie(response, search_context)
 
         return response
 

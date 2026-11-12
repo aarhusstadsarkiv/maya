@@ -14,11 +14,11 @@ log = get_log()
 
 
 class NormalizeFacets:
-    def __init__(self, request: Request, search_result, query_params=[], query_str=""):
+    def __init__(self, request: Request, search_result, query_params=None, query_str=""):
         self._request = request
         self._records = search_result
         self._active_facets = search_result["active_facets"]
-        self._query_params = query_params
+        self._query_params = list(query_params or [])
         self._query_str = query_str
         self._facets_resolved = search_result["facets_resolved"]
         self._filters: list = []
@@ -190,7 +190,7 @@ class NormalizeFacets:
             remove_link = self._get_remove_link(query_name, query_value)
             invert_link = self._get_invert_link(query_name, query_value)
 
-            filter["negated"] = query_name in self._query_params_negated
+            filter["negated"] = (query_name, query_value) in self._query_params_negated
             filter["query_name"] = query_name
             filter["query_value"] = query_value
             filter["remove_link"] = remove_link

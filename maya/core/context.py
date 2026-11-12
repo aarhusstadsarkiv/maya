@@ -16,8 +16,36 @@ from maya.core.auth import sanitize_next_url
 from maya.core.logging import get_log
 from maya.settings_types import PageSettings
 import urllib.parse
+from copy import deepcopy
 
 log = get_log()
+
+
+def get_error_context(request: Request, context_values: dict) -> dict:
+    """Render public navigation without API lookups or application hooks.
+
+    Error responses must work even when request data or the backend is invalid.
+    Copy configured menus because URL generation modifies them in place.
+    """
+    context = {
+        "request": request,
+        "identifier": "",
+        "is_logged_in": False,
+        "is_verified": False,
+        "is_employee": False,
+        "permissions_list": [],
+        "search_query_str": "",
+        "flash_messages": [],
+        "main_menu_system": _generate_menu_urls(request, deepcopy(_get_main_menu_system(False, [], False)), ""),
+        "main_menu_top": _generate_menu_urls(request, deepcopy(settings["main_menu_top"]), ""),
+        "main_menu_sections": deepcopy(settings["main_menu_sections"]),
+        "dark_theme": request.cookies.get("dark_theme", False),
+        "meta_tags": {"robots": "noindex, nofollow"},
+    }
+    context.update(context_values)
+    context.setdefault("meta_title", context["title"])
+    context.setdefault("meta_description", context["title"])
+    return context
 
 
 async def get_context(request: Request, context_values: dict = {}, identifier: str = "") -> dict:

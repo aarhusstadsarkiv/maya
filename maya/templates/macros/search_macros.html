@@ -176,6 +176,9 @@
         <input type="hidden" name="{{ key }}" value="{{ value }}">
         {% endfor %}
         <select name="size" class="select-size" aria-label="Antal resulter per side">
+            {% if size not in ["20", "50", "100"] %}
+            <option value="{{ size }}" selected>{{ size }} {{ translate('Per page') }}</option>
+            {% endif %}
             <option value="20" {% if size=="20" %}selected{% endif %}>{{ translate('20 per page') }}</option>
             <option value="50" {% if size=="50" %}selected{% endif %}>{{ translate('50 per page') }}</option>
             <option value="100" {% if size=="100" %}selected{% endif %}>{{ translate('100 per page') }}</option>
