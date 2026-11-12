@@ -324,7 +324,8 @@ class MiddlewareTest(IsolatedAsyncioTestCase):
         self.assertEqual(response.status_code, 403)
         self.assertEqual(response.body, b'{"error":true,"message":"Forbidden. Bad Origin."}')
         call_next.assert_not_called()
-        log.exception.assert_called_once_with(
+        log.exception.assert_not_called()
+        log.warning.assert_called_once_with(
             "Forbidden request from origin: https://blocked.example",
             extra={
                 "client_ip": "203.0.113.4",

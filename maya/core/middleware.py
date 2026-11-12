@@ -336,7 +336,7 @@ class SameOriginMiddleware(BaseHTTPMiddleware):
                     "error_code": exc.status_code,
                     "error_url": str(request.url),
                 }
-                log.exception(f"Forbidden request from origin: {origin}", extra=extra)
+                log.warning(f"Forbidden request from origin: {origin}", extra=extra)
                 return JSONResponse({"error": True, "message": exc.message}, status_code=exc.status_code)
 
         return await call_next(request)
