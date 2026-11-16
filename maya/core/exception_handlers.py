@@ -22,7 +22,7 @@ from maya.core.logging_context import get_request_client_ip
 from maya.core import flash
 from maya.core.auth import AuthException, AuthExceptionJSON
 from maya.core.search_validation import SearchQueryError
-from httpx2 import HTTPStatusError, TimeoutException
+from httpx2 import ConnectError, HTTPStatusError, TimeoutException
 import traceback
 
 HTML_404_PAGE = "404"
@@ -107,6 +107,32 @@ async def http_status_error(request: Request, exc: HTTPStatusError):
     return templates.TemplateResponse(request, "errors/default.html", context, status_code=exc.response.status_code)
 
 
+async def http_connect_error(request: Request, exc: ConnectError):
+    """Return Bad Gateway when a connection to an external API fails."""
+    status_code = 502
+    context_values = {
+        "title": "502 Bad Gateway",
+        "status_code": status_code,
+        "human_error": (
+            "Der kunne ikke oprettes forbindelse til et API. "
+            "Fejlen er blevet logget, og vi vil kigge på det hurtigst muligt."
+        ),
+        "exc": exc,
+        "exc_traceback": traceback.format_exc(),
+    }
+    log.exception(
+        "HTTP connection error",
+        extra={
+            "client_ip": get_request_client_ip(request),
+            "error_code": status_code,
+            "error_url": str(request.url),
+        },
+    )
+    # The backend may be unavailable, so rendering must not make more API calls.
+    context = get_error_context(request, context_values)
+    return templates.TemplateResponse(request, "errors/default.html", context, status_code=status_code)
+
+
 async def http_timeout_error(request: Request, exc: TimeoutException):
     """
     Any HTTPX2 timeout error (connect/read/write/pool) when calling external APIs.
@@ -182,6 +208,7 @@ exception_handlers = {
     500: server_error,
     SearchQueryError: invalid_search_query,
     HTTPStatusError: http_status_error,
+    ConnectError: http_connect_error,
     TimeoutException: http_timeout_error,
     AuthException: auth_exception_handler,
     AuthExceptionJSON: auth_exception_json_handler,

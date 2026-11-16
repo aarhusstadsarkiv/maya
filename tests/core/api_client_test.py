@@ -13,6 +13,7 @@ from starlette.testclient import TestClient
 
 from maya.core import api_client, exception_handlers
 from maya.core.middleware import ApiLogMiddleware, RequestBeginMiddleware
+from maya.routes import get_app_routes
 
 
 class TestApiClient(IsolatedAsyncioTestCase):
@@ -183,13 +184,18 @@ class TestHttpExceptionHandlers(TestCase):
         with self.assertRaises(httpx2.HTTPStatusError) as raised:
             upstream_response.raise_for_status()
 
-        for error, status in [(raised.exception, 503), (httpx2.ReadTimeout("Timed out", request=upstream_request), 504)]:
+        for error, status in [
+            (raised.exception, 503),
+            (httpx2.ReadTimeout("Timed out", request=upstream_request), 504),
+            (httpx2.ConnectTimeout("Timed out", request=upstream_request), 504),
+            (httpx2.ConnectError("All connection attempts failed", request=upstream_request), 502),
+        ]:
             with self.subTest(status=status):
 
                 async def endpoint(request):
                     raise error
 
-                app = Starlette(routes=[Route("/", endpoint)], exception_handlers=exception_handlers.exception_handlers)
+                app = Starlette(routes=[Route("/", endpoint), *get_app_routes()], exception_handlers=exception_handlers.exception_handlers)
                 with (
                     patch.object(exception_handlers, "get_context", new_callable=AsyncMock, return_value={}),
                     patch.object(exception_handlers, "templates") as templates,
@@ -200,3 +206,27 @@ class TestHttpExceptionHandlers(TestCase):
                     response = client.get("/")
                     self.assertEqual(response.status_code, status)
                     self.assertEqual(templates.TemplateResponse.call_args.kwargs["status_code"], status)
+
+    def test_connection_error_page_avoids_backend_lookups_and_logs_502(self):
+        async def endpoint(request):
+            raise httpx2.ConnectError("All connection attempts failed")
+
+        app = Starlette(routes=[Route("/", endpoint), *get_app_routes()], exception_handlers=exception_handlers.exception_handlers)
+        with (
+            patch.object(exception_handlers, "get_context", new_callable=AsyncMock) as get_context,
+            patch.object(exception_handlers, "templates") as templates,
+            patch.object(exception_handlers, "log") as log,
+            TestClient(app) as client,
+        ):
+            templates.TemplateResponse.side_effect = lambda request, name, context, **kwargs: JSONResponse(
+                {"title": context["title"], "status_code": context["status_code"]}, **kwargs
+            )
+            response = client.get("/")
+            self.assertEqual(response.status_code, 502)
+            self.assertEqual(response.json(), {"title": "502 Bad Gateway", "status_code": 502})
+            get_context.assert_not_awaited()
+            extra = log.exception.call_args.kwargs["extra"]
+            self.assertEqual(extra["error_code"], 502)
+            self.assertEqual(extra["error_url"], "http://testserver/")
+            context = templates.TemplateResponse.call_args.args[2]
+            self.assertIn("httpx2.ConnectError", context["exc_traceback"])
