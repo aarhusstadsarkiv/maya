@@ -37,6 +37,7 @@ MESSAGES = {
         "ready": "Your browser is ready. Select “Continue to search” to proceed.",
         "continuing": "Continuing to search…",
         "error": "Unable to verify this browser. Enable JavaScript and cookies, use HTTPS, and reload to try again.",
+        "failed_title": "Unable to verify your browser",
         "failed": "Verification failed or expired. Enable cookies and",
         "retry": "try again",
     },
@@ -48,6 +49,7 @@ MESSAGES = {
         "ready": "Din browser er klar. Vælg “Fortsæt til søgning” for at fortsætte.",
         "continuing": "Fortsætter til søgningen…",
         "error": "Vi kunne ikke bekræfte din browser. Aktivér JavaScript og cookies, brug HTTPS, og genindlæs siden for at prøve igen.",
+        "failed_title": "Vi kunne ikke bekræfte din browser",
         "failed": "Bekræftelsen mislykkedes eller er udløbet. Aktivér cookies, og",
         "retry": "prøv igen",
     },
@@ -270,10 +272,23 @@ class SearchChallengeMiddleware(BaseHTTPMiddleware):
     def verification_failed(request, reason):
         record_challenge_outcome(request, "failed", reason)
         language = challenge_language(request)
-        messages = MESSAGES[language]
+        messages = {key: html.escape(value, quote=True) for key, value in MESSAGES[language].items()}
+        style_nonce = secrets.token_hex(16)
         return HTMLResponse(
             f'<!doctype html><html lang="{language}"><meta charset="utf-8">'
-            f'<title>{messages["title"]}</title><p>{messages["failed"]} <a href="/search">{messages["retry"]}</a>.</p></html>',
+            '<meta name="viewport" content="width=device-width, initial-scale=1">'
+            f'<title>{messages["failed_title"]}</title><style nonce="{style_nonce}">{STYLE}</style>'
+            f'<body><main><h1>{messages["failed_title"]}</h1>'
+            f'<p>{messages["failed"]} <a href="/search">{messages["retry"]}</a>.</p></main></body></html>',
             status_code=400,
-            headers={"Cache-Control": "no-store", "Content-Language": language},
+            headers={
+                "Cache-Control": "no-store",
+                "Content-Language": language,
+                "X-Robots-Tag": "noindex, nofollow",
+                "Referrer-Policy": "same-origin",
+                "Content-Security-Policy": (
+                    f"default-src 'none'; style-src 'nonce-{style_nonce}'; "
+                    "form-action 'self'; base-uri 'none'; frame-ancestors 'none'"
+                ),
+            },
         )
